@@ -23,7 +23,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
   accept: cd backend && uv run pytest tests/test_ingest_auth.py -q
 
 ## Read API
-- [ ] T08: GET /api/v1/current per SPEC 4.1.
+- [x] T08: GET /api/v1/current per SPEC 4.1.
   accept: cd backend && uv run pytest tests/test_current.py -q
 - [ ] T09: GET /api/v1/series with step buckets per SPEC 4.2, 4.4.
   accept: cd backend && uv run pytest tests/test_series.py -q

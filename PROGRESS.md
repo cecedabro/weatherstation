@@ -50,3 +50,14 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `backend/app/ingest.py`: added `isinstance(readings, list)` guard so that a `"readings"` key with a non-array value (e.g. a string) returns 400 per SPEC 3.5.
 - Created `backend/tests/test_ingest_auth.py` with 10 tests: SPEC 3.4 (missing Authorization header → 401, empty Authorization header → 401, wrong bearer token → 401, valid token succeeds, auth checked before body validation) and SPEC 3.5 (non-JSON body → 400, no `readings` key → 400, `readings` not an array → 400, empty readings array accepted with 0 accepted, malformed body does not store data). Each auth test verifies 0 rows stored.
 - `make check` passes: ruff clean, mypy clean, 57 tests pass (10 new + 47 existing).
+
+## T08: GET /api/v1/current per SPEC 4.1 (done)
+- Implemented `GET /api/v1/current` in `backend/app/main.py`: uses a SQL subquery to find the latest
+  timestamp per (node_id, metric), joins back to get the actual reading values, then groups by node
+  and returns one entry per node with node_id, node_type, last_seen, battery_v, rssi_dbm, and a
+  metrics dict mapping metric name to its latest value.
+- Created `backend/tests/test_current.py` with 11 tests: empty DB returns empty list, latest values
+  returned (not historical), multiple nodes, soil metrics, nodes without readings, response field
+  validation, upsert updates reflected, battery_rssi included, node count correctness, empty metrics
+  for nodes without readings, and unique node_id entries.
+- `make check` passes: ruff clean, mypy clean, 68 tests pass (11 new + 57 existing).
