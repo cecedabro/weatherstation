@@ -19,7 +19,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
   accept: cd backend && uv run pytest tests/test_ingest_ok.py -q
 - [x] T06: Ingest validation, per-item rejection and node_type/metric rule per SPEC 3.2–3.3.
   accept: cd backend && uv run pytest tests/test_ingest_validation.py -q
-- [ ] T07: Ingest auth and malformed envelope per SPEC 3.4–3.5.
+- [x] T07: Ingest auth and malformed envelope per SPEC 3.4–3.5.
   accept: cd backend && uv run pytest tests/test_ingest_auth.py -q
 
 ## Read API

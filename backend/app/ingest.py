@@ -72,6 +72,8 @@ async def ingest_readings(request: Request) -> JSONResponse:
         raise HTTPException(status_code=400, detail="Missing 'readings' array")
 
     readings = body["readings"]
+    if not isinstance(readings, list):
+        raise HTTPException(status_code=400, detail="'readings' must be an array")
     valid_batches, rejected = _validate_batches(readings)
 
     with get_db_context() as db:

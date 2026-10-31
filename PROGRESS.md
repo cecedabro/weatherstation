@@ -45,3 +45,8 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `backend/app/ingest.py`: changed rejected list from `[indices]` to `[{"index": i, "error": "..."}]` per contract README format. Extracted `_validate_batches()` helper that validates each batch against JSON schema and node_type/metric alignment, collecting per-batch rejection details.
 - Created `backend/tests/test_ingest_validation.py` with 8 tests: SPEC 3.2 (missing required field rejected, null timestamp rejected, integer timestamp rejected, mixed valid+invalid batches, all batches invalid) and SPEC 3.3 (soil metric on weather node rejected, weather metric on soil node rejected, mixed valid+type-mismatch batches). Each test asserts HTTP response, rejection index, error presence, and DB state (no rows for rejected batches).
 - `make check` passes: ruff clean, mypy clean, 47 tests pass (8 new + 39 existing).
+
+## T07: Ingest auth and malformed envelope per SPEC 3.4–3.5 (done)
+- Updated `backend/app/ingest.py`: added `isinstance(readings, list)` guard so that a `"readings"` key with a non-array value (e.g. a string) returns 400 per SPEC 3.5.
+- Created `backend/tests/test_ingest_auth.py` with 10 tests: SPEC 3.4 (missing Authorization header → 401, empty Authorization header → 401, wrong bearer token → 401, valid token succeeds, auth checked before body validation) and SPEC 3.5 (non-JSON body → 400, no `readings` key → 400, `readings` not an array → 400, empty readings array accepted with 0 accepted, malformed body does not store data). Each auth test verifies 0 rows stored.
+- `make check` passes: ruff clean, mypy clean, 57 tests pass (10 new + 47 existing).
