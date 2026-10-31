@@ -9,7 +9,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
   accept: make check
 - [x] T02: Add GET /healthz per SPEC 1.2–1.3, config from env. See docs/backend.md §config.
   accept: cd backend && uv run pytest tests/test_health.py -q
-- [ ] T03: Test Postgres fixture (pgserver, see docs/testing.md), models, and Alembic migration for readings and nodes per SPEC 2.1. See docs/backend.md §storage.
+- [x] T03: Test Postgres fixture (pgserver, see docs/testing.md), models, and Alembic migration for readings and nodes per SPEC 2.1. See docs/backend.md §storage.
   accept: cd backend && uv run pytest tests/test_storage.py -q
 - [ ] T04: Store-reading service with upsert per SPEC 2.2–2.3.
   accept: cd backend && uv run pytest tests/test_store.py -q
