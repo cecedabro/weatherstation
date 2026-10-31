@@ -5,7 +5,7 @@ harness also runs `make check`. Keep each task to roughly one module or endpoint
 Read the named doc before starting. Mark boxes: the harness does, not you.
 
 ## Backend foundation
-- [ ] T01: Create the backend skeleton (uv project, FastAPI app factory, ruff+mypy+pytest wired, one trivial passing test) so `make check` passes. See docs/backend.md §skeleton.
+- [x] T01: Create the backend skeleton (uv project, FastAPI app factory, ruff+mypy+pytest wired, one trivial passing test) so `make check` passes. See docs/backend.md §skeleton.
   accept: make check
 - [ ] T02: Add GET /healthz per SPEC 1.2–1.3, config from env. See docs/backend.md §config.
   accept: cd backend && uv run pytest tests/test_health.py -q
