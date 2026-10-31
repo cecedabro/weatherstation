@@ -40,3 +40,8 @@ Appended by the agent after each task: what changed, where, and gotchas for late
   and SPEC 2.3 (no duplicates on re-insert, value updates on conflict, node registry updates,
   mixed accepted/rejected batches, empty batch list, soil batch, partial metrics).
 - `make check` passes: ruff clean, mypy clean, 33 tests pass (11 new + 22 existing).
+
+## T06: Ingest validation, per-item rejection and node_type/metric rule (done)
+- Updated `backend/app/ingest.py`: changed rejected list from `[indices]` to `[{"index": i, "error": "..."}]` per contract README format. Extracted `_validate_batches()` helper that validates each batch against JSON schema and node_type/metric alignment, collecting per-batch rejection details.
+- Created `backend/tests/test_ingest_validation.py` with 8 tests: SPEC 3.2 (missing required field rejected, null timestamp rejected, integer timestamp rejected, mixed valid+invalid batches, all batches invalid) and SPEC 3.3 (soil metric on weather node rejected, weather metric on soil node rejected, mixed valid+type-mismatch batches). Each test asserts HTTP response, rejection index, error presence, and DB state (no rows for rejected batches).
+- `make check` passes: ruff clean, mypy clean, 47 tests pass (8 new + 39 existing).
