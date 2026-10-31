@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://garden.cedricschippers.dev/schemas/reading.json",
+  "title": "Reading batch",
+  "description": "One MQTT message / one POST body: a batch of readings from one node at one time.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["node_id", "node_type", "ts", "fw", "metrics"],
+  "properties": {
+    "node_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{3,32}$",
+      "description": "Stable per-device id, e.g. 'weather-main' or 'soil-bed-3'."
+    },
+    "node_type": {
+      "type": "string",
+      "enum": ["weather", "soil"],
+      "description": "Determines which metrics are expected. See metric table in README."
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp of the reading, RFC3339, e.g. 2026-05-01T12:34:56Z. Nodes stamp it themselves after an NTP sync."
+    },
+    "fw": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Firmware semver of the node."
+    },
+    "battery_v": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 20,
+      "description": "Battery voltage in volts, or null for mains-powered nodes."
+    },
+    "rssi_dbm": {
+      "type": ["integer", "null"],
+      "minimum": -120,
+      "maximum": 0,
+      "description": "Wi-Fi signal strength in dBm, or null."
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Only the fields valid for this node_type are allowed; all are optional (a sensor may be missing), but an empty metrics object is invalid.",
+      "minProperties": 1,
+      "properties": {
+        "temp_c":          {"type": "number", "minimum": -50, "maximum": 80,   "description": "Air temperature, °C (weather)"},
+        "humidity_pct":    {"type": "number", "minimum": 0,   "maximum": 100,  "description": "Relative humidity, % (weather)"},
+        "pressure_hpa":    {"type": "number", "minimum": 800, "maximum": 1100, "description": "Barometric pressure, hPa (weather)"},
+        "rain_mm":         {"type": "number", "minimum": 0,   "maximum": 1000, "description": "Rainfall since the last reading, mm (weather)"},
+        "wind_speed_ms":   {"type": "number", "minimum": 0,   "maximum": 120,  "description": "Wind speed, m/s (weather)"},
+        "wind_dir_deg":    {"type": "number", "minimum": 0,   "maximum": 360,  "description": "Wind direction, degrees clockwise from north (weather)"},
+        "soil_moisture_pct":{"type": "number","minimum": 0,   "maximum": 100,  "description": "Calibrated volumetric soil moisture, % (soil)"},
+        "soil_temp_c":     {"type": "number", "minimum": -30, "maximum": 60,   "description": "Soil temperature, °C (soil)"}
+      }
+    }
+  }
+}
