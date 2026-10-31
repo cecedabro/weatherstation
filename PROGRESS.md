@@ -22,3 +22,13 @@ Appended by the agent after each task: what changed, where, and gotchas for late
   and SPEC 1.3 (Settings defaults are correct, env var overrides work, /healthz works even with bad DATABASE_URL).
 - Existing `backend/app/config.py` and `backend/app/main.py` already implement config and /healthz from T01.
 - `make check` passes: ruff clean, mypy clean, 10 tests pass (5 new + 5 contract tests).
+
+## T04: Store-reading service with upsert (done)
+- Created `backend/app/store.py` with `upsert_readings(db, batches)` service function that
+  upserts node rows (ON CONFLICT on `node_id` PK) and one metric reading row per entry
+  (ON CONFLICT on `(node_id, metric, ts)` unique constraint). Returns `{"accepted": n,
+  "rejected": [<indices>]}`. Invalid timestamps cause per-batch rejection.
+- Created `backend/tests/test_store.py` with 11 tests covering SPEC 2.2 (one row per metric)
+  and SPEC 2.3 (no duplicates on re-insert, value updates on conflict, node registry updates,
+  mixed accepted/rejected batches, empty batch list, soil batch, partial metrics).
+- `make check` passes: ruff clean, mypy clean, 33 tests pass (11 new + 22 existing).
