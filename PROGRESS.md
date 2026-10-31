@@ -16,3 +16,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `.gitignore` to exclude `__pycache__/` and cache directories (prevents protected path errors
   when contract tests create pycache during `make check`).
 - `make check` passes: ruff clean, mypy clean, 6 tests pass (1 new + 5 contract tests).
+
+## T02: Config from env + health tests (done)
+- Created `backend/tests/test_health.py` with 4 tests covering SPEC 1.2 (healthz returns 200 with correct body)
+  and SPEC 1.3 (Settings defaults are correct, env var overrides work, /healthz works even with bad DATABASE_URL).
+- Existing `backend/app/config.py` and `backend/app/main.py` already implement config and /healthz from T01.
+- `make check` passes: ruff clean, mypy clean, 10 tests pass (5 new + 5 contract tests).

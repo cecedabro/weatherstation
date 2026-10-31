@@ -7,7 +7,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
 ## Backend foundation
 - [x] T01: Create the backend skeleton (uv project, FastAPI app factory, ruff+mypy+pytest wired, one trivial passing test) so `make check` passes. See docs/backend.md §skeleton.
   accept: make check
-- [ ] T02: Add GET /healthz per SPEC 1.2–1.3, config from env. See docs/backend.md §config.
+- [x] T02: Add GET /healthz per SPEC 1.2–1.3, config from env. See docs/backend.md §config.
   accept: cd backend && uv run pytest tests/test_health.py -q
 - [ ] T03: Test Postgres fixture (pgserver, see docs/testing.md), models, and Alembic migration for readings and nodes per SPEC 2.1. See docs/backend.md §storage.
   accept: cd backend && uv run pytest tests/test_storage.py -q
