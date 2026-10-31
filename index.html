@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GardenLog — Gardening Information Logger</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #6ec4f0 0%, #a8e06a 50%, #5aad28 100%);
+    background-attachment: fixed;
+    color: #1a3a0a;
+  }
+
+  /* Glossy header */
+  .header {
+    background: linear-gradient(180deg, #4a9fd4 0%, #2e7db5 50%, #1a6ba5 100%);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.35);
+    border-bottom: 2px solid #5ab5e8;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
+  }
+
+  .header h1 {
+    font-size: 32px;
+    color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    position: relative;
+    letter-spacing: -0.5px;
+  }
+
+  .header h1 span { color: #d0f5a0; }
+
+  .header-logo {
+    width: 52px; height: 52px;
+    background: radial-gradient(circle at 35% 35%, #a8f06a, #4aad20);
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25), inset 0 -2px 4px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    position: relative;
+  }
+
+  /* Water bubble decorations */
+  .bubble {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), rgba(255,255,255,0.05));
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: inset 0 -4px 8px rgba(0,0,0,0.04), inset 0 2px 4px rgba(255,255,255,0.2);
+    pointer-events: none;
+    z-index: 0;
+    animation: float 12s ease-in-out infinite;
+  }
+  .bubble:nth-child(1) { width: 80px; height: 80px; top: 15%; left: 5%; animation-delay: 0s; }
+  .bubble:nth-child(2) { width: 120px; height: 120px; top: 40%; right: 8%; animation-delay: -3s; }
+  .bubble:nth-child(3) { width: 60px; height: 60px; bottom: 20%; left: 15%; animation-delay: -6s; }
+  .bubble:nth-child(4) { width: 90px; height: 90px; bottom: 10%; right: 18%; animation-delay: -9s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.04); }
+  }
+
+  /* Main container */
+  .container {
+    max-width: 960px;
+    margin: 40px auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Glass card */
+  .card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.2) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  .card h2 {
+    font-size: 22px;
+    color: #1a5c0a;
+    margin-bottom: 20px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card h2 .icon {
+    font-size: 24px;
+  }
+
+  /* Form */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  .form-group { display: flex; flex-direction: column; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2a5a1a;
+    margin-bottom: 6px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 14px;
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.3) 100%);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06), 0 1px 0 rgba(255,255,255,0.5);
+    color: #1a3a0a;
+    outline: none;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: #5ab5e8;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06), 0 0 0 3px rgba(90,181,232,0.3);
+  }
+
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  /* Glossy button */
+  .btn-glossy {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 30px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    border: 1px solid #3a9a30;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(180deg, #6ad850 0%, #3db828 50%, #2a9a18 100%);
+    box-shadow: 0 4px 14px rgba(40,140,30,0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+    transition: transform 0.1s, box-shadow 0.2s;
+    margin-top: 10px;
+  }
+
+  .btn-glossy:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(40,140,30,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+
+  .btn-glossy:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(40,140,30,0.3), inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .btn-glossy .btn-shine {
+    position: relative;
+  }
+
+  .btn-glossy::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+    border-radius: 12px 12px 0 0;
+    pointer-events: none;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.25) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  .stat-card .stat-icon { font-size: 36px; margin-bottom: 8px; }
+  .stat-card .stat-value { font-size: 32px; font-weight: 700; color: #1a5c0a; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
+  .stat-card .stat-label { font-size: 13px; color: #3a6a2a; margin-top: 4px; font-weight: 500; }
+
+  /* Table */
+  .entries-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+  }
+
+  .entries-table thead th {
+    background: linear-gradient(180deg, #e8f8e0 0%, #d0eac8 100%);
+    border: none;
+    border-bottom: 2px solid #8ac070;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    color: #1a5c0a;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+  }
+
+  .entries-table thead th:first-child { border-radius: 10px 0 0 0; }
+  .entries-table thead th:last-child { border-radius: 0 10px 0 0; }
+
+  .entries-table tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(138,192,112,0.25);
+    color: #2a4a1a;
+  }
+
+  .entries-table tbody tr {
+    transition: background 0.15s;
+  }
+
+  .entries-table tbody tr:hover {
+    background: rgba(255,255,255,0.25);
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-badge.planted {
+    background: linear-gradient(180deg, #a0e870, #70cc40);
+    color: #1a4a0a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4);
+    border: 1px solid #80d850;
+  }
+
+  .status-badge.watered {
+    background: linear-gradient(180deg, #60c8f0, #30a0d0);
+    color: #0a2a40;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4);
+    border: 1px solid #50b8e0;
+  }
+
+  .status-badge.harvested {
+    background: linear-gradient(180deg, #f0d060, #d0a830);
+    color: #4a3a0a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4);
+    border: 1px solid #e0c040;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 30px;
+    color: rgba(20,60,10,0.55);
+    font-size: 13px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+  }
+
+  /* Water drop decorations */
+  .waterdrop {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle at 40% 35%, #90d8f8, #3090c0);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: inset 0 -2px 3px rgba(0,0,0,0.1), inset 0 2px 3px rgba(255,255,255,0.3);
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  .leaf-icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background: radial-gradient(circle at 40% 35%, #90f060, #40a020);
+    border-radius: 2px 50% 50% 50%;
+    transform: rotate(-45deg);
+    box-shadow: inset 0 -1px 2px rgba(0,0,0,0.08), inset 0 1px 2px rgba(255,255,255,0.3);
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  /* No entries message */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #4a7a3a;
+    font-size: 15px;
+  }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr; }
+    .header { padding: 20px 24px; }
+    .header h1 { font-size: 24px; }
+    .card { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bubble"></div>
+<div class="bubble"></div>
+<div class="bubble"></div>
+<div class="bubble"></div>
+
+<div class="header">
+  <div>
+    <h1>🌿 Garden<span>Log</span></h1>
+  </div>
+  <div class="header-logo">🌻</div>
+</div>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">🌱</div>
+      <div class="stat-value" id="statPlants">0</div>
+      <div class="stat-label">Plants Logged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💧</div>
+      <div class="stat-value" id="statWatered">0</div>
+      <div class="stat-label">Waterings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🧺</div>
+      <div class="stat-value" id="statHarvested">0</div>
+      <div class="stat-label">Harvests</div>
+    </div>
+  </div>
+
+  <!-- Add Entry Card -->
+  <div class="card">
+    <h2><span class="icon">📝</span> Log New Entry</h2>
+    <form id="logForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="date">Date</label>
+          <input type="date" id="date" required>
+        </div>
+        <div class="form-group">
+          <label for="type">Activity Type</label>
+          <select id="type" required>
+            <option value="">Select...</option>
+            <option value="Planted">🌱 Planted</option>
+            <option value="Watered">💧 Watered</option>
+            <option value="Fertilized">🧪 Fertilized</option>
+            <option value="Pruned">✂️ Pruned</option>
+            <option value="Harvested">🧺 Harvested</option>
+            <option value="Pested">🐛 Pest Treatment</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="plant">Plant / Area</label>
+          <input type="text" id="plant" placeholder="e.g. Tomato Bed A, Basil Pot" required>
+        </div>
+        <div class="form-group">
+          <label for="variety">Variety (optional)</label>
+          <input type="text" id="variety" placeholder="e.g. Cherry Tomato">
+        </div>
+        <div class="form-group full">
+          <label for="notes">Notes</label>
+          <textarea id="notes" placeholder="Any observations, measurements, or thoughts..."></textarea>
+        </div>
+      </div>
+      <button type="submit" class="btn-glossy"><span class="btn-shine">✨</span> Save Entry</button>
+    </form>
+  </div>
+
+  <!-- Entries Card -->
+  <div class="card">
+    <h2><span class="icon">📋</span> Garden Journal</h2>
+    <div id="entriesContent">
+      <div class="empty-state">
+        <div class="empty-icon">🌾</div>
+        <div>No entries yet — start logging your garden activities above!</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  GardenLog — Your personal gardening companion 💚
+</div>
+
+<script>
+  const entries = [];
+
+  // Set default date to today
+  document.getElementById('date').valueAsDate = new Date();
+
+  document.getElementById('logForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const entry = {
+      id: Date.now(),
+      date: document.getElementById('date').value,
+      type: document.getElementById('type').value,
+      plant: document.getElementById('plant').value.trim(),
+      variety: document.getElementById('variety').value.trim(),
+      notes: document.getElementById('notes').value.trim()
+    };
+
+    entries.unshift(entry);
+    renderEntries();
+    updateStats();
+    this.reset();
+    document.getElementById('date').valueAsDate = new Date();
+  });
+
+  function getTypeIcon(type) {
+    const icons = { Planted: '🌱', Watered: '💧', Fertilized: '🧪', Pruned: '✂️', Harvested: '🧺', Pest: '🐛' };
+    return icons[type] || '📌';
+  }
+
+  function getStatusClass(type) {
+    if (['Planted'].includes(type)) return 'planted';
+    if (['Watered'].includes(type)) return 'watered';
+    if (['Harvested'].includes(type)) return 'harvested';
+    return 'planted';
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function renderEntries() {
+    const container = document.getElementById('entriesContent');
+    if (entries.length === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">🌾</div><div>No entries yet — start logging your garden activities above!</div></div>`;
+      return;
+    }
+
+    let html = `<table class="entries-table">
+      <thead><tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Plant / Area</th>
+        <th>Variety</th>
+        <th>Notes</th>
+        <th></th>
+      </tr></thead><tbody>`;
+
+    entries.forEach(entry => {
+      html += `<tr>
+        <td>${formatDate(entry.date)}</td>
+        <td><span class="status-badge ${getStatusClass(entry.type)}">${getTypeIcon(entry.type)} ${entry.type}</span></td>
+        <td><strong>${entry.plant}</strong></td>
+        <td>${entry.variety || '—'}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${entry.notes || ''}">${entry.notes || '—'}</td>
+        <td><button onclick="deleteEntry(${entry.id})" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:0.5;" title="Delete">🗑️</button></td>
+      </tr>`;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+  }
+
+  function deleteEntry(id) {
+    const idx = entries.findIndex(e => e.id === id);
+    if (idx !== -1) entries.splice(idx, 1);
+    renderEntries();
+    updateStats();
+  }
+
+  function updateStats() {
+    document.getElementById('statPlants').textContent = entries.filter(e => e.type === 'Planted').length;
+    document.getElementById('statWatered').textContent = entries.filter(e => e.type === 'Watered').length;
+    document.getElementById('statHarvested').textContent = entries.filter(e => e.type === 'Harvested').length;
+  }
+</script>
+
+</body>
+</html>
