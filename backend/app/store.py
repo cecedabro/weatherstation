@@ -18,9 +18,7 @@ from app.models import Node, Reading
 Batch = dict[str, Any]
 
 
-def upsert_readings(
-    db: Session, batches: Sequence[Batch]
-) -> dict[str, Any]:
+def upsert_readings(db: Session, batches: Sequence[Batch]) -> dict[str, Any]:
     """Upsert reading batches and return acceptance summary.
 
     For each batch:

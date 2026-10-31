@@ -88,3 +88,13 @@ def db(pg_url, pg_migrate) -> Iterator[Session]:
     except Exception:
         session.rollback()
     session.close()
+
+
+@pytest.fixture()
+def client(db):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    with TestClient(app) as c:
+        yield c

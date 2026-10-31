@@ -18,6 +18,10 @@ def create_app() -> FastAPI:
     async def nodes() -> list[dict[str, str | bool]]:
         return []
 
+    from app.ingest import router as ingest_router
+
+    application.include_router(ingest_router)
+
     return application
 
 

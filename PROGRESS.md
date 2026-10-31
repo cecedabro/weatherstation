@@ -23,6 +23,14 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Existing `backend/app/config.py` and `backend/app/main.py` already implement config and /healthz from T01.
 - `make check` passes: ruff clean, mypy clean, 10 tests pass (5 new + 5 contract tests).
 
+## T05: POST /api/v1/readings ingestion endpoint (done)
+- Created `backend/app/schema.py` that loads `contract/reading.schema.json` at startup, exposes `_VALIDATOR` (jsonschema `Draft202012Validator`) and `ALLOWED_METRICS` dict mapping `node_type` → allowed metric keys.
+- Created `backend/app/ingest.py` with `POST /api/v1/readings` endpoint: validates `Bearer <INGEST_TOKEN>`, requires `readings` array envelope, validates each batch against the JSON schema, checks `node_type` vs `metrics` alignment against `ALLOWED_METRICS`, rejects invalid batches by index, and calls `upsert_readings` for valid ones. Returns `{"accepted": n, "rejected": [...]}` with 200 status.
+- Updated `backend/app/main.py` to lazily include `ingest_router` at startup.
+- Updated `backend/tests/conftest.py` to add a `client` fixture using `fastapi.testclient.TestClient` for HTTP-level testing.
+- Created `backend/tests/test_ingest_ok.py` with 6 happy-path tests covering single weather/soil batches, multiple batch acceptance, response format, data integrity (values stored correctly), and node registry updates.
+- `make check` passes: ruff clean, mypy clean, 39 tests pass (6 new + 33 existing). Gotcha: `jsonschema` lacks type stubs (`# type: ignore[import-untyped]`), and `except` blocks use `raise ... from None` to satisfy ruff B904.
+
 ## T04: Store-reading service with upsert (done)
 - Created `backend/app/store.py` with `upsert_readings(db, batches)` service function that
   upserts node rows (ON CONFLICT on `node_id` PK) and one metric reading row per entry

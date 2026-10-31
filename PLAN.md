@@ -15,7 +15,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
   accept: cd backend && uv run pytest tests/test_store.py -q
 
 ## Ingest
-- [ ] T05: POST /api/v1/readings happy path per SPEC 3.1. See docs/backend.md §ingest.
+- [x] T05: POST /api/v1/readings happy path per SPEC 3.1. See docs/backend.md §ingest.
   accept: cd backend && uv run pytest tests/test_ingest_ok.py -q
 - [ ] T06: Ingest validation, per-item rejection and node_type/metric rule per SPEC 3.2–3.3.
   accept: cd backend && uv run pytest tests/test_ingest_validation.py -q
