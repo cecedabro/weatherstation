@@ -50,7 +50,7 @@ T10 and T14 above were skipped; these replace them. Do them in order.
   accept: cd backend && uv run pytest tests/test_nodes.py tests/test_current.py ../contract/tests -q
 - [x] T17: Move the HTML routes out of `app/main.py` (`/` into `app/web.py`, `/admin` into `app/admin.py`) so `main.py` only builds the app and includes routers. No behaviour change: every existing test must still pass unmodified.
   accept: cd backend && uv run pytest -q
-- [ ] T18: Vendor uPlot into `app/static/vendor/` (see docs/frontend.md §charts) and serve it. Note the version in PROGRESS.md. Test that `/static/vendor/uPlot.iife.min.js` and the CSS return 200.
+- [~] T18: Vendor uPlot into `app/static/vendor/` (see docs/frontend.md §charts) and serve it. Note the version in PROGRESS.md. Test that `/static/vendor/uPlot.iife.min.js` and the CSS return 200. — skipped: agent made no changes
   accept: cd backend && uv run pytest tests/test_vendor_assets.py -q
 - [ ] T19: Chart section on `/` (SPEC 5.2): a container, and a day/week/month selector rendered server-side as links or buttons carrying the `from`, `to` and `step` for `/api/v1/series` (day→5m, week→1h, month→1d). Write `tests/test_page_chart.py` asserting the container, the three selector options, and the exact series query values.
   accept: cd backend && uv run pytest tests/test_page_chart.py -q
