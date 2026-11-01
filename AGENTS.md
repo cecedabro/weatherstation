@@ -39,6 +39,7 @@ If they fail, your work is thrown away and the task is retried with the error.
 So: **run `make check` yourself before you stop, and fix what fails.**
 
 ## Rules
+- There is no human to answer questions. Never ask for confirmation or "would you like me to continue". Decide the simplest option, do the task, and note the choice in `PROGRESS.md`.
 - Change only what the task needs. Do not start other tasks.
 - Never edit `contract/`, `SPEC.md`, `PLAN.md`, or `AGENTS.md`. If a contract
   test seems wrong, make your code satisfy it and note the concern in `PROGRESS.md`.
@@ -72,5 +73,6 @@ So: **run `make check` yourself before you stop, and fix what fails.**
 - `make setup` — install backend deps (`uv sync`). Tests start their own throwaway Postgres (see `docs/testing.md`); there is no Docker here.
 - `make check` — lint + type-check + all tests of every part that exists (also the contract tests). Must pass after every task.
 - `make fmt` — autoformat (ruff). Run before `make check`.
+- `make dev` — run the site on :8000 with a throwaway Postgres and fake readings (for humans previewing; don't use it in tests).
 - `make run` — run the backend locally (needs a Postgres at `DATABASE_URL`; usually you only need the tests).
 See each area doc for area-specific commands (PlatformIO builds, etc.).

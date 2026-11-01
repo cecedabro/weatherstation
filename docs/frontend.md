@@ -26,6 +26,9 @@ the data it must show.
   never a stack trace or a broken chart.
 
 ## §charts
+- Vendoring uPlot: `npm` is installed. In a temp dir run `npm pack uplot`, extract the
+  tarball, and copy `dist/uPlot.iife.min.js` and `dist/uPlot.min.css` into
+  `backend/app/static/vendor/`. Record the version from `package.json` in PROGRESS.md.
 - Pick ONE small charting library (e.g. uPlot or Chart.js). Vendor it into
   `static/vendor/`. Note the choice and version in PROGRESS.md. Do not add a
   second chart library later.
