@@ -37,7 +37,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
   accept: cd backend && uv run pytest tests/test_page_home.py -q
 - [x] T13: Current-conditions and latest-soil sections on / per SPEC 5.1.
   accept: cd backend && uv run pytest tests/test_page_current.py -q
-- [ ] T14: History chart with day/week/month selector per SPEC 5.2. See docs/frontend.md §charts.
+- [~] T14: History chart with day/week/month selector per SPEC 5.2. See docs/frontend.md §charts. — skipped: $ cd backend && uv run pytest tests/test_page_chart.py -q  (exit 4)
   accept: cd backend && uv run pytest tests/test_page_chart.py -q
 
 ## Admin
