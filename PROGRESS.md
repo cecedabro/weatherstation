@@ -61,3 +61,21 @@ Appended by the agent after each task: what changed, where, and gotchas for late
   validation, upsert updates reflected, battery_rssi included, node count correctness, empty metrics
   for nodes without readings, and unique node_id entries.
 - `make check` passes: ruff clean, mypy clean, 68 tests pass (11 new + 57 existing).
+
+## T09: GET /api/v1/series + GET /api/v1/nodes per SPEC 4.2–4.4 (done)
+- Rewrote `backend/app/readapi.py` with fully implemented `/series` and `/nodes` endpoints.
+- `/series` (SPEC 4.2): `step=raw` returns individual points ordered by ts; `5m/1h/1d` bucketed
+  aggregation using `func.date_trunc` + offset math (5m), `date_trunc("hour")` (1h),
+  `date_trunc("day")` (1d). Rain uses `func.sum`, all others use `func.avg`. Filters for node,
+  metric, from/to applied to both paths.
+- `/series` (SPEC 4.4): `SeriesParams` Pydantic model validates `step` against `_VALID_STEPS`
+  and datetime strings via `fromisoformat`. Returns 400 on invalid input.
+- `/nodes` (SPEC 4.3): Returns all nodes with `online` flag based on 15-minute last_seen window.
+- Created `backend/tests/test_series.py` with 17 tests covering SPEC 4.2 (raw, 5m, 1h, 1d, rain_mm
+  sum, node/metric filtering, bucketed filtering, from/to bounds) and SPEC 4.4 (invalid step,
+  malformed dates, step validation, node/metric validation, from/to validation).
+- Gotcha: `TestClient` does not URL-encode `+` in query strings (`+00:00` becomes a space).
+  Fixed in validator by replacing spaces with `+`.
+- Gotcha: `5m` bucket SQL uses `literal_column("INTERVAL '5 minutes'")` instead of Python `timedelta`
+  to avoid "interval string has wrong format" Postgres error.
+- `make check` passes: ruff clean, mypy clean, 85 tests pass (17 new + 68 existing).

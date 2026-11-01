@@ -1,0 +1,204 @@
+"""Read API endpoints: /current, /series, /nodes per SPEC 4.1–4.4."""
+
+from datetime import UTC, datetime, timedelta
+from typing import Any
+
+from fastapi import APIRouter, Query
+from pydantic import BaseModel, field_validator
+from sqlalchemy import ColumnElement, func, literal_column, select
+
+from app.db import SessionLocal
+from app.models import Node, Reading
+
+router = APIRouter()
+
+_VALID_STEPS = {"raw", "5m", "1h", "1d"}
+
+
+class SeriesParams(BaseModel):
+    """Validated series query parameters."""
+
+    node: str | None = None
+    metric: str | None = None
+    step: str = "raw"
+    from_ts: str | None = None
+    to_ts: str | None = None
+
+    @field_validator("step")
+    @classmethod
+    def validate_step(cls, v: str) -> str:
+        if v not in _VALID_STEPS:
+            raise ValueError(
+                f"Invalid step '{v}'. Must be one of: raw, 5m, 1h, 1d"
+            )
+        return v
+
+    @field_validator("from_ts", "to_ts")
+    @classmethod
+    def validate_datetime(cls, v: str | None) -> str | None:
+        if v is None or v == "":
+            return None
+        # Handle URL-decoded + as space (legacy query string behavior)
+        v = v.replace(" ", "+")
+        try:
+            datetime.fromisoformat(v.replace("Z", "+00:00"))
+        except (ValueError, TypeError) as err:
+            raise ValueError(
+                f"Invalid datetime '{v}'. Must be RFC3339 UTC (e.g. 2026-05-01T12:00:00Z)"
+            ) from err
+        return v
+
+
+def _parse_dt(s: str | None) -> datetime | None:
+    """Parse an RFC3339 datetime string to UTC datetime."""
+    if s is None or s == "":
+        return None
+    return datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+
+def _bucket_column(step: str) -> ColumnElement[Any] | None:
+    """Return the SQL expression for bucketing timestamps."""
+    if step == "raw":
+        return None
+    if step == "5m":
+        return func.date_trunc("hour", Reading.ts) + (
+            func.floor(func.extract("minute", Reading.ts) / 5.0)
+            * literal_column("INTERVAL '5 minutes'")
+        )
+    if step == "1h":
+        return func.date_trunc("hour", Reading.ts)
+    if step == "1d":
+        return func.date_trunc("day", Reading.ts)
+    return None
+
+
+@router.get("/api/v1/series")
+async def series(
+    node: str | None = Query(None),
+    metric: str | None = Query(None),
+    step: str = Query("raw"),
+    from_ts: str | None = Query(None, alias="from"),
+    to_ts: str | None = Query(None, alias="to"),
+) -> list[dict[str, Any]]:
+    """Return time-ordered series points, optionally bucketed.
+
+    SPEC 4.2: step=raw returns stored points; 5m|1h|1d return averages per bucket
+    (sum for rain_mm).
+    SPEC 4.4: Invalid step or non-RFC3339 dates -> 400.
+    """
+    from fastapi import HTTPException
+
+    # Validate parameters
+    try:
+        params = SeriesParams(
+            node=node,
+            metric=metric,
+            step=step,
+            from_ts=from_ts,
+            to_ts=to_ts,
+        )
+    except Exception as err:
+        raise HTTPException(
+            status_code=400, detail="Invalid query parameter"
+        ) from err
+
+    from_dt = _parse_dt(params.from_ts)
+    to_dt = _parse_dt(params.to_ts)
+
+    # Build filter conditions
+    conditions: list[ColumnElement[Any]] = []
+    if params.node:
+        conditions.append(Reading.node_id == params.node)
+    if params.metric:
+        conditions.append(Reading.metric == params.metric)
+    if from_dt:
+        conditions.append(Reading.ts >= from_dt)  # type: ignore[arg-type]
+    if to_dt:
+        conditions.append(Reading.ts <= to_dt)  # type: ignore[arg-type]
+
+    db = SessionLocal()
+    try:
+        if params.step == "raw":
+            # Return all individual points, ordered by timestamp
+            stmt = select(Reading).where(*conditions).order_by(
+                Reading.ts.asc()
+            )
+            rows = db.execute(stmt).scalars().all()
+            result = [
+                {
+                    "ts": r.ts.isoformat(),
+                    "metric": str(r.metric),
+                    "value": float(r.value),
+                }
+                for r in rows
+            ]
+        else:
+            # Bucketed aggregation
+            bucket = _bucket_column(params.step)
+            assert bucket is not None, f"Expected bucket for step={params.step}"
+            agg_fn = (
+                func.sum(Reading.value)
+                if params.metric == "rain_mm"
+                else func.avg(Reading.value)
+            )
+
+            stmt = (
+                select(
+                    bucket.label("bucket"),
+                    Reading.metric,
+                    agg_fn.label("avg_value"),
+                )
+                .where(*conditions)
+                .group_by(bucket, Reading.metric)
+                .order_by(bucket.asc())
+            )
+
+            rows = db.execute(stmt).mappings().all()
+
+            result = [
+                {
+                    "ts": r["bucket"].isoformat(),
+                    "metric": str(r["metric"]),
+                    "value": (
+                        float(r["avg_value"])
+                        if r["avg_value"] is not None
+                        else 0.0
+                    ),
+                }
+                for r in rows
+            ]
+
+        return result
+    finally:
+        db.close()
+
+
+@router.get("/api/v1/nodes")
+async def nodes_list() -> list[dict[str, str | bool]]:
+    """Return all known nodes with online status per contract.
+
+    SPEC 4.3: online=true iff last_seen within 15 minutes of now.
+    """
+    db = SessionLocal()
+    try:
+        now = datetime.now(UTC)
+        cutoff = now - timedelta(minutes=15)
+        stmt = select(Node).order_by(Node.node_id.asc())
+        rows = db.execute(stmt).scalars().all()
+        result: list[dict[str, Any]] = []
+        for n in rows:
+            last_seen = n.last_seen
+            online = bool(last_seen and last_seen >= cutoff)
+            result.append(
+                {
+                    "node_id": str(n.node_id),
+                    "node_type": str(n.node_type),
+                    "last_seen": (
+                        n.last_seen.isoformat() if n.last_seen else None
+                    ),
+                    "online": online,
+                }
+            )
+        return result
+    finally:
+        db.close()

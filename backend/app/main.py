@@ -85,6 +85,10 @@ def create_app() -> FastAPI:
         finally:
             db.close()
 
+    from app.readapi import router as readapi_router
+
+    application.include_router(readapi_router)
+
     from app.ingest import router as ingest_router
 
     application.include_router(ingest_router)

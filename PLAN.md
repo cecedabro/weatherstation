@@ -25,7 +25,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
 ## Read API
 - [x] T08: GET /api/v1/current per SPEC 4.1.
   accept: cd backend && uv run pytest tests/test_current.py -q
-- [ ] T09: GET /api/v1/series with step buckets per SPEC 4.2, 4.4.
+- [x] T09: GET /api/v1/series with step buckets per SPEC 4.2, 4.4.
   accept: cd backend && uv run pytest tests/test_series.py -q
 - [ ] T10: GET /api/v1/nodes per SPEC 4.3 (must satisfy the contract tests).
   accept: cd backend && uv run pytest tests/test_nodes.py ../contract/tests -q
