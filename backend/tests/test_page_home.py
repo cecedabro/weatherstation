@@ -53,9 +53,7 @@ def _make_batch(
     for metric, value in metrics.items():
         reading = db.execute(
             select(Reading).where(
-                (Reading.node_id == node_id)
-                & (Reading.metric == metric)
-                & (Reading.ts == ts)
+                (Reading.node_id == node_id) & (Reading.metric == metric) & (Reading.ts == ts)
             )
         ).scalar_one_or_none()
         if reading is None:

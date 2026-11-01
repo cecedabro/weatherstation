@@ -35,7 +35,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
   accept: cd backend && uv run pytest tests/test_base_template.py -q
 - [x] T12: GET / page with header, layout and the "no readings yet" empty state per SPEC 5.1, 5.3, 5.4.
   accept: cd backend && uv run pytest tests/test_page_home.py -q
-- [ ] T13: Current-conditions and latest-soil sections on / per SPEC 5.1.
+- [x] T13: Current-conditions and latest-soil sections on / per SPEC 5.1.
   accept: cd backend && uv run pytest tests/test_page_current.py -q
 - [ ] T14: History chart with day/week/month selector per SPEC 5.2. See docs/frontend.md §charts.
   accept: cd backend && uv run pytest tests/test_page_chart.py -q

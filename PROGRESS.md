@@ -117,3 +117,15 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Gotcha: Jinja2 templates do not support JS-style `\u{1F4A7}` unicode escapes; must use
   HTML entities like `&#x1F4A7;` or HTML named entities.
 - `make check` passes: ruff clean, mypy clean, 120 tests pass (22 new + 98 existing).
+
+## T13: Current-conditions and latest-soil sections on / per SPEC 5.1 (done)
+- Created `backend/tests/test_page_current.py` with 15 tests covering SPEC 5.1:
+  current-conditions section header, weather node ID, temperature/humidity/pressure
+  display, latest-soil section header, soil node ID, moisture/temperature display,
+  individual empty states when one category lacks data, both sections visible with
+  mixed data, multiple weather and soil nodes rendering correctly.
+- The `home.html` template already implements the sections (built in T12); this task
+  provides the dedicated test file required by the acceptance harness.
+- Gotcha: soil moisture displays as integer (`%.0f` format), not float — test assertions
+  must match that (e.g. "38" not "38.5").
+- `make check` passes: ruff clean, mypy clean, 135 tests pass (15 new + 120 existing).
