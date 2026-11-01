@@ -54,7 +54,7 @@ T10 and T14 above were skipped; these replace them. Do them in order.
   accept: cd backend && uv run pytest tests/test_vendor_assets.py -q
 - [x] T19: Chart section on `/` (SPEC 5.2): a container, and a day/week/month selector rendered server-side as links or buttons carrying the `from`, `to` and `step` for `/api/v1/series` (day→5m, week→1h, month→1d). Write `tests/test_page_chart.py` asserting the container, the three selector options, and the exact series query values.
   accept: cd backend && uv run pytest tests/test_page_chart.py -q
-- [ ] T20: `app/static/chart.js` (under 150 lines): fetch `/api/v1/series` for the selected range, draw it with uPlot, redraw on selector change, show a friendly message when the series is empty. Test (Python) that the page loads `chart.js` and that the file exists and mentions `/api/v1/series`.
+- [~] T20: `app/static/chart.js` (under 150 lines): fetch `/api/v1/series` for the selected range, draw it with uPlot, redraw on selector change, show a friendly message when the series is empty. Test (Python) that the page loads `chart.js` and that the file exists and mentions `/api/v1/series`. — skipped: agent made no changes
   accept: cd backend && uv run pytest tests/test_chart_js.py -q
 
 ## Later (not for the loop yet)
