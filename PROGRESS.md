@@ -151,3 +151,11 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `backend/app/admin.py`: contains `_readings_24h()` helper, `basic_auth = HTTPBasic()`, and the `GET /admin` route with Basic auth validation and node health table rendering. Imports `_jinja_env` from `web.py`.
 - Rewrote `backend/app/main.py`: now only builds the FastAPI app, mounts `/static`, defines `/healthz`, and includes routers (`web`, `admin`, `readapi`, `ingest`). Removed all route handlers, Jinja2 env setup, and helper functions.
 - No test changes required: all 153 tests pass unmodified. `make check` passes: ruff clean, mypy clean, 98% coverage.
+
+## T19: Chart section on GET / per SPEC 5.2 (done)
+- Added `GET /` chart section to `backend/app/templates/home.html`: a `#chart-section` card containing three `.chart-btn` links (24h, 7d, 30d) with `from`, `to`, `step` query parameters pointing to `/api/v1/series`. The `data-step`, `data-from`, `data-to` attributes also carry these values for client-side JS consumption.
+- Updated `backend/app/web.py`: added `_SelectorSpec` TypedDict, selector constants (`_SELECTORS`, `_SELECTOR_HOURS`), `_selector_links()` helper that computes URL-encoded `from`/`to` timestamps, and passes `chart_selectors` to the template context.
+- Added CSS for `.chart-selector` and `.chart-btn` to `backend/app/static/style.css`.
+- Created `backend/tests/test_page_chart.py` with 3 tests: chart section/container presence, three selector links rendered, and correct time-window query values (parses `from`/`to` timestamps and verifies the hour delta matches expected 24h/168h/720h).
+- `make check` passes: ruff clean, mypy clean, 156 tests pass (3 new + 153 existing), 98% coverage.
+- Next task (T20): Wire up uPlot client-side chart rendering using the selector links and `/api/v1/series` data.

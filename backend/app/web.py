@@ -1,6 +1,8 @@
 """HTML routes: GET / (home page)."""
 
 from pathlib import Path
+from typing import TypedDict
+from urllib.parse import quote
 
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
@@ -8,6 +10,28 @@ from jinja2 import Environment, FileSystemLoader
 
 from app.db import SessionLocal
 from app.readapi import _current_readings
+
+
+class _SelectorSpec(TypedDict):
+    label: str
+    step: str
+    hours: int
+
+
+DAY_LABEL = "24h"
+WEEK_LABEL = "7d"
+MONTH_LABEL = "30d"
+
+DAY_SELECTOR: _SelectorSpec = {"label": DAY_LABEL, "step": "5m", "hours": 24}
+WEEK_SELECTOR: _SelectorSpec = {"label": WEEK_LABEL, "step": "1h", "hours": 168}
+MONTH_SELECTOR: _SelectorSpec = {"label": MONTH_LABEL, "step": "1d", "hours": 720}
+_SELECTORS: list[_SelectorSpec] = [DAY_SELECTOR, WEEK_SELECTOR, MONTH_SELECTOR]
+
+_SELECTOR_HOURS: dict[str, int] = {
+    DAY_LABEL: 24,
+    WEEK_LABEL: 168,
+    MONTH_LABEL: 720,
+}
 
 router = APIRouter()
 
@@ -18,6 +42,24 @@ _jinja_env = Environment(
     loader=FileSystemLoader(str(_TEMPLATE_DIR)),
     autoescape=True,
 )
+
+
+def _selector_links() -> list[dict[str, str]]:
+    """Build chart selector links with from/to/step for the series API."""
+    from datetime import UTC, datetime, timedelta
+
+    now = datetime.now(UTC)
+    links: list[dict[str, str]] = []
+    for sel in _SELECTORS:
+        from_dt = now - timedelta(hours=sel["hours"])
+        link: dict[str, str] = {
+            "label": sel["label"],
+            "step": sel["step"],
+            "from": quote(from_dt.isoformat()),
+            "to": quote(now.isoformat()),
+        }
+        links.append(link)
+    return links
 
 
 @router.get("/")
@@ -32,6 +74,7 @@ async def index() -> HTMLResponse:
         html = template.render(
             weather_nodes=weather_nodes,
             soil_nodes=soil_nodes,
+            chart_selectors=_selector_links(),
         )
         return HTMLResponse(content=html)
     finally:

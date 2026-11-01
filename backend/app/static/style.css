@@ -577,6 +577,25 @@ body {
   border: 1px solid #e0c040;
 }
 
+/* ---- Chart selector ---- */
+.chart-selector {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.chart-btn {
+  margin-top: 0;
+  padding: var(--space-sm) var(--space-xl);
+  font-size: 14px;
+}
+
+.chart-btn:hover {
+  transform: translateY(0);
+  box-shadow: var(--shadow-button);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 640px) {
   .form-grid { grid-template-columns: 1fr; }
