@@ -24,6 +24,7 @@ dev = [
     "ruff",
     "mypy",
     "pgserver",
+    "pytest-cov>=7.1.0",
 ]
 
 [tool.ruff]

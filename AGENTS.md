@@ -71,8 +71,9 @@ So: **run `make check` yourself before you stop, and fix what fails.**
 
 ## Commands
 - `make setup` — install backend deps (`uv sync`). Tests start their own throwaway Postgres (see `docs/testing.md`); there is no Docker here.
-- `make check` — lint + type-check + all tests of every part that exists (also the contract tests). Must pass after every task.
+- `make check` — lint + type-check + all tests of every part that exists (also the contract tests), backend coverage of at least 90%, and a `bandit` security scan (medium or higher). Must pass after every task, so write tests for the code you add.
 - `make fmt` — autoformat (ruff). Run before `make check`.
 - `make dev` — run the site on :8000 with a throwaway Postgres and fake readings (for humans previewing; don't use it in tests).
 - `make run` — run the backend locally (needs a Postgres at `DATABASE_URL`; usually you only need the tests).
+- Offline docs are in `~/docs/` (fastapi, sqlalchemy, alembic, jinja, htmx, uplot, python). Search them with `rg -i <term> ~/docs/<name>`; never read a whole file.
 See each area doc for area-specific commands (PlatformIO builds, etc.).
