@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Weather Station — Admin{% endblock %}
+
+{% block header_title %}&#x1F527; Weather<span>Station Admin</span>{% endblock %}
+{% block header_logo %}&#x1F512;{% endblock %}
+
+{% block content %}
+
+<section class="card">
+  <h2><span class="icon">&#x1F4CA;</span> Node Health</h2>
+
+  {% if nodes %}
+  <div class="admin-table-wrapper">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Node</th>
+          <th>Type</th>
+          <th>Last Seen</th>
+          <th>Online</th>
+          <th>Battery</th>
+          <th>RSSI</th>
+          <th>24 h Readings</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for node in nodes %}
+        <tr class="{% if not node.online %}row-offline{% endif %}{% if node.low_battery %} row-low-battery{% endif %}">
+          <td class="node-id">{{ node.node_id }}</td>
+          <td>{{ node.node_type }}</td>
+          <td>{{ node.last_seen }}</td>
+          <td>
+            {% if node.online %}
+              <span class="badge badge-online">Online</span>
+            {% else %}
+              <span class="badge badge-offline">Offline</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if node.low_battery %}
+              <span class="badge badge-low-battery">{{ "%.2f"|format(node.battery_v) }} V</span>
+            {% elif node.battery_v is not none %}
+              {{ "%.2f"|format(node.battery_v) }} V
+            {% else %}
+              &mdash;
+            {% endif %}
+          </td>
+          <td>
+            {% if node.rssi_dbm is not none %}
+              {{ node.rssi_dbm }} dBm
+            {% else %}
+              &mdash;
+            {% endif %}
+          </td>
+          <td>{{ node.readings_24h }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">&#x1F50D;</div>
+    <h2>No Nodes Registered</h2>
+    <p style="color: var(--color-text-muted); font-size: 15px;">
+      No sensor nodes have reported yet. The table will appear once nodes send their first reading.
+    </p>
+  </div>
+  {% endif %}
+</section>
+
+{% endblock %}

@@ -41,7 +41,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
   accept: cd backend && uv run pytest tests/test_page_chart.py -q
 
 ## Admin
-- [ ] T15: /admin with Basic auth and node health table per SPEC 6. See docs/frontend.md §admin.
+- [x] T15: /admin with Basic auth and node health table per SPEC 6. See docs/frontend.md §admin.
   accept: cd backend && uv run pytest tests/test_admin.py -q
 
 ## Later (not for the loop yet)

@@ -129,3 +129,11 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Gotcha: soil moisture displays as integer (`%.0f` format), not float — test assertions
   must match that (e.g. "38" not "38.5").
 - `make check` passes: ruff clean, mypy clean, 135 tests pass (15 new + 120 existing).
+
+## T15: /admin endpoint with Basic auth and node health table per SPEC 6 (done)
+- Added `GET /admin` route in `backend/app/main.py`: validates HTTP Basic auth credentials against `ADMIN_USER`/`ADMIN_PASSWORD` (hmac-compare, 401 on mismatch), queries latest readings per node, computes 24h reading counts, and renders `admin.html` with node health table (last_seen, online/offline >15m, battery <3.4V flag, RSSI, 24h count).
+- Created `backend/tests/test_admin.py` with 13 tests: SPEC 6.1 (401 on missing/empty/wrong/invalid-utf8 credentials), SPEC 6.2 (health table with last_seen, online/offline, low-battery flag, battery/RSSI display, empty state), SPEC 6.3 (24h reading counts).
+- Created `backend/app/templates/admin.html`: extends `base.html`, renders node health table with status badges.
+- Added admin CSS (table, badges, row-hover styles) to `backend/app/static/style.css`.
+- Gotcha: ruff B008 flags `Depends(basic_auth)` in function signature — added `# noqa: B008` (FastAPI DI pattern). Mypy `var-annotated`/`arg-type` errors on SQLAlchemy `select()` chain — added `# type: ignore` comments.
+- `make check` passes: ruff clean, mypy clean, 148 tests pass (13 new + 135 existing).
