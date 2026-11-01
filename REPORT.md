@@ -1,23 +1,13 @@
-# Agent run agent/2026-10-31-2134
+# Agent run agent/2026-11-01-1013
 
-Ended 2026-11-01 02:27: plan complete. 13 done, 2 skipped, 4.9 h.
+Ended 2026-11-01 11:13: plan complete. 3 done, 2 skipped, 1.0 h.
 
 | Task | Result | Attempts | Minutes | Note |
 | --- | --- | --- | --- | --- |
-| T01 Create the backend skeleton (uv project, FastAPI app factory, ruff+mypy+pytest wired, one trivial passing test) so `make check` passes. See docs/backend.md §skeleton. | done | 3 | 15 |  |
-| T02 Add GET /healthz per SPEC 1.2–1.3, config from env. See docs/backend.md §config. | done | 1 | 3 |  |
-| T03 Test Postgres fixture (pgserver, see docs/testing.md), models, and Alembic migration for readings and nodes per SPEC 2.1. See docs/backend.md §storage. | done | 2 | 57 |  |
-| T04 Store-reading service with upsert per SPEC 2.2–2.3. | done | 1 | 8 |  |
-| T05 POST /api/v1/readings happy path per SPEC 3.1. See docs/backend.md §ingest. | done | 2 | 26 |  |
-| T06 Ingest validation, per-item rejection and node_type/metric rule per SPEC 3.2–3.3. | done | 1 | 6 |  |
-| T07 Ingest auth and malformed envelope per SPEC 3.4–3.5. | done | 1 | 4 |  |
-| T08 GET /api/v1/current per SPEC 4.1. | done | 1 | 8 |  |
-| T09 GET /api/v1/series with step buckets per SPEC 4.2, 4.4. | done | 2 | 31 |  |
-| T10 GET /api/v1/nodes per SPEC 4.3 (must satisfy the contract tests). | skipped | 3 | 45 | $ cd backend && uv run pytest tests/test_nodes.py ../contract/tests -q  (exit 1) |
-| T11 Base template and one stylesheet of design tokens, ported from the root index.html. See docs/frontend.md, docs/design.md. | done | 1 | 10 |  |
-| T12 GET / page with header, layout and the "no readings yet" empty state per SPEC 5.1, 5.3, 5.4. | done | 3 | 50 |  |
-| T13 Current-conditions and latest-soil sections on / per SPEC 5.1. | done | 1 | 5 |  |
-| T14 History chart with day/week/month selector per SPEC 5.2. See docs/frontend.md §charts. | skipped | 3 | 14 | $ cd backend && uv run pytest tests/test_page_chart.py -q  (exit 4) |
-| T15 /admin with Basic auth and node health table per SPEC 6. See docs/frontend.md §admin. | done | 1 | 11 |  |
+| T16 Delete the duplicate `/api/v1/nodes` and `/api/v1/current` from `app/main.py`; keep one implementation of each in `app/readapi.py` (SPEC 4.1, 4.3). Write `tests/test_nodes.py`: online true iff last_seen within 15 min (test 14 and 16 minutes), contract field names, empty list when no nodes. | done | 2 | 32 |  |
+| T17 Move the HTML routes out of `app/main.py` (`/` into `app/web.py`, `/admin` into `app/admin.py`) so `main.py` only builds the app and includes routers. No behaviour change: every existing test must still pass unmodified. | done | 1 | 6 |  |
+| T18 Vendor uPlot into `app/static/vendor/` (see docs/frontend.md §charts) and serve it. Note the version in PROGRESS.md. Test that `/static/vendor/uPlot.iife.min.js` and the CSS return 200. | skipped | 3 | 5 | agent made no changes |
+| T19 Chart section on `/` (SPEC 5.2): a container, and a day/week/month selector rendered server-side as links or buttons carrying the `from`, `to` and `step` for `/api/v1/series` (day→5m, week→1h, month→1d). Write `tests/test_page_chart.py` asserting the container, the three selector options, and the exact series query values. | done | 1 | 12 |  |
+| T20 `app/static/chart.js` (under 150 lines): fetch `/api/v1/series` for the selected range, draw it with uPlot, redraw on selector change, show a friendly message when the series is empty. Test (Python) that the page loads `chart.js` and that the file exists and mentions `/api/v1/series`. | skipped | 3 | 5 | agent made no changes |
 
 Logs: `.agent/logs/` in the devbox checkout.
