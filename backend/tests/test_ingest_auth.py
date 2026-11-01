@@ -25,6 +25,7 @@ WEATHER_READINGS = {
 
 # ---------- SPEC 3.4: bearer token authentication ----------
 
+
 def test_missing_authorization_header(client, db):
     """SPEC 3.4: missing Authorization header returns 401."""
     resp = client.post(
@@ -90,6 +91,7 @@ def test_auth_checked_before_body_validation(client, db):
 
 
 # ---------- SPEC 3.5: malformed envelope ----------
+
 
 def test_non_json_body(client, db):
     """SPEC 3.5: non-JSON body returns 400."""

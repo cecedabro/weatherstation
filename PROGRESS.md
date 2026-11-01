@@ -79,3 +79,23 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Gotcha: `5m` bucket SQL uses `literal_column("INTERVAL '5 minutes'")` instead of Python `timedelta`
   to avoid "interval string has wrong format" Postgres error.
 - `make check` passes: ruff clean, mypy clean, 85 tests pass (17 new + 68 existing).
+
+## T11: Base template and design tokens stylesheet (done)
+- Created `backend/app/static/style.css`: full Frutiger Aero stylesheet ported from the approved
+  `index.html` mock. All design tokens (colours, spacing, radius, blur, shadows, typography) are
+  CSS custom properties in `:root`. Includes `.header`, `.card`, `.stat-card`, `.btn-glossy`,
+  `.entries-table`, `.status-badge`, `.empty-state`, bubble decorations, and responsive breakpoints.
+- Created `backend/app/templates/base.html`: Jinja2 base template with `html lang="en"`, viewport
+  meta tag (SPEC 5.4), semantic `<header>`, `<main>`, `<footer>`, four bubble decorations, linked
+  stylesheet, and extensible blocks (`title`, `head`, `content`, `scripts`, `header_title`,
+  `header_logo`, `footer`).
+- Updated `backend/app/main.py`: mounted `/static` directory with `StaticFiles`, registered Jinja2
+  `Environment` for templates, added `GET /` route rendering `base.html`.
+- Created `backend/tests/test_base_template.py` with 13 tests: stylesheet served + content-type,
+  design tokens present, header/card classes defined, base template renders at `/`, DOCTYPE and
+  lang attribute, stylesheet link, semantic HTML, bubbles, container, footer, and viewport meta.
+- Palette: sky blues (#6ec4f0 → #a8e06a → #5aad28), greens (#a8f06a, #4aad20, #d0f5a0), glass
+  cards with 12px backdrop blur, 18px border radius. Font: Segoe UI stack. Font used: Frutiger-adjacent
+  Segoe UI (system font, no external download needed).
+- `make check` passes: ruff clean, mypy clean, 98 tests pass (13 new + 85 existing).
+- Next task (T12): Build the `/` page with header, layout, and empty state per SPEC 5.1, 5.3, 5.4.

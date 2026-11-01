@@ -28,9 +28,7 @@ class SeriesParams(BaseModel):
     @classmethod
     def validate_step(cls, v: str) -> str:
         if v not in _VALID_STEPS:
-            raise ValueError(
-                f"Invalid step '{v}'. Must be one of: raw, 5m, 1h, 1d"
-            )
+            raise ValueError(f"Invalid step '{v}'. Must be one of: raw, 5m, 1h, 1d")
         return v
 
     @field_validator("from_ts", "to_ts")
@@ -98,9 +96,7 @@ async def series(
             to_ts=to_ts,
         )
     except Exception as err:
-        raise HTTPException(
-            status_code=400, detail="Invalid query parameter"
-        ) from err
+        raise HTTPException(status_code=400, detail="Invalid query parameter") from err
 
     from_dt = _parse_dt(params.from_ts)
     to_dt = _parse_dt(params.to_ts)
@@ -120,9 +116,7 @@ async def series(
     try:
         if params.step == "raw":
             # Return all individual points, ordered by timestamp
-            stmt = select(Reading).where(*conditions).order_by(
-                Reading.ts.asc()
-            )
+            stmt = select(Reading).where(*conditions).order_by(Reading.ts.asc())
             rows = db.execute(stmt).scalars().all()
             result = [
                 {
@@ -137,9 +131,7 @@ async def series(
             bucket = _bucket_column(params.step)
             assert bucket is not None, f"Expected bucket for step={params.step}"
             agg_fn = (
-                func.sum(Reading.value)
-                if params.metric == "rain_mm"
-                else func.avg(Reading.value)
+                func.sum(Reading.value) if params.metric == "rain_mm" else func.avg(Reading.value)
             )
 
             stmt = (
@@ -159,11 +151,7 @@ async def series(
                 {
                     "ts": r["bucket"].isoformat(),
                     "metric": str(r["metric"]),
-                    "value": (
-                        float(r["avg_value"])
-                        if r["avg_value"] is not None
-                        else 0.0
-                    ),
+                    "value": (float(r["avg_value"]) if r["avg_value"] is not None else 0.0),
                 }
                 for r in rows
             ]
@@ -193,9 +181,7 @@ async def nodes_list() -> list[dict[str, str | bool]]:
                 {
                     "node_id": str(n.node_id),
                     "node_type": str(n.node_type),
-                    "last_seen": (
-                        n.last_seen.isoformat() if n.last_seen else None
-                    ),
+                    "last_seen": (n.last_seen.isoformat() if n.last_seen else None),
                     "online": online,
                 }
             )

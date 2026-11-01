@@ -37,16 +37,14 @@ def _validate_batches(
 
         node_type = batch.get("node_type", "")
         allowed = ALLOWED_METRICS.get(node_type, set())
-        bad_metrics = [
-            m for m in batch.get("metrics", {}) if m not in allowed
-        ]
+        bad_metrics = [m for m in batch.get("metrics", {}) if m not in allowed]
         if bad_metrics:
-            rejected.append({
-                "index": idx,
-                "error": (
-                    f"node_type={node_type} does not allow metrics: {bad_metrics}"
-                ),
-            })
+            rejected.append(
+                {
+                    "index": idx,
+                    "error": (f"node_type={node_type} does not allow metrics: {bad_metrics}"),
+                }
+            )
             continue
 
         valid_batches.append(batch)

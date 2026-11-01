@@ -1,19 +1,43 @@
 """Application factory and entry point."""
 
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import func, select
 
 from app.config import Settings
 from app.db import SessionLocal
 from app.models import Node, Reading
 
+_BASE_DIR = Path(__file__).resolve().parent
+_TEMPLATE_DIR = _BASE_DIR / "templates"
+_STATIC_DIR = _BASE_DIR / "static"
+
+# Jinja2 environment
+_jinja_env = Environment(
+    loader=FileSystemLoader(str(_TEMPLATE_DIR)),
+    autoescape=True,
+)
+
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     application = FastAPI(title="Weather Station")
     _ = Settings()  # validate defaults at startup
+
+    # Serve static files (CSS, JS, vendor libs)
+    application.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
+
+    @application.get("/")
+    async def index() -> HTMLResponse:
+        """Render the base template with the Frutiger Aero design."""
+        template = _jinja_env.get_template("base.html")
+        html = template.render()
+        return HTMLResponse(content=html)
 
     @application.get("/healthz")
     async def healthz() -> dict[str, str]:
@@ -38,14 +62,11 @@ def create_app() -> FastAPI:
                 .subquery()
             )
             # Join back to get the actual reading rows
-            reading_stmt = (
-                select(Reading)
-                .join(
-                    latest_subq,
-                    (Reading.node_id == latest_subq.c.node_id)
-                    & (Reading.metric == latest_subq.c.metric)
-                    & (Reading.ts == latest_subq.c.max_ts),
-                )
+            reading_stmt = select(Reading).join(
+                latest_subq,
+                (Reading.node_id == latest_subq.c.node_id)
+                & (Reading.metric == latest_subq.c.metric)
+                & (Reading.ts == latest_subq.c.max_ts),
             )
             reading_rows = db.execute(reading_stmt).scalars().all()
 
@@ -68,19 +89,17 @@ def create_app() -> FastAPI:
                     # Sort metrics for deterministic output
                     for m in sorted(by_node[nid]):
                         metrics[m] = by_node[nid][m]
-                battery_v = (
-                    float(node.last_battery_v)
-                    if node.last_battery_v is not None
-                    else None
+                battery_v = float(node.last_battery_v) if node.last_battery_v is not None else None
+                result.append(
+                    {
+                        "node_id": nid,
+                        "node_type": node.node_type,
+                        "last_seen": node.last_seen.isoformat(),
+                        "battery_v": battery_v,
+                        "rssi_dbm": node.last_rssi_dbm,
+                        "metrics": metrics,
+                    }
                 )
-                result.append({
-                    "node_id": nid,
-                    "node_type": node.node_type,
-                    "last_seen": node.last_seen.isoformat(),
-                    "battery_v": battery_v,
-                    "rssi_dbm": node.last_rssi_dbm,
-                    "metrics": metrics,
-                })
             return result
         finally:
             db.close()

@@ -42,6 +42,7 @@ AUTH = {"Authorization": "Bearer dev-token"}
 
 # ---------- SPEC 3.2 helpers ----------
 
+
 def _missing_field(base, field):
     """Return a copy of base with *field* removed."""
     b = copy.deepcopy(base)
@@ -50,6 +51,7 @@ def _missing_field(base, field):
 
 
 # ---------- SPEC 3.2: per-item schema rejection ----------
+
 
 def test_schema_reject_missing_required_field(client, db):
     """SPEC 3.2: batch missing a required field is rejected per-item."""
@@ -111,6 +113,7 @@ def test_schema_reject_integer_timestamp(client, db):
 
 # ---------- SPEC 3.2: mixed valid + invalid ----------
 
+
 def test_mixed_valid_and_invalid_batches(client, db):
     """SPEC 3.2: valid batch accepted, invalid batch rejected, only valid stored."""
     bad = _missing_field(_BASE_WEATHER, "fw")
@@ -151,6 +154,7 @@ def test_all_batches_invalid(client, db):
 
 
 # ---------- SPEC 3.3: node_type / metric mismatch ----------
+
 
 def test_reject_soil_metric_on_weather_node(client, db):
     """SPEC 3.3: a weather node sending soil metrics is rejected."""
