@@ -99,3 +99,21 @@ Appended by the agent after each task: what changed, where, and gotchas for late
   Segoe UI (system font, no external download needed).
 - `make check` passes: ruff clean, mypy clean, 98 tests pass (13 new + 85 existing).
 - Next task (T12): Build the `/` page with header, layout, and empty state per SPEC 5.1, 5.3, 5.4.
+
+## T12: GET / dynamic homepage with weather/soil data and empty states (done)
+- Rewrote `GET /` in `backend/app/main.py` to query latest weather and soil readings via
+  `_current_readings()` (subquery-max-timestamp join, grouped by node_type). Replaced the
+  minimal `base.html` render with `home.html` template passing `weather_nodes` and
+  `soil_nodes` dicts plus the app title.
+- Created `backend/app/templates/home.html`: extends `base.html`, renders the app title and
+  subtitle, weather cards (temperature, humidity, pressure, rain), soil cards (moisture, NPK),
+  and per-category empty state blocks ("No Weather Data" / "No Soil Data"). Uses HTML entities
+  for unicode icons (Jinja2 does not support `\u{...}` escapes).
+- Created `backend/tests/test_page_home.py` with 22 tests: title, subtitle, section headers,
+  weather/soil cards populated from DB data, individual empty states when one category is
+  present, global empty state when no data exists, and correct HTML structure.
+- Fixed `backend/tests/test_base_template.py`: added `db` fixture to all tests exercising
+  `GET /` (the route now requires a database connection).
+- Gotcha: Jinja2 templates do not support JS-style `\u{1F4A7}` unicode escapes; must use
+  HTML entities like `&#x1F4A7;` or HTML named entities.
+- `make check` passes: ruff clean, mypy clean, 120 tests pass (22 new + 98 existing).

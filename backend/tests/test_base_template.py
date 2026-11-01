@@ -70,7 +70,7 @@ def test_stylesheet_contains_card_class():
 # ---------------------------------------------------------------------------
 
 
-def test_base_template_renders():
+def test_base_template_renders(db):
     """GET / renders the base template with HTTP 200 and HTML content."""
     client = TestClient(app)
     resp = client.get("/")
@@ -78,7 +78,7 @@ def test_base_template_renders():
     assert "text/html" in resp.headers["content-type"]
 
 
-def test_base_template_has_doctype_and_html():
+def test_base_template_has_doctype_and_html(db):
     """The rendered page starts with DOCTYPE and has <html lang='en'>."""
     client = TestClient(app)
     resp = client.get("/")
@@ -86,14 +86,14 @@ def test_base_template_has_doctype_and_html():
     assert '<html lang="en"' in resp.text
 
 
-def test_base_template_links_stylesheet():
+def test_base_template_links_stylesheet(db):
     """The rendered page includes a link to the stylesheet."""
     client = TestClient(app)
     resp = client.get("/")
     assert "/static/style.css" in resp.text
 
 
-def test_base_template_has_header():
+def test_base_template_has_header(db):
     """The rendered page contains the header element with the logo."""
     client = TestClient(app)
     resp = client.get("/")
@@ -101,28 +101,28 @@ def test_base_template_has_header():
     assert "<h1>" in resp.text
 
 
-def test_base_template_has_bubbles():
+def test_base_template_has_bubbles(db):
     """The rendered page contains the four water bubble decorations."""
     client = TestClient(app)
     resp = client.get("/")
     assert resp.text.count('class="bubble"') == 4
 
 
-def test_base_template_has_container():
+def test_base_template_has_container(db):
     """The rendered page contains a <main> container element."""
     client = TestClient(app)
     resp = client.get("/")
     assert '<main class="container">' in resp.text
 
 
-def test_base_template_has_footer():
+def test_base_template_has_footer(db):
     """The rendered page contains a footer element."""
     client = TestClient(app)
     resp = client.get("/")
     assert '<footer class="footer">' in resp.text
 
 
-def test_base_template_has_meta_viewport():
+def test_base_template_has_meta_viewport(db):
     """The page includes a viewport meta tag for responsive design (SPEC 5.4)."""
     client = TestClient(app)
     resp = client.get("/")
@@ -131,7 +131,7 @@ def test_base_template_has_meta_viewport():
     assert "initial-scale=1.0" in resp.text or "initial-scale = 1.0" in resp.text
 
 
-def test_base_template_has_semantic_structure():
+def test_base_template_has_semantic_structure(db):
     """The page uses semantic HTML elements: header, main, footer."""
     client = TestClient(app)
     resp = client.get("/")

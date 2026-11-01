@@ -33,7 +33,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
 ## Website
 - [x] T11: Base template and one stylesheet of design tokens, ported from the root index.html. See docs/frontend.md, docs/design.md.
   accept: cd backend && uv run pytest tests/test_base_template.py -q
-- [ ] T12: GET / page with header, layout and the "no readings yet" empty state per SPEC 5.1, 5.3, 5.4.
+- [x] T12: GET / page with header, layout and the "no readings yet" empty state per SPEC 5.1, 5.3, 5.4.
   accept: cd backend && uv run pytest tests/test_page_home.py -q
 - [ ] T13: Current-conditions and latest-soil sections on / per SPEC 5.1.
   accept: cd backend && uv run pytest tests/test_page_current.py -q
