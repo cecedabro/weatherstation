@@ -44,6 +44,19 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
 - [x] T15: /admin with Basic auth and node health table per SPEC 6. See docs/frontend.md §admin.
   accept: cd backend && uv run pytest tests/test_admin.py -q
 
+## Round 2: fixes and the history chart
+T10 and T14 above were skipped; these replace them. Do them in order.
+- [ ] T16: Delete the duplicate `/api/v1/nodes` and `/api/v1/current` from `app/main.py`; keep one implementation of each in `app/readapi.py` (SPEC 4.1, 4.3). Write `tests/test_nodes.py`: online true iff last_seen within 15 min (test 14 and 16 minutes), contract field names, empty list when no nodes.
+  accept: cd backend && uv run pytest tests/test_nodes.py tests/test_current.py ../contract/tests -q
+- [ ] T17: Move the HTML routes out of `app/main.py` (`/` into `app/web.py`, `/admin` into `app/admin.py`) so `main.py` only builds the app and includes routers. No behaviour change: every existing test must still pass unmodified.
+  accept: cd backend && uv run pytest -q
+- [ ] T18: Vendor uPlot into `app/static/vendor/` (see docs/frontend.md §charts) and serve it. Note the version in PROGRESS.md. Test that `/static/vendor/uPlot.iife.min.js` and the CSS return 200.
+  accept: cd backend && uv run pytest tests/test_vendor_assets.py -q
+- [ ] T19: Chart section on `/` (SPEC 5.2): a container, and a day/week/month selector rendered server-side as links or buttons carrying the `from`, `to` and `step` for `/api/v1/series` (day→5m, week→1h, month→1d). Write `tests/test_page_chart.py` asserting the container, the three selector options, and the exact series query values.
+  accept: cd backend && uv run pytest tests/test_page_chart.py -q
+- [ ] T20: `app/static/chart.js` (under 150 lines): fetch `/api/v1/series` for the selected range, draw it with uPlot, redraw on selector change, show a friendly message when the series is empty. Test (Python) that the page loads `chart.js` and that the file exists and mentions `/api/v1/series`.
+  accept: cd backend && uv run pytest tests/test_chart_js.py -q
+
 ## Later (not for the loop yet)
 Gateway (SPEC 7), firmware (SPEC 8) and deployment (SPEC 9) tasks get added once
 the website works and the sensor hardware is decided.

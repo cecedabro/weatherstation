@@ -1,5 +1,5 @@
 SHELL := bash
-.PHONY: setup fmt check run migrate
+.PHONY: setup fmt check run migrate dev
 # Targets MUST exist and `make check` MUST pass after every task. `check` runs
 # each part of the repo that exists so far; later tasks extend it, never weaken it.
 
@@ -19,3 +19,6 @@ run:
 
 migrate:
 	cd backend && uv run alembic upgrade head
+
+dev:
+	cd backend && uv run python scripts/dev.py
