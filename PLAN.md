@@ -48,7 +48,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
 T10 and T14 above were skipped; these replace them. Do them in order.
 - [x] T16: Delete the duplicate `/api/v1/nodes` and `/api/v1/current` from `app/main.py`; keep one implementation of each in `app/readapi.py` (SPEC 4.1, 4.3). Write `tests/test_nodes.py`: online true iff last_seen within 15 min (test 14 and 16 minutes), contract field names, empty list when no nodes.
   accept: cd backend && uv run pytest tests/test_nodes.py tests/test_current.py ../contract/tests -q
-- [ ] T17: Move the HTML routes out of `app/main.py` (`/` into `app/web.py`, `/admin` into `app/admin.py`) so `main.py` only builds the app and includes routers. No behaviour change: every existing test must still pass unmodified.
+- [x] T17: Move the HTML routes out of `app/main.py` (`/` into `app/web.py`, `/admin` into `app/admin.py`) so `main.py` only builds the app and includes routers. No behaviour change: every existing test must still pass unmodified.
   accept: cd backend && uv run pytest -q
 - [ ] T18: Vendor uPlot into `app/static/vendor/` (see docs/frontend.md §charts) and serve it. Note the version in PROGRESS.md. Test that `/static/vendor/uPlot.iife.min.js` and the CSS return 200.
   accept: cd backend && uv run pytest tests/test_vendor_assets.py -q

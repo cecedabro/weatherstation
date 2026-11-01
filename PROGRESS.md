@@ -145,3 +145,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `backend/tests/test_nodes.py` with 5 tests: empty list, 14-min boundary (online), 16-min boundary (offline), contract field validation, mixed online/offline nodes.
 - Created `backend/conftest.py` to insert `backend/` into `sys.path` — required because pytest loads contract tests from `../contract/tests/` which otherwise drops `app` from the import path.
 - `make check` passes: ruff clean, mypy clean, 153 tests pass (5 new + 148 existing), 98% coverage.
+
+## T17: Move HTML routes out of main.py into web.py and admin.py (done)
+- Created `backend/app/web.py`: contains `_jinja_env` (Jinja2 environment) and the `GET /` route rendering `home.html`.
+- Created `backend/app/admin.py`: contains `_readings_24h()` helper, `basic_auth = HTTPBasic()`, and the `GET /admin` route with Basic auth validation and node health table rendering. Imports `_jinja_env` from `web.py`.
+- Rewrote `backend/app/main.py`: now only builds the FastAPI app, mounts `/static`, defines `/healthz`, and includes routers (`web`, `admin`, `readapi`, `ingest`). Removed all route handlers, Jinja2 env setup, and helper functions.
+- No test changes required: all 153 tests pass unmodified. `make check` passes: ruff clean, mypy clean, 98% coverage.
