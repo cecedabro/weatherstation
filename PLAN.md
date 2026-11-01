@@ -27,7 +27,7 @@ Read the named doc before starting. Mark boxes: the harness does, not you.
   accept: cd backend && uv run pytest tests/test_current.py -q
 - [x] T09: GET /api/v1/series with step buckets per SPEC 4.2, 4.4.
   accept: cd backend && uv run pytest tests/test_series.py -q
-- [ ] T10: GET /api/v1/nodes per SPEC 4.3 (must satisfy the contract tests).
+- [~] T10: GET /api/v1/nodes per SPEC 4.3 (must satisfy the contract tests). — skipped: $ cd backend && uv run pytest tests/test_nodes.py ../contract/tests -q  (exit 1)
   accept: cd backend && uv run pytest tests/test_nodes.py ../contract/tests -q
 
 ## Website
