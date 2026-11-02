@@ -12,7 +12,7 @@ from sqlalchemy import select
 
 from app.db import SessionLocal
 from app.fmt import _register_filters
-from app.readapi import _current_readings, _daily_aggregation
+from app.readapi import _current_readings, _daily_aggregation, _garden_alerts
 
 
 class _SelectorSpec(TypedDict):
@@ -83,12 +83,14 @@ async def index() -> HTMLResponse:
         weather_nodes = [n for n in all_nodes if n["node_type"] == "weather"]
         soil_nodes = [n for n in all_nodes if n["node_type"] == "soil"]
         first_weather_node = weather_nodes[0]["node_id"] if weather_nodes else None
+        alerts = _garden_alerts(db)
         template = _jinja_env.get_template("home.html")
         html = template.render(
             weather_nodes=weather_nodes,
             soil_nodes=soil_nodes,
             chart_selectors=_selector_links(),
             first_weather_node=first_weather_node,
+            alerts=alerts,
             active="home",
             page_title="Current Conditions",
         )

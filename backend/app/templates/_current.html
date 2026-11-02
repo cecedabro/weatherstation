@@ -1,7 +1,27 @@
 <div id="current-conditions"
-     hx-get="/partials/current"
-     hx-trigger="every 60s"
-     hx-swap="outerHTML">
+      hx-get="/partials/current"
+      hx-trigger="every 60s"
+      hx-swap="outerHTML">
+{% if alerts %}
+{% if alerts.frost_warning %}
+<div class="alert alert--frost">
+  <span class="alert-icon">&#x1F9E8;</span>
+  <strong>Frost Warning</strong> – Temperatures at or below freezing detected. Protect sensitive plants.
+</div>
+{% endif %}
+{% if alerts.rain_total_24h > 0 %}
+<div class="alert alert--rain">
+  <span class="alert-icon">&#x1F4A7;</span>
+  <strong>Rain 24h</strong> – {{ "%.1f"|format(alerts.rain_total_24h) }} mm recorded.
+</div>
+{% endif %}
+{% if alerts.beds_needing_water > 0 %}
+<div class="alert alert--moisture">
+  <span class="alert-icon">&#x1F331;</span>
+  <strong>Water Needed</strong> – {{ alerts.beds_needing_water }} bed{{ 's' if alerts.beds_needing_water > 1 else '' }} need{{ 's' if alerts.beds_needing_water != 1 else '' }} water (<a href="/soil">details</a>).
+</div>
+{% endif %}
+{% endif %}
 {% if weather_nodes %}
 <section class="card">
   <h2><span class="icon">&#x1F326;&#xFE0F;</span> Current Conditions</h2>

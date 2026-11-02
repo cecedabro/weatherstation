@@ -6,7 +6,7 @@ from typing import Any
 from fastapi import APIRouter, Query
 from fastapi.responses import Response
 from pydantic import BaseModel, field_validator
-from sqlalchemy import ColumnElement, func, literal_column, select
+from sqlalchemy import ColumnElement, Select, func, literal_column, select
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
 
@@ -353,6 +353,80 @@ def _daily_aggregation(
         result.append(entry)
 
     return result
+
+
+def _garden_alerts(db: Session) -> dict[str, Any]:
+    """Compute garden alerts for the home page per SPEC 10.14.
+
+    Returns a dict with:
+      - frost_warning: bool - true if any weather node reads temp_c <= 2.0
+      - rain_total_24h: float - total rain_mm from the last 24 hours (all nodes)
+      - beds_needing_water: int - count of soil nodes with moisture < 25.0
+    """
+    now = datetime.now(UTC)
+    yesterday = now - timedelta(hours=24)
+
+    # Frost warning: check latest readings from weather nodes
+    frost_warning = False
+    latest_subq = (
+        select(
+            Reading.node_id,
+            Reading.metric,
+            func.max(Reading.ts).label("max_ts"),
+        )
+        .group_by(Reading.node_id, Reading.metric)
+        .subquery()
+    )
+    reading_stmt = select(Reading).join(
+        latest_subq,
+        (Reading.node_id == latest_subq.c.node_id)
+        & (Reading.metric == latest_subq.c.metric)
+        & (Reading.ts == latest_subq.c.max_ts),
+    )
+    reading_rows = db.execute(reading_stmt).scalars().all()
+
+    by_node: dict[str, dict[str, float]] = {}
+    for r in reading_rows:
+        nid = str(r.node_id)
+        if nid not in by_node:
+            by_node[nid] = {}
+        by_node[nid][str(r.metric)] = float(r.value)
+
+    node_stmt = select(Node)
+    nodes_rows = db.execute(node_stmt).scalars().all()
+    for node in nodes_rows:
+        nid = str(node.node_id)
+        if (
+            nid in by_node
+            and node.node_type == "weather"
+            and "temp_c" in by_node[nid]
+            and by_node[nid]["temp_c"] <= 2.0
+        ):
+            frost_warning = True
+
+    # Count beds needing water
+    beds_needing_water = 0
+    for node in nodes_rows:
+        nid = str(node.node_id)
+        if (
+            nid in by_node
+            and node.node_type == "soil"
+            and "soil_moisture_pct" in by_node[nid]
+            and by_node[nid]["soil_moisture_pct"] < 25.0
+        ):
+            beds_needing_water += 1
+
+    # 24h rain total: sum all rain_mm readings in the last 24 hours
+    rain_stmt: Select[Any] = select(func.coalesce(func.sum(Reading.value), 0.0)).where(
+        (Reading.metric == "rain_mm") & (Reading.ts >= yesterday)  # type: ignore[arg-type]
+    )
+    rain_24h_mm = float(db.execute(rain_stmt).scalar() or 0.0)
+
+    return {
+        "frost_warning": frost_warning,
+        "rain_total_24h": round(rain_24h_mm, 2),
+        "beds_needing_water": beds_needing_water,
+    }
 
 
 @router.get("/api/v1/export.csv")

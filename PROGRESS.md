@@ -274,3 +274,11 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `backend/app/templates/about.html`: extends `base.html`, renders station description mentioning the volkstuin garden near Landsmeer, a simple CSS-styled data path diagram (ESP32 Nodes → MQTT → Pi → Backend → Website), a units table (°C, %, hPa, mm, m/s, degrees, V, dBm), and a node registry table with online/offline badges and `<time>` tags.
 - Created `backend/tests/test_page_about.py` with 9 tests: page loads, empty state message, station description, data path elements, units table content, table headers, online node badge, offline node badge, and multiple nodes.
 - `make check` passes: ruff clean, mypy clean, 383 tests pass (9 new + 374 existing), 97.73% coverage.
+
+## T39: Garden alerts banner on home page / (SPEC 10.14) - DONE 2026-11-02
+- Added `_garden_alerts(db)` helper to `backend/app/readapi.py`: aggregates nodes by ID from latest readings, detects frost warning (any weather node `temp_c <= 2.0`), computes 24-hour rain total via `SUM(rain_mm)`, and counts beds needing water (soil nodes with `soil_moisture_pct < 25.0`). Returns dict with `frost_warning`, `rain_total_24h`, `beds_needing_water`.
+- Updated `/` route in `backend/app/web.py` to call `_garden_alerts(db)` and pass `alerts` to the template.
+- Updated `backend/app/templates/_current.html` to render alerts before current conditions: frost banner (🧊 red/orange gradient), rain banner (🌧️ blue gradient), beds needing water banner (🪴 orange gradient) — each only shown when alert is active.
+- Added alert banner CSS styles to `backend/app/static/style.css`: `.alert-banner`, `.alert--frost`, `.alert--rain`, `.alert--moisture` with gradients, icons, and responsive padding.
+- Created `backend/tests/test_page_alerts.py` with 15 tests: page loads, alert presence, frost warning at threshold (2.0°C), no frost above threshold (2.1°C), rain total display, zero rain handling, beds needing water counts, no beds needing water, and multiple alert presence.
+- `make check` passes: ruff clean, mypy clean, 398 tests pass (15 new + 383 existing), 97.82% coverage.
