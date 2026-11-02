@@ -74,7 +74,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_nav.py -q
 - [x] T27: Styled 404 page (SPEC 10.9): an exception handler that renders `templates/404.html` (extends base, friendly message, link home) with status 404 for paths outside `/api/`, and keeps the JSON 404 for `/api/...`. Write `tests/test_404.py`.
   accept: cd backend && uv run pytest tests/test_404.py -q
-- [ ] T28: `GET /partials/current` (SPEC 10.10): move the current-conditions and soil markup of the home page into `templates/_current.html`; `/` includes it and the new route returns only that fragment (no `<html>`, no nav). Write `tests/test_partials.py` (node ids present, no `<html`, empty-state fragment when there is no data). Existing home tests must still pass.
+- [x] T28: `GET /partials/current` (SPEC 10.10): move the current-conditions and soil markup of the home page into `templates/_current.html`; `/` includes it and the new route returns only that fragment (no `<html>`, no nav). Write `tests/test_partials.py` (node ids present, no `<html`, empty-state fragment when there is no data). Existing home tests must still pass.
   accept: cd backend && uv run pytest tests/test_partials.py tests/test_page_current.py tests/test_page_home.py -q
 - [ ] T29: Auto-refresh on `/` (SPEC 10.10): the root element of `_current.html` carries `hx-get="/partials/current" hx-trigger="every 60s" hx-swap="outerHTML"`, so it keeps refreshing after each swap. Write `tests/test_autorefresh.py` asserting those attributes on `/` and on the fragment.
   accept: cd backend && uv run pytest tests/test_autorefresh.py -q

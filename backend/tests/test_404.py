@@ -4,6 +4,7 @@ VERIFIES SPEC 10.9: Unknown URLs return a styled HTML 404 page with a link home;
 /api/ paths keep JSON errors.
 """
 
+
 def test_unknown_non_api_path_returns_html_404(client):
     """GET /unknown returns HTML 404 with status 404."""
     resp = client.get("/unknown-path")
@@ -39,7 +40,7 @@ def test_unknown_non_api_404_extends_base(client):
     assert resp.status_code == 404
     assert 'class="header"' in resp.text
     assert 'class="footer"' in resp.text
-    assert '<main' in resp.text
+    assert "<main" in resp.text
 
 
 def test_api_unknown_path_returns_json_404(client):

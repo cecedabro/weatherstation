@@ -96,6 +96,32 @@ async def index() -> HTMLResponse:
         db.close()
 
 
+@router.get("/partials/current")
+async def current_partial() -> HTMLResponse:
+    """Return current-conditions + soil fragment for HTMX per SPEC 10.10."""
+    db = SessionLocal()
+    try:
+        all_nodes = _current_readings(db)
+        now = datetime.now(UTC)
+        for node in all_nodes:
+            rt = node.get("reading_time")
+            if rt is not None:
+                offline = (now - rt) > timedelta(minutes=15)
+                node["offline"] = offline
+            else:
+                node["offline"] = True
+        weather_nodes = [n for n in all_nodes if n["node_type"] == "weather"]
+        soil_nodes = [n for n in all_nodes if n["node_type"] == "soil"]
+        template = _jinja_env.get_template("_current.html")
+        html = template.render(
+            weather_nodes=weather_nodes,
+            soil_nodes=soil_nodes,
+        )
+        return HTMLResponse(content=html)
+    finally:
+        db.close()
+
+
 @router.get("/weather")
 async def weather_page() -> HTMLResponse:
     """Render the weather page per SPEC 10.2."""

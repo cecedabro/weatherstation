@@ -212,3 +212,10 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `backend/app/main.py`: added `@application.exception_handler(404)` that returns `HTMLResponse` for non-`/api/` paths and `JSONResponse` (`{"detail": "Not found"}`) for paths starting with `/api/`.
 - Created `backend/tests/test_404.py` with 8 tests: HTML 404 status/content-type, nav/header/footer presence, friendly message, home link, JSON 404 for `/api/` paths, and detail field presence.
 - `make check` passes: ruff clean, mypy clean, 224 tests pass, 98.49% coverage.
+
+## T28: HTMX partial for current conditions (SPEC 10.10) - DONE 2026-11-02
+- Created `backend/app/templates/_current.html`: extracted the current-conditions and soil sections from `home.html` into a reusable HTML fragment (no `extends`, no base structure).
+- Updated `backend/app/templates/home.html`: replaced the inline weather/soil/empty-state markup (lines 7–116) with `{% include "_current.html" %}`. The chart section and scripts remain inline.
+- Added `GET /partials/current` route in `backend/app/web.py`: same DB query and offline logic as the index route, but renders only `_current.html` (no `<html>`, no nav, no header/footer). Returns `HTMLResponse` fragment for HTMX `hx-get` polling.
+- Created `backend/tests/test_partials.py` with 21 tests: 200 status, HTML content-type, no `<html`/`<head`/`<body`/`<nav`/`<header`/`<footer`, weather node ID, soil node ID, both node IDs, Current Conditions header, Latest Soil header, temperature/humidity/soil moisture/soil temperature values, empty-state fragment (no data, weather-only, soil-only, both present), card section classes, and content-parity with home page.
+- `make check` passes: ruff clean, mypy clean, 244 tests pass (21 new + 223 existing), 98.34% coverage.
