@@ -232,6 +232,14 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Fixed `backend/app/templates/base.html`: nav links now include both `class="nav-link {% active %}"` and `aria-current="page"` with correct attribute ordering (`aria-current` before `class`) so both `test_nav.py` and `test_page_weather.py` assertions pass.
 - `make check` passes: ruff clean, mypy clean, 263 tests pass (9 new + 254 existing), 98.17% coverage.
 
+## T32: /soil page (SPEC 10.3) - DONE 2026-11-02
+- Updated `backend/app/web.py`: replaced `/soil` stub with full route that fetches soil nodes via `_current_readings(db)`, computes `offline` flag (>15 min), and passes `soil_nodes`, `active="soil"`, `page_title`, `now` to template.
+- Rewrote `backend/app/templates/soil.html`: extends `base.html`, renders beds/moisture/soil temp/battery/online state per node. Cards show "Needs Water" badge when moisture < 25%, offline indicator with local time, online status with `<time>` ago, and links to `/soil/<node_id>`. Empty state when no soil data.
+- Added `.badge-needs-water` and `.card-meta` styles to `backend/app/static/style.css`.
+- Created `backend/tests/test_page_soil.py` with 13 tests: page loads, content-type, node ID, moisture/temp/battery display, nav active state, badge threshold (24.9% shows, 25.0% doesn't), 16-min offline, empty state, online status, and detail links.
+- Gotcha: HTML entities like `&#176;` inside Jinja2 `{{ }}` expressions cause a `TemplateSyntaxError` ("unexpected char '&'"). Must place the entity or the Unicode degree symbol outside the expression (e.g. `{{ value }}°C`).
+- `make check` passes: ruff clean, mypy clean, 286 tests pass (13 new + 273 existing), 98.02% coverage.
+
 ## T31: Charts on GET /weather (SPEC 10.2) - DONE 2026-11-02
 - Updated `backend/app/web.py`: added `chart_selectors=_selector_links()` to the `/weather` route context.
 - Updated `backend/app/templates/weather.html`: added "History" section with shared day/week/month chart selector and one `<div data-chart>` container per metric per node (temp_c, humidity_pct, pressure_hpa, rain_mm, wind_speed_ms, wind_dir_deg). uPlot assets loaded via `{% block head %}`.

@@ -82,7 +82,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_page_weather.py -q
 - [x] T31: Charts on `/weather` (SPEC 10.2, second half): one chart element per metric the node reports (same `data-chart`/`data-node`/`data-metric` contract as `/`) and one shared day/week/month selector; `chart.js` handles several charts on one page and draws `rain_mm` as bars. Write `tests/test_page_weather_charts.py`.
   accept: cd backend && uv run pytest tests/test_page_weather_charts.py -q && node --check app/static/chart.js
-- [ ] T32: `/soil` page (SPEC 10.3): one card per soil node with moisture, soil temperature, battery voltage, online/offline and last seen (`ago`), plus a "needs water" badge when moisture < 25 %. Each card links to `/soil/<node_id>`. Empty state. Write `tests/test_page_soil.py` (24.9 % shows the badge, 25.0 % does not; a node last seen 16 min ago is offline).
+- [x] T32: `/soil` page (SPEC 10.3): one card per soil node with moisture, soil temperature, battery voltage, online/offline and last seen (`ago`), plus a "needs water" badge when moisture < 25 %. Each card links to `/soil/<node_id>`. Empty state. Write `tests/test_page_soil.py` (24.9 % shows the badge, 25.0 % does not; a node last seen 16 min ago is offline).
   accept: cd backend && uv run pytest tests/test_page_soil.py -q
 - [ ] T33: `/soil/{node_id}` page (SPEC 10.4): current values plus moisture and soil-temperature charts (same chart contract and selector). An unknown or non-soil node returns the styled 404 page. Write `tests/test_page_soil_detail.py`.
   accept: cd backend && uv run pytest tests/test_page_soil_detail.py -q

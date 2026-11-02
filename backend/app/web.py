@@ -152,9 +152,28 @@ async def weather_page() -> HTMLResponse:
 @router.get("/soil")
 async def soil_page() -> HTMLResponse:
     """Render the soil page per SPEC 10.3."""
-    template = _jinja_env.get_template("soil.html")
-    html = template.render(active="soil", page_title="Soil")
-    return HTMLResponse(content=html)
+    db = SessionLocal()
+    try:
+        all_nodes = _current_readings(db)
+        now = datetime.now(UTC)
+        for node in all_nodes:
+            rt = node.get("reading_time")
+            if rt is not None:
+                offline = (now - rt) > timedelta(minutes=15)
+                node["offline"] = offline
+            else:
+                node["offline"] = True
+        soil_nodes = [n for n in all_nodes if n["node_type"] == "soil"]
+        template = _jinja_env.get_template("soil.html")
+        html = template.render(
+            soil_nodes=soil_nodes,
+            active="soil",
+            page_title="Soil",
+            now=now,
+        )
+        return HTMLResponse(content=html)
+    finally:
+        db.close()
 
 
 @router.get("/history")

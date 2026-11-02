@@ -644,6 +644,13 @@ body {
   border: 1px solid #e0c040;
 }
 
+.badge-needs-water {
+  background: linear-gradient(180deg, #60c8f0, #30a0d0);
+  color: #0a2a40;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  border: 1px solid #50b8e0;
+}
+
 /* ---- Chart selector ---- */
 .chart-selector {
   display: flex;
@@ -661,6 +668,21 @@ body {
 .chart-btn:hover {
   transform: translateY(0);
   box-shadow: var(--shadow-button);
+}
+
+.card-meta {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-md);
+  font-size: var(--font-size-badge);
+  font-weight: 600;
+}
+
+.card-meta time {
+  font-size: var(--font-size-badge);
+  color: var(--color-text-muted);
 }
 
 /* ---- Responsive ---- */
