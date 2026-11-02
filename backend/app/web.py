@@ -9,6 +9,7 @@ from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
 
 from app.db import SessionLocal
+from app.fmt import _register_filters
 from app.readapi import _current_readings
 
 
@@ -42,6 +43,7 @@ _jinja_env = Environment(
     loader=FileSystemLoader(str(_TEMPLATE_DIR)),
     autoescape=True,
 )
+_register_filters(_jinja_env)
 
 
 def _selector_links() -> list[dict[str, str]]:

@@ -184,3 +184,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Moved 12 inline `style="..."` attributes from `backend/app/templates/home.html` to named CSS classes in `backend/app/static/style.css`.
 - New classes: `.card-spaced` (card bottom margin), `.node-title` (h3 with font-size/color/margin), `.stats-row--soil` (2-column grid variant), `.empty-state h2` (margin override), `.empty-state p` (color + font-size), `.chart-container` (width + height).
 - No new tests needed: all 174 existing tests pass unmodified, confirming no visual or behavioral change. `make check` passes: ruff clean, mypy clean, 98% coverage.
+
+## T24: Pure formatting helpers in app/fmt.py (done)
+- Created `backend/app/fmt.py`: three pure helpers — `compass(deg)` → 16-point name (N, NNE, … NNW; 0/360→N), `local_time(dt)` → "14:05, 2 Nov" via `zoneinfo` with Europe/Amsterdam timezone, `ago(dt, now)` → "just now" (< 1 min), "X min ago" (< 2 h), "X h ago" (< 48 h), "X days ago" (>= 48 h).
+- Registered all three as Jinja2 filters (and `ago` as a template global) via `_register_filters()` called from `web.py` on the shared `_jinja_env`.
+- Created `backend/tests/test_fmt.py` with 19 tests: compass 0→N, 360→N, 12→NNE, 225→SW, all 16 cardinal/intercardinal points, boundary tests; winter (CET) and summer (CEST) UTC offset for local_time; 59 s, 61 min, 25 h, 2 days for ago; filter registration check.
+- `make check` passes: ruff clean, mypy clean, 193 tests pass (19 new + 174 existing), 98% coverage.
