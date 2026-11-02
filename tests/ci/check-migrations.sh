@@ -14,7 +14,8 @@ step() { printf '\n== %s\n' "$*"; }
 run() { local dir=$1; shift; (cd "$dir/backend" && uv run --frozen -q "$@"); }
 
 step "one migration head"
-heads=$(run "$ROOT" alembic heads | grep -c . || true)
+heads_out=$(run "$ROOT" alembic heads)
+heads=$(grep -c . <<<"$heads_out" || true)
 if [ "$heads" -ne 1 ]; then
   echo "expected exactly 1 alembic head, found $heads (merge the branches)"; exit 1
 fi
