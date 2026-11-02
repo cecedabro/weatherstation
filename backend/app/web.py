@@ -8,6 +8,7 @@ from urllib.parse import quote
 from fastapi import APIRouter, Query
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
+from sqlalchemy import select
 
 from app.db import SessionLocal
 from app.fmt import _register_filters
@@ -255,6 +256,32 @@ async def history_page(node: str | None = Query(None)) -> HTMLResponse:
 @router.get("/about")
 async def about_page() -> HTMLResponse:
     """Render the about page per SPEC 10.8."""
-    template = _jinja_env.get_template("about.html")
-    html = template.render(active="about", page_title="About")
-    return HTMLResponse(content=html)
+    from app.models import Node
+
+    db = SessionLocal()
+    try:
+        now = datetime.now(UTC)
+        cutoff = now - timedelta(minutes=15)
+        nodes_rows = db.execute(select(Node).order_by(Node.node_id.asc())).scalars().all()
+        nodes = []
+        for n in nodes_rows:
+            last_seen = n.last_seen
+            nodes.append(
+                {
+                    "node_id": str(n.node_id),
+                    "node_type": n.node_type,
+                    "first_seen": n.first_seen,
+                    "last_seen": last_seen,
+                    "online": bool(last_seen and last_seen >= cutoff),
+                }
+            )
+        template = _jinja_env.get_template("about.html")
+        html = template.render(
+            nodes=nodes,
+            active="about",
+            page_title="About",
+            now=now,
+        )
+        return HTMLResponse(content=html)
+    finally:
+        db.close()

@@ -268,3 +268,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added 8 new tests to `backend/tests/test_export.py` for plain date format acceptance, mixed formats, and validation.
 - Moved `_now()`, `_make_batch()`, `_make_daily()`, `history_data`, and `multi_node_history` from `test_page_history.py` to `conftest.py` for cross-module fixture availability.
 - `make check` passes: ruff clean, mypy clean, 374 tests pass (23 new + 351 existing), 97.69% coverage.
+
+## T38: /about page (SPEC 10.8) - DONE 2026-11-02
+- Updated `backend/app/web.py`: replaced the `/about` stub with a full route that fetches all `Node` records, computes `online` flag (>15 min threshold), and passes `nodes`, `active="about"`, `page_title`, `now` to the template.
+- Created `backend/app/templates/about.html`: extends `base.html`, renders station description mentioning the volkstuin garden near Landsmeer, a simple CSS-styled data path diagram (ESP32 Nodes → MQTT → Pi → Backend → Website), a units table (°C, %, hPa, mm, m/s, degrees, V, dBm), and a node registry table with online/offline badges and `<time>` tags.
+- Created `backend/tests/test_page_about.py` with 9 tests: page loads, empty state message, station description, data path elements, units table content, table headers, online node badge, offline node badge, and multiple nodes.
+- `make check` passes: ruff clean, mypy clean, 383 tests pass (9 new + 374 existing), 97.73% coverage.

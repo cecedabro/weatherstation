@@ -1,8 +1,92 @@
 {% extends "base.html" %}
-{% block title %}{{ page_title }} - Weather Station{% endblock %}
+{% block title %}About{% endblock %}
 {% block content %}
-<section class="card">
-  <h2>{{ page_title }}</h2>
-  <p>Information about the weather station and its nodes.</p>
-</section>
+<div class="about-page">
+  <h1>About the Garden Weather Station</h1>
+
+  <section class="about-section">
+    <h2>The Station</h2>
+    <p>
+      This is a private weather station for a garden (volkstuin) near Landsmeer.
+      Multiple ESP32 sensor nodes collect temperature, humidity, light, soil moisture,
+      rainfall, and wind data and publish their readings over MQTT. A Raspberry Pi
+      aggregates the data and forwards it to this backend for storage and display.
+    </p>
+  </section>
+
+  <section class="about-section">
+    <h2>Data Path</h2>
+    <div class="data-path-diagram">
+      <div class="path-node">ESP32 Nodes</div>
+      <div class="path-arrow">→</div>
+      <div class="path-node">MQTT (Mosquitto)</div>
+      <div class="path-arrow">→</div>
+      <div class="path-node">Raspberry Pi</div>
+      <div class="path-arrow">→</div>
+      <div class="path-node">Backend (k3s)</div>
+      <div class="path-arrow">→</div>
+      <div class="path-node">Website</div>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <h2>Units</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Unit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Air temperature</td><td>°C</td></tr>
+        <tr><td>Relative humidity</td><td>%</td></tr>
+        <tr><td>Atmospheric pressure</td><td>hPa</td></tr>
+        <tr><td>Rainfall</td><td>mm</td></tr>
+        <tr><td>Wind speed</td><td>m/s</td></tr>
+        <tr><td>Wind direction</td><td>degrees (0–360)</td></tr>
+        <tr><td>Soil moisture</td><td>% (volumetric)</td></tr>
+        <tr><td>Solar radiation</td><td>W/m²</td></tr>
+        <tr><td>Battery level</td><td>V</td></tr>
+        <tr><td>Signal strength</td><td>dBm</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="about-section">
+    <h2>Known Nodes</h2>
+    {% if nodes %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Node ID</th>
+          <th>Type</th>
+          <th>First Seen</th>
+          <th>Last Seen</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for node in nodes %}
+        <tr>
+          <td>{{ node.node_id }}</td>
+          <td>{{ node.node_type or "unknown" }}</td>
+          <td>{{ node.first_seen.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+          <td>{{ node.last_seen.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+          <td>
+            {% if node.online %}
+            <span class="badge badge-online">Online</span>
+            {% else %}
+            <span class="badge badge-offline">Offline</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">No sensor nodes registered yet.</p>
+    {% endif %}
+  </section>
+</div>
 {% endblock %}
