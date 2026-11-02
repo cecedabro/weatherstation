@@ -78,3 +78,38 @@ Requirements as testable sentences. Each section maps to one or more tasks in
 - 9.2 `kubeconform` passes on the rendered manifests (`make -C deploy validate`).
 - 9.3 Secrets (`INGEST_TOKEN`, `ADMIN_PASSWORD`, DB password) are referenced from
       a Secret, never inline; a `*.example.yaml` documents the keys.
+
+## 10. Website pages (round 3)
+- 10.1 Every public page shares one layout with a navigation bar linking Home `/`,
+       Weather `/weather`, Soil `/soil`, History `/history` and About `/about`; the
+       current page's link has `aria-current="page"`.
+- 10.2 `/weather` shows, per weather node, every current metric with its unit and a
+       chart per metric with a day / week / month selector.
+- 10.3 `/soil` lists every soil node as a card with moisture, soil temperature,
+       battery, online state and last seen; moisture below 25 % shows "needs water".
+- 10.4 `/soil/{node_id}` shows one bed's current values and moisture and soil
+       temperature charts; an unknown node gives the styled 404 page.
+- 10.5 `/history` shows daily summaries for the last 30 days: min / max / average
+       temperature, total rain and average humidity; no data → a friendly state.
+- 10.6 `GET /api/v1/daily?node=&days=` returns one row per UTC day with `date`,
+       `temp_min`, `temp_max`, `temp_avg`, `rain_total`, `humidity_avg`.
+       `days` is 1–366 (default 30), otherwise 400.
+- 10.7 `GET /api/v1/export.csv?node=&metric=&from=&to=` downloads raw readings as
+       CSV with the header `ts,node_id,metric,value`.
+- 10.8 `/about` explains the station and the data path and lists the known nodes.
+- 10.9 Unknown URLs return a styled HTML 404 page with a link home; `/api/` paths
+       keep JSON errors.
+- 10.10 The current conditions on `/` refresh every 60 s through HTMX from
+        `GET /partials/current` (an HTML fragment) without a full page reload.
+- 10.11 Times on pages are shown in Europe/Amsterdam with a relative age
+        ("5 min ago"); wind direction is shown as a compass point next to degrees.
+- 10.12 Every page has its own `<title>` and meta description, a favicon, and
+        `<nav>` / `<main>` / `<footer>` landmarks; charts have text alternatives and
+        every form control has a label.
+- 10.13 A node whose last reading is older than 15 minutes is shown as
+        "offline since …", never as live.
+- 10.14 `/` shows a frost warning when any weather node reads ≤ 2.0 °C, the rain
+        total of the last 24 h, and how many beds need water.
+- 10.15 Every response sends `X-Content-Type-Options`, `Referrer-Policy`,
+        `X-Frame-Options` and a same-origin `Content-Security-Policy`; pages use no
+        inline scripts.
