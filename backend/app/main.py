@@ -2,8 +2,10 @@
 
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from jinja2 import Environment, FileSystemLoader
 
 from app.config import Settings
 
@@ -37,6 +39,24 @@ def create_app() -> FastAPI:
     from app.ingest import router as ingest_router
 
     application.include_router(ingest_router)
+
+    _BASE_DIR = Path(__file__).resolve().parent
+    _TEMPLATE_DIR = _BASE_DIR / "templates"
+    _jinja_env = Environment(
+        loader=FileSystemLoader(str(_TEMPLATE_DIR)),
+        autoescape=True,
+    )
+
+    @application.exception_handler(404)
+    async def not_found_handler(
+        request: Request, exc: HTTPException
+    ) -> HTMLResponse | JSONResponse:  # noqa: ANN201
+        """SPEC 10.9: HTML 404 for non-API paths, JSON 404 for /api/ paths."""
+        if request.url.path.startswith("/api/"):
+            return JSONResponse(status_code=404, content={"detail": "Not found"})
+        template = _jinja_env.get_template("404.html")
+        html = template.render()
+        return HTMLResponse(content=html, status_code=404)
 
     return application
 

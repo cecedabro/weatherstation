@@ -206,3 +206,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added `.nav` responsive CSS (`flex-wrap: wrap`) to `backend/app/static/style.css`.
 - Created `backend/tests/test_nav.py` (7 tests covering link presence, active state switching, CSS wrap).
 - `make check` passes: ruff clean, mypy clean, 216 tests pass, 98.45% coverage.
+
+## T27: Styled 404 page (SPEC 10.9) - DONE 2026-11-02
+- Created `backend/app/templates/404.html`: extends `base.html`, shows "Page Not Found" message with friendly text and a `<a href="/" class="btn-glossy">Back to Home</a>` link.
+- Updated `backend/app/main.py`: added `@application.exception_handler(404)` that returns `HTMLResponse` for non-`/api/` paths and `JSONResponse` (`{"detail": "Not found"}`) for paths starting with `/api/`.
+- Created `backend/tests/test_404.py` with 8 tests: HTML 404 status/content-type, nav/header/footer presence, friendly message, home link, JSON 404 for `/api/` paths, and detail field presence.
+- `make check` passes: ruff clean, mypy clean, 224 tests pass, 98.49% coverage.

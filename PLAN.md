@@ -72,7 +72,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_page_home_fmt.py -q
 - [x] T26: Shared navigation (SPEC 10.1): a `<nav aria-label="Main">` in `base.html` linking Home `/`, Weather `/weather`, Soil `/soil`, History `/history`, About `/about`. Each route passes `active` ("home", "weather", …) and that link gets `aria-current="page"`. It must wrap without horizontal scroll at 360 px. Write `tests/test_nav.py` for `/` (all five links, only Home is current).
   accept: cd backend && uv run pytest tests/test_nav.py -q
-- [ ] T27: Styled 404 page (SPEC 10.9): an exception handler that renders `templates/404.html` (extends base, friendly message, link home) with status 404 for paths outside `/api/`, and keeps the JSON 404 for `/api/...`. Write `tests/test_404.py`.
+- [x] T27: Styled 404 page (SPEC 10.9): an exception handler that renders `templates/404.html` (extends base, friendly message, link home) with status 404 for paths outside `/api/`, and keeps the JSON 404 for `/api/...`. Write `tests/test_404.py`.
   accept: cd backend && uv run pytest tests/test_404.py -q
 - [ ] T28: `GET /partials/current` (SPEC 10.10): move the current-conditions and soil markup of the home page into `templates/_current.html`; `/` includes it and the new route returns only that fragment (no `<html>`, no nav). Write `tests/test_partials.py` (node ids present, no `<html`, empty-state fragment when there is no data). Existing home tests must still pass.
   accept: cd backend && uv run pytest tests/test_partials.py tests/test_page_current.py tests/test_page_home.py -q
