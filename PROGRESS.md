@@ -158,4 +158,12 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added CSS for `.chart-selector` and `.chart-btn` to `backend/app/static/style.css`.
 - Created `backend/tests/test_page_chart.py` with 3 tests: chart section/container presence, three selector links rendered, and correct time-window query values (parses `from`/`to` timestamps and verifies the hour delta matches expected 24h/168h/720h).
 - `make check` passes: ruff clean, mypy clean, 156 tests pass (3 new + 153 existing), 98% coverage.
-- Next task (T20): Wire up uPlot client-side chart rendering using the selector links and `/api/v1/series` data.
+
+## T20: Client-side uPlot chart rendering (done)
+- Created `backend/app/static/chart.js` (under 150 lines): IIFE module that finds elements with `data-chart`, reads `data-node`/`data-metric` from the script tag, fetches `/api/v1/series` with the selected range params, renders a uPlot line chart, and handles `.chart-btn` click events with `preventDefault` to re-fetch and redraw. Shows "No data for this range" message when the series is empty.
+- Updated `backend/app/templates/home.html`: added `data-chart`, `data-node`, and `data-metric="temp_c"` attributes to `#chart-container`. Added `head` block with uPlot CSS/JS link and `scripts` block with `chart.js` script tag (passing data attributes from Jinja context).
+- Updated `backend/app/web.py`: passes `first_weather_node` (first weather node ID or `None`) to the template context for use in data attributes.
+- Created `backend/tests/test_chart_js.py` with 3 tests: page loads all three assets (uPlot CSS, uPlot IIFE JS, chart.js), chart container has required data attributes, and `chart.js` file exists and references `/api/v1/series`.
+- `make check` passes: ruff clean, mypy clean, 159 tests pass (3 new + 156 existing), 98% coverage. Gotcha: chart.js uses `document.currentScript.dataset.*` to read its own data attributes since the data-node value is server-determined.
+
+- Next task: (none remaining per PLAN.md)

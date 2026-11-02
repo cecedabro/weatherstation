@@ -70,11 +70,13 @@ async def index() -> HTMLResponse:
         all_nodes = _current_readings(db)
         weather_nodes = [n for n in all_nodes if n["node_type"] == "weather"]
         soil_nodes = [n for n in all_nodes if n["node_type"] == "soil"]
+        first_weather_node = weather_nodes[0]["node_id"] if weather_nodes else None
         template = _jinja_env.get_template("home.html")
         html = template.render(
             weather_nodes=weather_nodes,
             soil_nodes=soil_nodes,
             chart_selectors=_selector_links(),
+            first_weather_node=first_weather_node,
         )
         return HTMLResponse(content=html)
     finally:
