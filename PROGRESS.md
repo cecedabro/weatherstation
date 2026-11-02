@@ -166,4 +166,7 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `backend/tests/test_chart_js.py` with 3 tests: page loads all three assets (uPlot CSS, uPlot IIFE JS, chart.js), chart container has required data attributes, and `chart.js` file exists and references `/api/v1/series`.
 - `make check` passes: ruff clean, mypy clean, 159 tests pass (3 new + 156 existing), 98% coverage. Gotcha: chart.js uses `document.currentScript.dataset.*` to read its own data attributes since the data-node value is server-determined.
 
-- Next task: (none remaining per PLAN.md)
+## T21: Load HTMX on every page via base.html (done)
+- Added `<script src="/static/vendor/htmx.min.js"></script>` to `backend/app/templates/base.html` in the `<head>` block so HTMX loads on every page.
+- Created `backend/tests/test_static_assets.py` with 4 tests: htmx.min.js serves 200 with JS content type, uPlot.iife.min.js serves 200 with JS content type, uPlot.min.css serves 200 with CSS content type, and `/` HTML contains a reference to htmx.min.js.
+- `make check` passes: ruff clean, mypy clean, 163 tests pass (4 new + 159 existing), 98% coverage.

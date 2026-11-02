@@ -60,7 +60,7 @@ T10 and T14 above were skipped; these replace them. Do them in order.
 ## Round 3: a complete multi-page site
 Read SPEC §10 and docs/frontend.md §pages first. Do the tasks in order; each builds on the
 ones before. Every new page extends `base.html` and reuses the design tokens in `style.css`.
-- [ ] T21: Load HTMX on every page: `base.html` includes `/static/vendor/htmx.min.js` (already vendored). Write `tests/test_static_assets.py`: `/static/vendor/htmx.min.js`, `/static/vendor/uPlot.iife.min.js` and `/static/vendor/uPlot.min.css` return 200 with a JavaScript/CSS content type, and `/` references htmx.
+- [x] T21: Load HTMX on every page: `base.html` includes `/static/vendor/htmx.min.js` (already vendored). Write `tests/test_static_assets.py`: `/static/vendor/htmx.min.js`, `/static/vendor/uPlot.iife.min.js` and `/static/vendor/uPlot.min.css` return 200 with a JavaScript/CSS content type, and `/` references htmx.
   accept: cd backend && uv run pytest tests/test_static_assets.py -q
 - [ ] T22: Fix the home empty states (SPEC 5.3): with no data at all show only the single "No readings yet" card; show "No weather data" or "No soil data" only when the other kind exists. Write `tests/test_page_empty.py` covering nothing / only weather / only soil, asserting which messages appear and which do not.
   accept: cd backend && uv run pytest tests/test_page_empty.py -q
