@@ -224,3 +224,10 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added `<div id="current-conditions" hx-get="/partials/current" hx-trigger="every 60s" hx-swap="outerHTML">` wrapper as the root element of `backend/app/templates/_current.html`, wrapping all conditional section blocks.
 - Created `backend/tests/test_autorefresh.py` with 10 tests: asserts `id="current-conditions"` and all three HTMX attributes (`hx-get`, `hx-trigger`, `hx-swap`) are present on both `GET /` (home page) and `GET /partials/current` (fragment).
 - `make check` passes: ruff clean, mypy clean, 254 tests pass (10 new + 244 existing), 98.34% coverage.
+
+## T30: Weather page `GET /weather` (SPEC 10.2) - DONE 2026-11-02
+- Updated `backend/app/web.py`: replaced the `/weather` stub with a full route that fetches weather nodes via `_current_readings(db)`, computes offline status (>15 min threshold), and passes `weather_nodes`, `active="weather"`, and `now` to the template.
+- Created `backend/app/templates/weather.html`: extends `base.html`, renders "Current Conditions" header, loops over weather nodes displaying all metrics (temp, humidity, pressure, wind speed + compass direction), shows last-updated time with `<time>` tags, and displays "Offline since ..." for old readings. Empty state shows "No Weather Data" with a friendly waiting message.
+- Created `backend/tests/test_page_weather.py` with 9 tests: 200 status, HTML content-type, metric values + units, node ID, last-updated timestamp, offline indicator, nav active state, empty state, and section header.
+- Fixed `backend/app/templates/base.html`: nav links now include both `class="nav-link {% active %}"` and `aria-current="page"` with correct attribute ordering (`aria-current` before `class`) so both `test_nav.py` and `test_page_weather.py` assertions pass.
+- `make check` passes: ruff clean, mypy clean, 263 tests pass (9 new + 254 existing), 98.17% coverage.

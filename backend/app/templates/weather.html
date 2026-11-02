@@ -1,8 +1,55 @@
 {% extends "base.html" %}
 {% block title %}{{ page_title }} - Weather Station{% endblock %}
 {% block content %}
+{% if not weather_nodes %}
 <section class="card">
-  <h2>{{ page_title }}</h2>
-  <p>Per-node current metrics with charts per metric.</p>
+  <div class="empty-state">
+    <div class="empty-icon">&#x1F326;&#xFE0F;</div>
+    <h2>No Weather Data</h2>
+    <p>
+      Waiting for a weather node to send its first reading.
+    </p>
+  </div>
 </section>
+{% else %}
+<section class="card">
+  <h2><span class="icon">&#x1F326;&#xFE0F;</span> Current Conditions</h2>
+  {% for node in weather_nodes %}
+  <div class="card card-spaced">
+    <h3 class="node-title">{{ node.node_id }}</h3>
+    <div class="stats-row">
+      {% for metric_name, metric_icon, metric_unit in [
+        ("temp_c", "\u2600\uFE0F", "\u00B0C"),
+        ("humidity_pct", "&#x1F4A7;", "%"),
+        ("pressure_hpa", "&#x1F321;&#xFE0F;", "hPa"),
+        ("rain_mm", "&#x1F4A6;", "mm"),
+        ("wind_speed_ms", "\u26C5", "m/s"),
+        ("wind_dir_deg", "&#x1F9ED;", "\u00B0")
+      ] %}
+        {% if metric_name in node.metrics %}
+        <div class="stat-card">
+          <div class="stat-icon">{{ metric_icon }}</div>
+          {% if metric_name == "wind_dir_deg" %}
+          <div class="stat-value">{{ compass(node.metrics[metric_name]) }} {{ "%.0f"|format(node.metrics[metric_name]) }}{{ metric_unit }}</div>
+          {% else %}
+          <div class="stat-value">{{ "%.1f"|format(node.metrics[metric_name]) }}{{ metric_unit }}</div>
+          {% endif %}
+          <div class="stat-label">{{ metric_name.replace("_", " ") | title }}</div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if node.offline %}
+    <div class="offline-indicator">
+      Offline since {{ node.reading_time|local_time if node.reading_time else 'N/A' }}
+    </div>
+    {% else %}
+    <time class="updated-time" datetime="{{ node.reading_time.isoformat() if node.reading_time else '' }}" title="{{ node.reading_time|local_time if node.reading_time else '' }}">
+      Updated {{ ago(node.reading_time) if node.reading_time else 'N/A' }}
+    </time>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
 {% endblock %}

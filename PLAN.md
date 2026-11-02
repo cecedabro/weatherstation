@@ -78,7 +78,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_partials.py tests/test_page_current.py tests/test_page_home.py -q
 - [x] T29: Auto-refresh on `/` (SPEC 10.10): the root element of `_current.html` carries `hx-get="/partials/current" hx-trigger="every 60s" hx-swap="outerHTML"`, so it keeps refreshing after each swap. Write `tests/test_autorefresh.py` asserting those attributes on `/` and on the fragment.
   accept: cd backend && uv run pytest tests/test_autorefresh.py -q
-- [ ] T30: `/weather` page (SPEC 10.2, first half): route in `web.py`, `templates/weather.html`, nav active "weather". Per weather node: every current metric with label, value and unit (wind as compass), and its last-updated time. Empty state when there are no weather nodes. Write `tests/test_page_weather.py`.
+- [x] T30: `/weather` page (SPEC 10.2, first half): route in `web.py`, `templates/weather.html`, nav active "weather". Per weather node: every current metric with label, value and unit (wind as compass), and its last-updated time. Empty state when there are no weather nodes. Write `tests/test_page_weather.py`.
   accept: cd backend && uv run pytest tests/test_page_weather.py -q
 - [ ] T31: Charts on `/weather` (SPEC 10.2, second half): one chart element per metric the node reports (same `data-chart`/`data-node`/`data-metric` contract as `/`) and one shared day/week/month selector; `chart.js` handles several charts on one page and draws `rain_mm` as bars. Write `tests/test_page_weather_charts.py`.
   accept: cd backend && uv run pytest tests/test_page_weather_charts.py -q && node --check app/static/chart.js
