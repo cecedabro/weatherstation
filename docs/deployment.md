@@ -29,6 +29,13 @@ NetworkPolicy and ExternalSecrets. You never touch the cluster or the homelab re
 - Lint with `uvx --from hadolint-py hadolint Dockerfile`. There is no Docker in the
   devbox, so you cannot build or run the image; CI does that.
 
+## Migrations must be safe to auto-deploy
+Every merge deploys, with one replica and `Recreate`: if a migration fails, the old
+pod is already gone and the site is down until a fix is released. So migrations are
+idempotent and backward-compatible (add columns/tables; never drop or rename in the
+same release that stops using them), and each new migration gets a test that runs
+`alembic upgrade head` on an empty and on an existing database.
+
 ## Runtime facts (agreed with the homelab side, do not change)
 | What | Value |
 | --- | --- |
