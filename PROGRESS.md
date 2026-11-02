@@ -282,3 +282,10 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added alert banner CSS styles to `backend/app/static/style.css`: `.alert-banner`, `.alert--frost`, `.alert--rain`, `.alert--moisture` with gradients, icons, and responsive padding.
 - Created `backend/tests/test_page_alerts.py` with 15 tests: page loads, alert presence, frost warning at threshold (2.0°C), no frost above threshold (2.1°C), rain total display, zero rain handling, beds needing water counts, no beds needing water, and multiple alert presence.
 - `make check` passes: ruff clean, mypy clean, 398 tests pass (15 new + 383 existing), 97.82% coverage.
+
+## T40: Page metadata — favicon, <title>, <meta description>, landmarks (SPEC 10.12) - DONE 2026-11-02
+- Created `backend/app/static/favicon.svg`: simple leaf SVG with radial gradients (green/gold) matching the Frutiger Aero theme. Served at `/static/favicon.svg` with `image/svg+xml` content-type.
+- Updated `backend/app/templates/base.html`: added `<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">` and `{% block description %}<meta name="description" content="{% block description %}{% endblock %}">{% endblock %}` inside `<head>`. Confirmed existing `<main class="container">` and `<footer class="footer">` landmarks.
+- Updated all page templates with unique `<title>` and `<meta name="description">` blocks: `home.html`, `weather.html`, `soil.html`, `history.html`, `about.html`, `soil_detail.html`, `404.html`.
+- Created `backend/tests/test_meta.py` with 4 tests: favicon serves 200 with correct content-type and `<svg>` markup; titles are unique across all 5 tested pages (`/`, `/weather`, `/soil`, `/history`, `/about`); every page has a non-empty `<meta name="description">`; base template has `<main>` and `<footer>` landmarks.
+- `make check` passes: ruff clean, mypy clean, 402 tests pass (4 new + 398 existing), 97.82% coverage.

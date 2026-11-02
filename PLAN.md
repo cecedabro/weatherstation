@@ -98,7 +98,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_page_about.py -q
 - [x] T39: Garden alerts on `/` (SPEC 10.14): a frost banner when any weather node's current `temp_c` ≤ 2.0, a "rain in the last 24 h: X mm" figure, and a "beds needing water: n" link to `/soil` (same < 25 % rule as T32). Write `tests/test_page_alerts.py` (2.0 shows frost, 2.1 does not).
   accept: cd backend && uv run pytest tests/test_page_alerts.py -q
-- [ ] T40: Page metadata (SPEC 10.12): every public page sets its own `<title>` and `<meta name="description">`; `base.html` links an SVG favicon at `/static/favicon.svg` (draw a simple leaf or sun) and has `<main>` and `<footer>` landmarks. Write `tests/test_meta.py` looping over `/`, `/weather`, `/soil`, `/history`, `/about` (titles unique, description present, favicon returns 200).
+- [x] T40: Page metadata (SPEC 10.12): every public page sets its own `<title>` and `<meta name="description">`; `base.html` links an SVG favicon at `/static/favicon.svg` (draw a simple leaf or sun) and has `<main>` and `<footer>` landmarks. Write `tests/test_meta.py` looping over `/`, `/weather`, `/soil`, `/history`, `/about` (titles unique, description present, favicon returns 200).
   accept: cd backend && uv run pytest tests/test_meta.py -q
 - [ ] T41: Accessibility pass (SPEC 10.12): every chart element has `role="img"` and an `aria-label` naming metric and node, a `<noscript>` note says the charts need JavaScript, decorative emoji are `aria-hidden="true"`, and every form control has a `<label>`. Write `tests/test_a11y.py` that parses each public page with `html.parser` and checks these rules.
   accept: cd backend && uv run pytest tests/test_a11y.py -q
