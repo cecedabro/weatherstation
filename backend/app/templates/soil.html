@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} - Weather Station{% endblock %}
+{% block description %}Soil moisture, temperature, and battery levels for each garden bed — track watering needs and node health.{% endblock %}
+{% block content %}
+<section class="card">
+  <h2><span class="icon" aria-hidden="true">&#x1F331;</span> {{ page_title }}</h2>
+  <p>Beds, moisture, soil temperature, battery, and online state.</p>
+</section>
+{% if not soil_nodes %}
+<section class="card">
+  <div class="empty-state">
+    <div class="empty-icon" aria-hidden="true">&#x1F331;&#xFE0F;</div>
+    <h2>No Soil Data</h2>
+    <p>
+      Waiting for a soil node to send its first reading.
+    </p>
+  </div>
+</section>
+{% else %}
+{% for node in soil_nodes %}
+<section class="card" id="soil-card-{{ node.node_id }}">
+  <h3 class="node-title">
+    <a href="/soil/{{ node.node_id }}">{{ node.node_id }}</a>
+  </h3>
+  <div class="stats-row">
+    {% if "soil_moisture_pct" in node.metrics %}
+    <div class="stat-card">
+      <div class="stat-icon" aria-hidden="true">&#x1F4A7;</div>
+      <div class="stat-value">{{ "%.0f"|format(node.metrics["soil_moisture_pct"]) }}%</div>
+      <div class="stat-label">Moisture</div>
+    </div>
+    {% endif %}
+    {% if "soil_temp_c" in node.metrics %}
+    <div class="stat-card">
+      <div class="stat-icon" aria-hidden="true">&#x1F321;&#xFE0F;</div>
+      <div class="stat-value">{{ "%.1f"|format(node.metrics["soil_temp_c"]) }}°C</div>
+      <div class="stat-label">Soil Temperature</div>
+    </div>
+    {% endif %}
+    {% if node.battery_v is not none %}
+    <div class="stat-card">
+      <div class="stat-icon" aria-hidden="true">&#x1F50B;</div>
+      <div class="stat-value">{{ "%.2f"|format(node.battery_v) }}V</div>
+      <div class="stat-label">Battery</div>
+    </div>
+    {% endif %}
+  </div>
+  <div class="card-meta">
+    {% if node.metrics.get("soil_moisture_pct", 100) < 25 %}
+    <span class="badge badge-needs-water"><span aria-hidden="true">&#x1F4A6;</span> Needs Water</span>
+    {% endif %}
+    {% if node.offline %}
+    <span class="badge badge-offline">Offline since {{ node.reading_time|local_time if node.reading_time else 'N/A' }}</span>
+    {% else %}
+    <span class="badge badge-online">Online</span>
+    <time datetime="{{ node.reading_time.isoformat() if node.reading_time else '' }}" title="{{ node.reading_time|local_time if node.reading_time else '' }}">
+      Updated {{ ago(node.reading_time) if node.reading_time else 'N/A' }}
+    </time>
+    {% endif %}
+  </div>
+</section>
+{% endfor %}
+{% endif %}
+{% endblock %}

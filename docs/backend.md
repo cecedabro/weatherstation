@@ -7,7 +7,7 @@ code; visual choices live in `docs/frontend.md` and `docs/design.md`.
 ## Allowed dependencies (pin versions)
 fastapi, uvicorn[standard], sqlalchemy>=2, alembic, psycopg[binary], pydantic>=2,
 jinja2, python-multipart, jsonschema, httpx (tests), pytest, pytest-asyncio,
-ruff, mypy, pytest-cov, and `pgserver` (dev-only: a throwaway Postgres for tests). Add nothing else without noting why in PROGRESS.md.
+ruff, mypy, pytest-cov, `tzdata` (only if `zoneinfo` cannot find Europe/Amsterdam), and `pgserver` (dev-only: a throwaway Postgres for tests). Add nothing else without noting why in PROGRESS.md.
 
 ## Layout (inside `backend/`)
 ```

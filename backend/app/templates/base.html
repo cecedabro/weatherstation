@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <title>{% block title %}Weather Station{% endblock %}</title>
+  <meta name="description" content="{% block description %}Garden weather station near Landsmeer{% endblock %}">
   <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/vendor/htmx.min.js"></script>
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -17,17 +20,25 @@
 
   <header class="header">
     <div>
-      <h1>{% block header_title %}&#x1F33F; Weather<span>Station</span>{% endblock %}</h1>
+      <h1>{% block header_title %}<span aria-hidden="true">&#x1F33F;</span> Weather<span>Station</span>{% endblock %}</h1>
     </div>
-    <div class="header-logo">{% block header_logo %}&#x1F33B;{% endblock %}</div>
+    <div class="header-logo">{% block header_logo %}<span aria-hidden="true">&#x1F33B;</span>{% endblock %}</div>
   </header>
+
+  <nav aria-label="Main" class="nav">
+    <a href="/" {% if active == 'home' %}aria-current="page"{% endif %} class="nav-link {% if active == 'home' %}active{% endif %}">Home</a>
+    <a href="/weather" {% if active == 'weather' %}aria-current="page"{% endif %} class="nav-link {% if active == 'weather' %}active{% endif %}">Weather</a>
+    <a href="/soil" {% if active == 'soil' %}aria-current="page"{% endif %} class="nav-link {% if active == 'soil' %}active{% endif %}">Soil</a>
+    <a href="/history" {% if active == 'history' %}aria-current="page"{% endif %} class="nav-link {% if active == 'history' %}active{% endif %}">History</a>
+    <a href="/about" {% if active == 'about' %}aria-current="page"{% endif %} class="nav-link {% if active == 'about' %}active{% endif %}">About</a>
+  </nav>
 
   <main class="container">
     {% block content %}{% endblock %}
   </main>
 
   <footer class="footer">
-    {% block footer %}Weather Station &#x2764;&#xFE0F;{% endblock %}
+    {% block footer %}Weather Station <span aria-hidden="true">&#x2764;&#xFE0F;</span>{% endblock %}
   </footer>
 
   {% block scripts %}{% endblock %}

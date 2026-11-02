@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} - Weather Station{% endblock %}
+{% block description %}Detailed soil readings for a single garden bed — moisture, soil temperature, battery level, and historical charts.{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/vendor/uPlot.min.css">
+<script src="/static/vendor/uPlot.iife.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<section class="card">
+  <h2><span class="icon" aria-hidden="true">&#x1F331;</span> {{ node.node_id }}</h2>
+  <div class="stats-row">
+    {% if "soil_moisture_pct" in node.metrics %}
+    <div class="stat-card">
+      <div class="stat-icon" aria-hidden="true">&#x1F4A7;</div>
+      <div class="stat-value">{{ "%.0f"|format(node.metrics["soil_moisture_pct"]) }}%</div>
+      <div class="stat-label">Moisture</div>
+    </div>
+    {% endif %}
+    {% if "soil_temp_c" in node.metrics %}
+    <div class="stat-card">
+      <div class="stat-icon" aria-hidden="true">&#x1F321;&#xFE0F;</div>
+      <div class="stat-value">{{ "%.1f"|format(node.metrics["soil_temp_c"]) }}°C</div>
+      <div class="stat-label">Soil Temperature</div>
+    </div>
+    {% endif %}
+    {% if node.battery_v is not none %}
+    <div class="stat-card">
+      <div class="stat-icon" aria-hidden="true">&#x1F50B;</div>
+      <div class="stat-value">{{ "%.2f"|format(node.battery_v) }}V</div>
+      <div class="stat-label">Battery</div>
+    </div>
+    {% endif %}
+  </div>
+  <div class="card-meta">
+    {% if node.metrics.get("soil_moisture_pct", 100) < 25 %}
+    <span class="badge badge-needs-water"><span aria-hidden="true">&#x1F4A6;</span> Needs Water</span>
+    {% endif %}
+    {% if node.offline %}
+    <span class="badge badge-offline">Offline since {{ node.reading_time|local_time if node.reading_time else 'N/A' }}</span>
+    {% else %}
+    <span class="badge badge-online">Online</span>
+    <time datetime="{{ node.reading_time.isoformat() if node.reading_time else '' }}" title="{{ node.reading_time|local_time if node.reading_time else '' }}">
+      Updated {{ ago(node.reading_time) if node.reading_time else 'N/A' }}
+    </time>
+    {% endif %}
+  </div>
+</section>
+
+<section class="card" id="chart-section">
+  <h2><span class="icon" aria-hidden="true">&#x1F4C8;</span> History</h2>
+  <div class="chart-selector">
+    {% for sel in chart_selectors %}
+    <a href="/api/v1/series?from={{ sel.from }}&to={{ sel.to }}&step={{ sel.step }}"
+       class="btn-glossy chart-btn"
+       data-step="{{ sel.step }}"
+       data-from="{{ sel.from }}"
+       data-to="{{ sel.to }}">
+      {{ sel.label }}
+    </a>
+    {% endfor %}
+  </div>
+  {% if "soil_moisture_pct" in node.metrics %}
+  <div class="chart-container"
+        id="chart-{{ node.node_id }}-soil_moisture_pct"
+        data-chart
+        data-node="{{ node.node_id }}"
+        data-metric="soil_moisture_pct"
+        role="img"
+        aria-label="soil_moisture_pct chart for {{ node.node_id }}"></div>
+  {% endif %}
+  {% if "soil_temp_c" in node.metrics %}
+  <div class="chart-container"
+        id="chart-{{ node.node_id }}-soil_temp_c"
+        data-chart
+        data-node="{{ node.node_id }}"
+        data-metric="soil_temp_c"
+        role="img"
+        aria-label="soil_temp_c chart for {{ node.node_id }}"></div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<noscript>
+  <style>.chart-container{min-height:60px;}</style>
+  <div class="card" style="margin-bottom:var(--space-4xl)">
+    <p>Charts require JavaScript to display. Without JavaScript, historical data cannot be visualized.</p>
+  </div>
+</noscript>
+<script src="/static/chart.js"></script>
+{% endblock %}

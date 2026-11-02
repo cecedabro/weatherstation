@@ -41,6 +41,8 @@ So: **run `make check` yourself before you stop, and fix what fails.**
 ## Rules
 - There is no human to answer questions. Never ask for confirmation or "would you like me to continue". Decide the simplest option, do the task, and note the choice in `PROGRESS.md`.
 - Change only what the task needs. Do not start other tasks.
+- Stay inside the repo. You are not allowed to touch `/tmp` or any path outside it;
+  such commands are rejected. For scratch files use `.agent/tmp/` (git-ignored).
 - Never edit `contract/`, `SPEC.md`, `PLAN.md`, or `AGENTS.md`. If a contract
   test seems wrong, make your code satisfy it and note the concern in `PROGRESS.md`.
 - You write the code **and its tests** (except the contract tests, which exist

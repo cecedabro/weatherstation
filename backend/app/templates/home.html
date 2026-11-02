@@ -1,100 +1,46 @@
 {% extends "base.html" %}
 
 {% block title %}Weather Station — Live Conditions{% endblock %}
+{% block description %}Current weather and soil conditions for the garden near Landsmeer — temperature, humidity, rainfall, and soil moisture at a glance.{% endblock %}
 
 {% block content %}
 
-{% if weather_nodes %}
-<section class="card">
-  <h2><span class="icon">&#x1F326;&#xFE0F;</span> Current Conditions</h2>
-  {% for node in weather_nodes %}
-  <div class="card" style="margin-bottom: var(--space-lg);">
-    <h3 style="font-size: var(--font-size-h2); color: var(--color-text-strong); margin-bottom: var(--space-md);">{{ node.node_id }}</h3>
-    <div class="stats-row">
-      {% for metric_name, metric_icon, metric_unit in [
-        ("temp_c", "\u2600\uFE0F", "\u00B0C"),
-        ("humidity_pct", "&#x1F4A7;", "%"),
-        ("pressure_hpa", "&#x1F321;&#xFE0F;", "hPa"),
-        ("rain_mm", "&#x1F4A6;", "mm"),
-        ("wind_speed_ms", "\u26C5", "m/s"),
-        ("wind_dir_deg", "&#x1F9ED;", "\u00B0")
-      ] %}
-        {% if metric_name in node.metrics %}
-        <div class="stat-card">
-          <div class="stat-icon">{{ metric_icon }}</div>
-          <div class="stat-value">{{ "%.1f"|format(node.metrics[metric_name]) }}{{ metric_unit }}</div>
-          <div class="stat-label">{{ metric_name.replace("_", " ") | title }}</div>
-        </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-  </div>
-  {% endfor %}
-</section>
-{% endif %}
+{% include "_current.html" %}
 
-{% if soil_nodes %}
-<section class="card">
-  <h2><span class="icon">&#x1F33F;</span> Latest Soil Readings</h2>
-  {% for node in soil_nodes %}
-  <div class="card" style="margin-bottom: var(--space-lg);">
-    <h3 style="font-size: var(--font-size-h2); color: var(--color-text-strong); margin-bottom: var(--space-md);">{{ node.node_id }}</h3>
-    <div class="stats-row" style="grid-template-columns: repeat(2, 1fr);">
-      {% if "soil_moisture_pct" in node.metrics %}
-      <div class="stat-card">
-        <div class="stat-icon">&#x1F331;</div>
-        <div class="stat-value">{{ "%.0f"|format(node.metrics["soil_moisture_pct"]) }}%</div>
-        <div class="stat-label">Moisture</div>
-      </div>
-      {% endif %}
-      {% if "soil_temp_c" in node.metrics %}
-      <div class="stat-card">
-        <div class="stat-icon">&#x1F321;&#xFE0F;</div>
-        <div class="stat-value">{{ "%.1f"|format(node.metrics["soil_temp_c"]|default(0)) }}\u00B0C</div>
-        <div class="stat-label">Temperature</div>
-      </div>
-      {% endif %}
-    </div>
+<section class="card" id="chart-section">
+  <h2><span class="icon" aria-hidden="true">&#x1F4C8;</span> History</h2>
+  <div class="chart-selector">
+    {% for sel in chart_selectors %}
+    <a href="/api/v1/series?from={{ sel.from }}&to={{ sel.to }}&step={{ sel.step }}&metric=temp_c"
+       class="btn-glossy chart-btn"
+       data-step="{{ sel.step }}"
+       data-from="{{ sel.from }}"
+       data-to="{{ sel.to }}">
+      {{ sel.label }}
+    </a>
+    {% endfor %}
   </div>
-  {% endfor %}
+  <div id="chart-container"
+        class="chart-container"
+        data-chart
+        data-node="{{ first_weather_node or '' }}"
+        data-metric="temp_c"
+        role="img"
+        aria-label="Temperature chart for {{ first_weather_node or 'no node' }}"></div>
 </section>
-{% endif %}
 
-{% if not weather_nodes and not soil_nodes %}
-<section class="card">
-  <div class="empty-state">
-    <div class="empty-icon">&#x1F332;</div>
-    <h2 style="margin-bottom: var(--space-md);">No Readings Yet</h2>
-    <p style="color: var(--color-text-muted); font-size: 15px;">
-      The weather station is setting up. Once the sensors start reporting,
-      live conditions will appear here.
-    </p>
+{% endblock %}
+
+{% block scripts %}
+<noscript>
+  <style>.chart-container{min-height:60px;}</style>
+  <div class="card" style="margin-bottom:var(--space-4xl)">
+    <p>Charts require JavaScript to display. Without JavaScript, historical data cannot be visualized.</p>
   </div>
-</section>
-{% endif %}
-
-{% if not weather_nodes %}
-<section class="card">
-  <div class="empty-state">
-    <div class="empty-icon">&#x1F326;&#xFE0F;</div>
-    <h2 style="margin-bottom: var(--space-md);">No Weather Data</h2>
-    <p style="color: var(--color-text-muted); font-size: 15px;">
-      Waiting for the weather node to send its first reading.
-    </p>
-  </div>
-</section>
-{% endif %}
-
-{% if not soil_nodes %}
-<section class="card">
-  <div class="empty-state">
-    <div class="empty-icon">&#x1F331;</div>
-    <h2 style="margin-bottom: var(--space-md);">No Soil Data</h2>
-    <p style="color: var(--color-text-muted); font-size: 15px;">
-      Waiting for the soil sensor node to send its first reading.
-    </p>
-  </div>
-</section>
-{% endif %}
-
+</noscript>
+<link rel="stylesheet" href="/static/vendor/uPlot.min.css">
+<script src="/static/vendor/uPlot.iife.min.js"></script>
+<script src="/static/chart.js"
+        data-node="{{ first_weather_node or '' }}"
+        data-metric="temp_c"></script>
 {% endblock %}

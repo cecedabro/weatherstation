@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} - Weather Station{% endblock %}
+{% block description %}Real-time weather readings including temperature, humidity, pressure, rainfall, and wind — with historical charts for day, week, and month.{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/vendor/uPlot.min.css">
+<script src="/static/vendor/uPlot.iife.min.js"></script>
+{% endblock %}
+
+{% block content %}
+{% if not weather_nodes %}
+<section class="card">
+  <div class="empty-state">
+    <div class="empty-icon" aria-hidden="true">&#x1F326;&#xFE0F;</div>
+    <h2>No Weather Data</h2>
+    <p>
+      Waiting for a weather node to send its first reading.
+    </p>
+  </div>
+</section>
+{% else %}
+<section class="card">
+  <h2><span class="icon" aria-hidden="true">&#x1F326;&#xFE0F;</span> Current Conditions</h2>
+  {% for node in weather_nodes %}
+  <div class="card card-spaced">
+    <h3 class="node-title">{{ node.node_id }}</h3>
+    <div class="stats-row">
+      {% for metric_name, metric_icon, metric_unit in [
+        ("temp_c", "\u2600\uFE0F", "\u00B0C"),
+        ("humidity_pct", "&#x1F4A7;", "%"),
+        ("pressure_hpa", "&#x1F321;&#xFE0F;", "hPa"),
+        ("rain_mm", "&#x1F4A6;", "mm"),
+        ("wind_speed_ms", "\u26C5", "m/s"),
+        ("wind_dir_deg", "&#x1F9ED;", "\u00B0")
+      ] %}
+        {% if metric_name in node.metrics %}
+        <div class="stat-card">
+          <div class="stat-icon" aria-hidden="true">{{ metric_icon }}</div>
+          {% if metric_name == "wind_dir_deg" %}
+          <div class="stat-value">{{ compass(node.metrics[metric_name]) }} {{ "%.0f"|format(node.metrics[metric_name]) }}{{ metric_unit }}</div>
+          {% else %}
+          <div class="stat-value">{{ "%.1f"|format(node.metrics[metric_name]) }}{{ metric_unit }}</div>
+          {% endif %}
+          <div class="stat-label">{{ metric_name.replace("_", " ") | title }}</div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if node.offline %}
+    <div class="offline-indicator">
+      Offline since {{ node.reading_time|local_time if node.reading_time else 'N/A' }}
+    </div>
+    {% else %}
+    <time class="updated-time" datetime="{{ node.reading_time.isoformat() if node.reading_time else '' }}" title="{{ node.reading_time|local_time if node.reading_time else '' }}">
+      Updated {{ ago(node.reading_time) if node.reading_time else 'N/A' }}
+    </time>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>
+
+<section class="card" id="chart-section">
+  <h2><span class="icon" aria-hidden="true">&#x1F4C8;</span> History</h2>
+  <div class="chart-selector">
+    {% for sel in chart_selectors %}
+    <a href="/api/v1/series?from={{ sel.from }}&to={{ sel.to }}&step={{ sel.step }}"
+       class="btn-glossy chart-btn"
+       data-step="{{ sel.step }}"
+       data-from="{{ sel.from }}"
+       data-to="{{ sel.to }}">
+      {{ sel.label }}
+    </a>
+    {% endfor %}
+  </div>
+  {% for node in weather_nodes %}
+    {% for metric_name in ["temp_c", "humidity_pct", "pressure_hpa", "rain_mm", "wind_speed_ms", "wind_dir_deg"] %}
+      {% if metric_name in node.metrics %}
+  <div class="chart-container"
+        id="chart-{{ node.node_id }}-{{ metric_name }}"
+        data-chart
+        data-node="{{ node.node_id }}"
+        data-metric="{{ metric_name }}"
+        role="img"
+        aria-label="{{ metric_name }} chart for {{ node.node_id }}"></div>
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<noscript>
+  <style>.chart-container{min-height:60px;}</style>
+  <div class="card" style="margin-bottom:var(--space-4xl)">
+    <p>Charts require JavaScript to display. Without JavaScript, historical data cannot be visualized.</p>
+  </div>
+</noscript>
+<script src="/static/chart.js"></script>
+{% endblock %}
