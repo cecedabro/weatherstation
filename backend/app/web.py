@@ -140,6 +140,7 @@ async def weather_page() -> HTMLResponse:
         template = _jinja_env.get_template("weather.html")
         html = template.render(
             weather_nodes=weather_nodes,
+            chart_selectors=_selector_links(),
             active="weather",
             page_title="Weather",
         )

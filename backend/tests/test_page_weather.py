@@ -50,9 +50,7 @@ def _make_batch(
     for metric, value in metrics.items():
         reading = db.execute(
             select(Reading).where(
-                (Reading.node_id == node_id)
-                & (Reading.metric == metric)
-                & (Reading.ts == ts)
+                (Reading.node_id == node_id) & (Reading.metric == metric) & (Reading.ts == ts)
             )
         ).scalar_one_or_none()
         if reading is None:
@@ -110,12 +108,12 @@ def test_weather_page_shows_metrics(client, weather_data):
     """Metrics appear with correct values and units."""
     resp = client.get("/weather")
     html = resp.text
-    assert "21.5\u00B0C" in html
+    assert "21.5\u00b0C" in html
     assert "65.0%" in html
     assert "1013.4hPa" in html
     assert "5.2m/s" in html
     assert "SSE" in html
-    assert "164\u00B0" in html
+    assert "164\u00b0" in html
 
 
 def test_weather_page_shows_node_id(client, weather_data):

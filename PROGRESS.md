@@ -231,3 +231,10 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `backend/tests/test_page_weather.py` with 9 tests: 200 status, HTML content-type, metric values + units, node ID, last-updated timestamp, offline indicator, nav active state, empty state, and section header.
 - Fixed `backend/app/templates/base.html`: nav links now include both `class="nav-link {% active %}"` and `aria-current="page"` with correct attribute ordering (`aria-current` before `class`) so both `test_nav.py` and `test_page_weather.py` assertions pass.
 - `make check` passes: ruff clean, mypy clean, 263 tests pass (9 new + 254 existing), 98.17% coverage.
+
+## T31: Charts on GET /weather (SPEC 10.2) - DONE 2026-11-02
+- Updated `backend/app/web.py`: added `chart_selectors=_selector_links()` to the `/weather` route context.
+- Updated `backend/app/templates/weather.html`: added "History" section with shared day/week/month chart selector and one `<div data-chart>` container per metric per node (temp_c, humidity_pct, pressure_hpa, rain_mm, wind_speed_ms, wind_dir_deg). uPlot assets loaded via `{% block head %}`.
+- Rewrote `backend/app/static/chart.js`: now finds chart sections by scanning `section.card` elements for `[data-chart]` children, registers multiple charts per section, sets `_section` ID on ranges, and handles selector button clicks to update all charts in the matching section. `rain_mm` renders as bars via `barPath()` function.
+- Created `backend/tests/test_page_weather_charts.py` with 10 tests: chart section existence, selector presence/query params, chart containers per metric, data-node/data-chart attributes, rain_mm presence, barPath JS function, empty state behavior.
+- `make check` passes: ruff clean, mypy clean, 273 tests pass (10 new + 263 existing), 98.17% coverage.

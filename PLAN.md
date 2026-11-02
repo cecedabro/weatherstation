@@ -80,7 +80,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_autorefresh.py -q
 - [x] T30: `/weather` page (SPEC 10.2, first half): route in `web.py`, `templates/weather.html`, nav active "weather". Per weather node: every current metric with label, value and unit (wind as compass), and its last-updated time. Empty state when there are no weather nodes. Write `tests/test_page_weather.py`.
   accept: cd backend && uv run pytest tests/test_page_weather.py -q
-- [ ] T31: Charts on `/weather` (SPEC 10.2, second half): one chart element per metric the node reports (same `data-chart`/`data-node`/`data-metric` contract as `/`) and one shared day/week/month selector; `chart.js` handles several charts on one page and draws `rain_mm` as bars. Write `tests/test_page_weather_charts.py`.
+- [x] T31: Charts on `/weather` (SPEC 10.2, second half): one chart element per metric the node reports (same `data-chart`/`data-node`/`data-metric` contract as `/`) and one shared day/week/month selector; `chart.js` handles several charts on one page and draws `rain_mm` as bars. Write `tests/test_page_weather_charts.py`.
   accept: cd backend && uv run pytest tests/test_page_weather_charts.py -q && node --check app/static/chart.js
 - [ ] T32: `/soil` page (SPEC 10.3): one card per soil node with moisture, soil temperature, battery voltage, online/offline and last seen (`ago`), plus a "needs water" badge when moisture < 25 %. Each card links to `/soil/<node_id>`. Empty state. Write `tests/test_page_soil.py` (24.9 % shows the badge, 25.0 % does not; a node last seen 16 min ago is offline).
   accept: cd backend && uv run pytest tests/test_page_soil.py -q

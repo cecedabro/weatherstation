@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 {% block title %}{{ page_title }} - Weather Station{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/vendor/uPlot.min.css">
+<script src="/static/vendor/uPlot.iife.min.js"></script>
+{% endblock %}
+
 {% block content %}
 {% if not weather_nodes %}
 <section class="card">
@@ -51,5 +57,35 @@
   </div>
   {% endfor %}
 </section>
+
+<section class="card" id="chart-section">
+  <h2><span class="icon">&#x1F4C8;</span> History</h2>
+  <div class="chart-selector">
+    {% for sel in chart_selectors %}
+    <a href="/api/v1/series?from={{ sel.from }}&to={{ sel.to }}&step={{ sel.step }}"
+       class="btn-glossy chart-btn"
+       data-step="{{ sel.step }}"
+       data-from="{{ sel.from }}"
+       data-to="{{ sel.to }}">
+      {{ sel.label }}
+    </a>
+    {% endfor %}
+  </div>
+  {% for node in weather_nodes %}
+    {% for metric_name in ["temp_c", "humidity_pct", "pressure_hpa", "rain_mm", "wind_speed_ms", "wind_dir_deg"] %}
+      {% if metric_name in node.metrics %}
+  <div class="chart-container"
+       id="chart-{{ node.node_id }}-{{ metric_name }}"
+       data-chart
+       data-node="{{ node.node_id }}"
+       data-metric="{{ metric_name }}"></div>
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+</section>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/chart.js"></script>
 {% endblock %}
