@@ -8,7 +8,7 @@
 {% include "_current.html" %}
 
 <section class="card" id="chart-section">
-  <h2><span class="icon">&#x1F4C8;</span> History</h2>
+  <h2><span class="icon" aria-hidden="true">&#x1F4C8;</span> History</h2>
   <div class="chart-selector">
     {% for sel in chart_selectors %}
     <a href="/api/v1/series?from={{ sel.from }}&to={{ sel.to }}&step={{ sel.step }}&metric=temp_c"
@@ -24,12 +24,20 @@
         class="chart-container"
         data-chart
         data-node="{{ first_weather_node or '' }}"
-        data-metric="temp_c"></div>
+        data-metric="temp_c"
+        role="img"
+        aria-label="Temperature chart for {{ first_weather_node or 'no node' }}"></div>
 </section>
 
 {% endblock %}
 
 {% block scripts %}
+<noscript>
+  <style>.chart-container{min-height:60px;}</style>
+  <div class="card" style="margin-bottom:var(--space-4xl)">
+    <p>Charts require JavaScript to display. Without JavaScript, historical data cannot be visualized.</p>
+  </div>
+</noscript>
 <link rel="stylesheet" href="/static/vendor/uPlot.min.css">
 <script src="/static/vendor/uPlot.iife.min.js"></script>
 <script src="/static/chart.js"

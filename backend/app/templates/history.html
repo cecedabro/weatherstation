@@ -4,7 +4,7 @@
 
 {% block content %}
 <section class="card">
-  <h2><span class="icon">&#x1F4C8;</span> Daily History</h2>
+  <h2><span class="icon" aria-hidden="true">&#x1F4C8;</span> Daily History</h2>
 
   {% if selected_node %}
   <p class="node-label">Node: {{ selected_node }}</p>
@@ -23,7 +23,7 @@
 
   {% if not daily_data %}
   <div class="empty-state">
-    <div class="empty-icon">&#x1F332;</div>
+    <div class="empty-icon" aria-hidden="true">&#x1F332;</div>
     <h3>No History Yet</h3>
     <p>
       Waiting for the weather node to send its first reading. Daily summaries
@@ -61,7 +61,7 @@
 </section>
 
 <section class="card">
-  <h2><span class="icon">&#x1F4BE;</span> Export Data</h2>
+  <h2><span class="icon" aria-hidden="true">&#x1F4BE;</span> Export Data</h2>
 
   <form method="get" action="/api/v1/export.csv" class="export-form">
     <div class="form-row">

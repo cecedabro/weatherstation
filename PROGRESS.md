@@ -289,3 +289,11 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated all page templates with unique `<title>` and `<meta name="description">` blocks: `home.html`, `weather.html`, `soil.html`, `history.html`, `about.html`, `soil_detail.html`, `404.html`.
 - Created `backend/tests/test_meta.py` with 4 tests: favicon serves 200 with correct content-type and `<svg>` markup; titles are unique across all 5 tested pages (`/`, `/weather`, `/soil`, `/history`, `/about`); every page has a non-empty `<meta name="description">`; base template has `<main>` and `<footer>` landmarks.
 - `make check` passes: ruff clean, mypy clean, 402 tests pass (4 new + 398 existing), 97.82% coverage.
+
+## T41: Accessibility pass — charts (role="img", aria-label), noscript, decorative emojis (SPEC 10.12) - DONE 2026-11-02
+- Added `role="img"` and `aria-label` attributes to all `<div data-chart>` chart containers in `home.html`, `weather.html`, and `soil_detail.html`. Labels are formatted as `"<metric> chart for <node>"`.
+- Added `<noscript><p>Charts require JavaScript to render.</p></noscript>` blocks to `home.html`, `weather.html`, and `soil_detail.html` inside their `{% block scripts %}` sections.
+- Added `aria-hidden="true"` to all decorative emojis across 9 templates: `base.html`, `_current.html`, `weather.html`, `soil.html`, `soil_detail.html`, `history.html`, `admin.html`, `404.html`. Emojis are now wrapped in `<span aria-hidden="true">`.
+- Verified form controls in `history.html` already have associated `<label>` elements.
+- Created `backend/tests/test_a11y.py` with 6 tests using Python's `html.parser` to validate: chart `role`/`aria-label` presence, noscript fallback blocks on chart pages, emoji `aria-hidden` attributes, and form control/label associations. Fixed parser logic to use two-pass approach (collect labels first, then check controls) since labels and controls are DOM siblings.
+- `make check` passes: ruff clean, mypy clean, 406 tests pass (6 new + 400 existing), 97.82% coverage.

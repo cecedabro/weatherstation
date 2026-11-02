@@ -29,6 +29,7 @@ def _get_title(text):
 def _get_meta_description(text):
     """Extract <meta name="description"> content from HTML response."""
     import re
+
     m = re.search(
         r'<meta\s+name=["\']description["\']\s+content=["\']([^"\']*)["\']',
         text,
@@ -58,9 +59,7 @@ def test_titles_unique(db):
         title = _get_title(resp.text)
         assert title is not None, f"Missing <title> on {url}"
         titles.append(title)
-    assert len(titles) == len(set(titles)), (
-        f"Duplicate titles found: {titles}"
-    )
+    assert len(titles) == len(set(titles)), f"Duplicate titles found: {titles}"
 
 
 def test_meta_description_present(db):
@@ -70,12 +69,8 @@ def test_meta_description_present(db):
         resp = client.get(url)
         assert resp.status_code == 200, f"{url} returned {resp.status_code}"
         desc = _get_meta_description(resp.text)
-        assert desc is not None, (
-            f"Missing <meta name='description'> on {url}"
-        )
-        assert len(desc.strip()) > 0, (
-            f"<meta name='description'> on {url} has empty content"
-        )
+        assert desc is not None, f"Missing <meta name='description'> on {url}"
+        assert len(desc.strip()) > 0, f"<meta name='description'> on {url} has empty content"
 
 
 def test_base_template_has_landmarks(db):

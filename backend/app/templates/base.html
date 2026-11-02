@@ -20,9 +20,9 @@
 
   <header class="header">
     <div>
-      <h1>{% block header_title %}&#x1F33F; Weather<span>Station</span>{% endblock %}</h1>
+      <h1>{% block header_title %}<span aria-hidden="true">&#x1F33F;</span> Weather<span>Station</span>{% endblock %}</h1>
     </div>
-    <div class="header-logo">{% block header_logo %}&#x1F33B;{% endblock %}</div>
+    <div class="header-logo">{% block header_logo %}<span aria-hidden="true">&#x1F33B;</span>{% endblock %}</div>
   </header>
 
   <nav aria-label="Main" class="nav">
@@ -38,7 +38,7 @@
   </main>
 
   <footer class="footer">
-    {% block footer %}Weather Station &#x2764;&#xFE0F;{% endblock %}
+    {% block footer %}Weather Station <span aria-hidden="true">&#x2764;&#xFE0F;</span>{% endblock %}
   </footer>
 
   {% block scripts %}{% endblock %}

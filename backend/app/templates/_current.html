@@ -5,26 +5,26 @@
 {% if alerts %}
 {% if alerts.frost_warning %}
 <div class="alert alert--frost">
-  <span class="alert-icon">&#x1F9E8;</span>
+  <span class="alert-icon" aria-hidden="true">&#x1F9E8;</span>
   <strong>Frost Warning</strong> – Temperatures at or below freezing detected. Protect sensitive plants.
 </div>
 {% endif %}
 {% if alerts.rain_total_24h > 0 %}
 <div class="alert alert--rain">
-  <span class="alert-icon">&#x1F4A7;</span>
+  <span class="alert-icon" aria-hidden="true">&#x1F4A7;</span>
   <strong>Rain 24h</strong> – {{ "%.1f"|format(alerts.rain_total_24h) }} mm recorded.
 </div>
 {% endif %}
 {% if alerts.beds_needing_water > 0 %}
 <div class="alert alert--moisture">
-  <span class="alert-icon">&#x1F331;</span>
+  <span class="alert-icon" aria-hidden="true">&#x1F331;</span>
   <strong>Water Needed</strong> – {{ alerts.beds_needing_water }} bed{{ 's' if alerts.beds_needing_water > 1 else '' }} need{{ 's' if alerts.beds_needing_water != 1 else '' }} water (<a href="/soil">details</a>).
 </div>
 {% endif %}
 {% endif %}
 {% if weather_nodes %}
 <section class="card">
-  <h2><span class="icon">&#x1F326;&#xFE0F;</span> Current Conditions</h2>
+  <h2><span class="icon" aria-hidden="true">&#x1F326;&#xFE0F;</span> Current Conditions</h2>
   {% for node in weather_nodes %}
   <div class="card card-spaced">
     <h3 class="node-title">{{ node.node_id }}</h3>
@@ -39,7 +39,7 @@
       ] %}
         {% if metric_name in node.metrics %}
         <div class="stat-card">
-          <div class="stat-icon">{{ metric_icon }}</div>
+          <div class="stat-icon" aria-hidden="true">{{ metric_icon }}</div>
           {% if metric_name == "wind_dir_deg" %}
           <div class="stat-value">{{ compass(node.metrics[metric_name]) }} {{ "%.0f"|format(node.metrics[metric_name]) }}{{ metric_unit }}</div>
           {% else %}
@@ -66,21 +66,21 @@
 
 {% if soil_nodes %}
 <section class="card">
-  <h2><span class="icon">&#x1F33F;</span> Latest Soil Readings</h2>
+  <h2><span class="icon" aria-hidden="true">&#x1F33F;</span> Latest Soil Readings</h2>
   {% for node in soil_nodes %}
   <div class="card card-spaced">
     <h3 class="node-title">{{ node.node_id }}</h3>
     <div class="stats-row stats-row--soil">
       {% if "soil_moisture_pct" in node.metrics %}
       <div class="stat-card">
-        <div class="stat-icon">&#x1F331;</div>
+        <div class="stat-icon" aria-hidden="true">&#x1F331;</div>
         <div class="stat-value">{{ "%.0f"|format(node.metrics["soil_moisture_pct"]) }}%</div>
         <div class="stat-label">Moisture</div>
       </div>
       {% endif %}
       {% if "soil_temp_c" in node.metrics %}
       <div class="stat-card">
-        <div class="stat-icon">&#x1F321;&#xFE0F;</div>
+        <div class="stat-icon" aria-hidden="true">&#x1F321;&#xFE0F;</div>
         <div class="stat-value">{{ "%.1f"|format(node.metrics["soil_temp_c"]|default(0)) }}\u00B0C</div>
         <div class="stat-label">Temperature</div>
       </div>
@@ -103,7 +103,7 @@
 {% if not weather_nodes and not soil_nodes %}
 <section class="card">
   <div class="empty-state">
-    <div class="empty-icon">&#x1F332;</div>
+    <div class="empty-icon" aria-hidden="true">&#x1F332;</div>
     <h2>No Readings Yet</h2>
     <p>
       The weather station is setting up. Once the sensors start reporting,
@@ -114,7 +114,7 @@
 {% elif not weather_nodes %}
 <section class="card">
   <div class="empty-state">
-    <div class="empty-icon">&#x1F326;&#xFE0F;</div>
+    <div class="empty-icon" aria-hidden="true">&#x1F326;&#xFE0F;</div>
     <h2>No Weather Data</h2>
     <p>
       Waiting for the weather node to send its first reading.
@@ -124,7 +124,7 @@
 {% elif not soil_nodes %}
 <section class="card">
   <div class="empty-state">
-    <div class="empty-icon">&#x1F331;</div>
+    <div class="empty-icon" aria-hidden="true">&#x1F331;</div>
     <h2>No Soil Data</h2>
     <p>
       Waiting for the soil sensor node to send its first reading.

@@ -11,7 +11,7 @@
 {% if not weather_nodes %}
 <section class="card">
   <div class="empty-state">
-    <div class="empty-icon">&#x1F326;&#xFE0F;</div>
+    <div class="empty-icon" aria-hidden="true">&#x1F326;&#xFE0F;</div>
     <h2>No Weather Data</h2>
     <p>
       Waiting for a weather node to send its first reading.
@@ -20,7 +20,7 @@
 </section>
 {% else %}
 <section class="card">
-  <h2><span class="icon">&#x1F326;&#xFE0F;</span> Current Conditions</h2>
+  <h2><span class="icon" aria-hidden="true">&#x1F326;&#xFE0F;</span> Current Conditions</h2>
   {% for node in weather_nodes %}
   <div class="card card-spaced">
     <h3 class="node-title">{{ node.node_id }}</h3>
@@ -35,7 +35,7 @@
       ] %}
         {% if metric_name in node.metrics %}
         <div class="stat-card">
-          <div class="stat-icon">{{ metric_icon }}</div>
+          <div class="stat-icon" aria-hidden="true">{{ metric_icon }}</div>
           {% if metric_name == "wind_dir_deg" %}
           <div class="stat-value">{{ compass(node.metrics[metric_name]) }} {{ "%.0f"|format(node.metrics[metric_name]) }}{{ metric_unit }}</div>
           {% else %}
@@ -60,7 +60,7 @@
 </section>
 
 <section class="card" id="chart-section">
-  <h2><span class="icon">&#x1F4C8;</span> History</h2>
+  <h2><span class="icon" aria-hidden="true">&#x1F4C8;</span> History</h2>
   <div class="chart-selector">
     {% for sel in chart_selectors %}
     <a href="/api/v1/series?from={{ sel.from }}&to={{ sel.to }}&step={{ sel.step }}"
@@ -76,10 +76,12 @@
     {% for metric_name in ["temp_c", "humidity_pct", "pressure_hpa", "rain_mm", "wind_speed_ms", "wind_dir_deg"] %}
       {% if metric_name in node.metrics %}
   <div class="chart-container"
-       id="chart-{{ node.node_id }}-{{ metric_name }}"
-       data-chart
-       data-node="{{ node.node_id }}"
-       data-metric="{{ metric_name }}"></div>
+        id="chart-{{ node.node_id }}-{{ metric_name }}"
+        data-chart
+        data-node="{{ node.node_id }}"
+        data-metric="{{ metric_name }}"
+        role="img"
+        aria-label="{{ metric_name }} chart for {{ node.node_id }}"></div>
       {% endif %}
     {% endfor %}
   {% endfor %}
@@ -88,5 +90,11 @@
 {% endblock %}
 
 {% block scripts %}
+<noscript>
+  <style>.chart-container{min-height:60px;}</style>
+  <div class="card" style="margin-bottom:var(--space-4xl)">
+    <p>Charts require JavaScript to display. Without JavaScript, historical data cannot be visualized.</p>
+  </div>
+</noscript>
 <script src="/static/chart.js"></script>
 {% endblock %}

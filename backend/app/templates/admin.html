@@ -2,13 +2,13 @@
 
 {% block title %}Weather Station — Admin{% endblock %}
 
-{% block header_title %}&#x1F527; Weather<span>Station Admin</span>{% endblock %}
-{% block header_logo %}&#x1F512;{% endblock %}
+{% block header_title %}<span aria-hidden="true">&#x1F527;</span> Weather<span>Station Admin</span>{% endblock %}
+{% block header_logo %}<span aria-hidden="true">&#x1F512;</span>{% endblock %}
 
 {% block content %}
 
 <section class="card">
-  <h2><span class="icon">&#x1F4CA;</span> Node Health</h2>
+  <h2><span class="icon" aria-hidden="true">&#x1F4CA;</span> Node Health</h2>
 
   {% if nodes %}
   <div class="admin-table-wrapper">
@@ -61,7 +61,7 @@
   </div>
   {% else %}
   <div class="empty-state">
-    <div class="empty-icon">&#x1F50D;</div>
+    <div class="empty-icon" aria-hidden="true">&#x1F50D;</div>
     <h2>No Nodes Registered</h2>
     <p style="color: var(--color-text-muted); font-size: 15px;">
       No sensor nodes have reported yet. The table will appear once nodes send their first reading.
