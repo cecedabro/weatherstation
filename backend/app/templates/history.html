@@ -1,8 +1,61 @@
 {% extends "base.html" %}
 {% block title %}{{ page_title }} - Weather Station{% endblock %}
+
 {% block content %}
 <section class="card">
-  <h2>{{ page_title }}</h2>
-  <p>Daily summaries for the last 30 days.</p>
+  <h2><span class="icon">&#x1F4C8;</span> Daily History</h2>
+
+  {% if selected_node %}
+  <p class="node-label">Node: {{ selected_node }}</p>
+  {% endif %}
+
+  {% if weather_nodes|length > 1 %}
+  <form method="get" class="node-selector" hx-get="/history" hx-target="#history-content" hx-include="[name='node']">
+    <label for="node-select">Select node:</label>
+    <select name="node" id="node-select" onchange="this.form.submit()">
+      {% for n in weather_nodes %}
+      <option value="{{ n.node_id }}" {% if n.node_id == selected_node %}selected{% endif %}>{{ n.node_id }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% endif %}
+
+  {% if not daily_data %}
+  <div class="empty-state">
+    <div class="empty-icon">&#x1F332;</div>
+    <h3>No History Yet</h3>
+    <p>
+      Waiting for the weather node to send its first reading. Daily summaries
+      will appear here once readings are available.
+    </p>
+  </div>
+  {% else %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Temp Min</th>
+          <th>Temp Max</th>
+          <th>Temp Avg</th>
+          <th>Rain Total</th>
+          <th>Humidity Avg</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in daily_data %}
+        <tr>
+          <td>{{ row.date.strftime("%-d %b %Y") }}</td>
+          <td>{% if row.temp_min is not none %}{{ "%.1f"|format(row.temp_min) }}&#x00B0;{% endif %}</td>
+          <td>{% if row.temp_max is not none %}{{ "%.1f"|format(row.temp_max) }}&#x00B0;{% endif %}</td>
+          <td>{% if row.temp_avg is not none %}{{ "%.1f"|format(row.temp_avg) }}&#x00B0;{% endif %}</td>
+          <td>{% if row.rain_total > 0 %}{{ "%.1f"|format(row.rain_total) }} mm{% else %}0.0 mm{% endif %}</td>
+          <td>{% if row.humidity_avg is not none %}{{ "%.0f"|format(row.humidity_avg) }}%{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
 </section>
 {% endblock %}

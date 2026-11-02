@@ -2,16 +2,16 @@
 
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import TypedDict
+from typing import Any, TypedDict
 from urllib.parse import quote
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
 
 from app.db import SessionLocal
 from app.fmt import _register_filters
-from app.readapi import _current_readings
+from app.readapi import _current_readings, _daily_aggregation
 
 
 class _SelectorSpec(TypedDict):
@@ -209,11 +209,45 @@ async def soil_detail_page(node_id: str) -> HTMLResponse:
 
 
 @router.get("/history")
-async def history_page() -> HTMLResponse:
+async def history_page(node: str | None = Query(None)) -> HTMLResponse:
     """Render the history page per SPEC 10.5."""
-    template = _jinja_env.get_template("history.html")
-    html = template.render(active="history", page_title="History")
-    return HTMLResponse(content=html)
+    db = SessionLocal()
+    try:
+        all_nodes = _current_readings(db)
+        weather_nodes = [n for n in all_nodes if n["node_type"] == "weather"]
+
+        # Pick the node to show
+        selected_node: str | None = None
+        if node:
+            # Use ?node= only if it matches a known weather node
+            if any(n["node_id"] == node for n in weather_nodes):
+                selected_node = node
+        elif len(weather_nodes) > 1:
+            # Default to first weather node when there are several
+            selected_node = weather_nodes[0]["node_id"]
+        elif len(weather_nodes) == 1:
+            selected_node = weather_nodes[0]["node_id"]
+
+        daily_data: list[dict[str, Any]] = []
+        if selected_node:
+            try:
+                daily_data = _daily_aggregation(db, node=selected_node, days=30)
+            except ValueError:
+                daily_data = []
+        # Reverse for newest-first display
+        daily_data = list(reversed(daily_data))
+
+        template = _jinja_env.get_template("history.html")
+        html = template.render(
+            daily_data=daily_data,
+            weather_nodes=weather_nodes,
+            selected_node=selected_node,
+            active="history",
+            page_title="History",
+        )
+        return HTMLResponse(content=html)
+    finally:
+        db.close()
 
 
 @router.get("/about")

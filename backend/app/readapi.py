@@ -228,6 +228,100 @@ async def current() -> list[dict[str, Any]]:
         db.close()
 
 
+def _daily_aggregation(
+    db: Session,
+    *,
+    node: str | None = None,
+    days: int = 30,
+) -> list[dict[str, Any]]:
+    """Return daily aggregation for *node* over the last *days* days.
+
+    One row per UTC day with *date*, *temp_min*, *temp_max*, *temp_avg*,
+    *rain_total*, *humidity_avg* (None when that day has no such data).
+
+    *days* must be 1-366; values outside this range raise ValueError.
+
+    Rows are returned **oldest first** (caller may reverse).
+    """
+    if days < 1 or days > 366:
+        raise ValueError("days must be 1-366")
+
+    now = datetime.now(UTC)
+    from_dt = now - timedelta(days=days)
+
+    conditions: list[ColumnElement[Any]] = []
+    conditions.append(Reading.ts >= from_dt)  # type: ignore[arg-type]
+    if node:
+        conditions.append(Reading.node_id == node)
+
+    # Fetch all readings for the period, grouped by day bucket + metric.
+    # We bucket by day using date_trunc to keep everything in SQL.
+    day_col = func.date_trunc("day", Reading.ts)
+
+    stmt = (
+        select(
+            day_col.label("day"),
+            Reading.metric,
+            Reading.value,
+        )
+        .where(*conditions)
+        .order_by(day_col.asc())
+    )
+
+    rows = db.execute(stmt).mappings().all()
+
+    # Pivot into per-day dicts, aggregating per metric.
+    # Different metrics need different aggregate functions:
+    #   temp_c  -> min, max, avg
+    #   rain_mm -> sum
+    #   humidity_pct -> avg
+    days_map: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        day_val = row["day"]
+        d = day_val.date() if hasattr(day_val, "date") else day_val
+        d_str = str(d)
+        if d_str not in days_map:
+            days_map[d_str] = {"date": d}
+        m = row["metric"]
+        v = float(row["value"]) if row["value"] is not None else None
+        if m == "temp_c":
+            if v is not None:
+                days_map[d_str].setdefault("temp_min", v)
+                days_map[d_str]["temp_min"] = min(days_map[d_str]["temp_min"], v)
+                days_map[d_str].setdefault("temp_max", v)
+                days_map[d_str]["temp_max"] = max(days_map[d_str]["temp_max"], v)
+                days_map[d_str]["_temp_sum"] = days_map[d_str].get("_temp_sum", 0) + v
+                days_map[d_str]["_temp_n"] = days_map[d_str].get("_temp_n", 0) + 1
+        elif m == "rain_mm":
+            if v is not None:
+                days_map[d_str]["rain_total"] = days_map[d_str].get("rain_total", 0) + v
+        elif m == "humidity_pct" and v is not None:
+            days_map[d_str]["_hum_sum"] = days_map[d_str].get("_hum_sum", 0) + v
+            days_map[d_str]["_hum_n"] = days_map[d_str].get("_hum_n", 0) + 1
+
+    # Build final result list sorted oldest-first
+    result: list[dict[str, Any]] = []
+    for d_str in sorted(days_map):
+        d = days_map[d_str]["date"]
+        tn = days_map[d_str].get("_temp_n", 0)
+        hn = days_map[d_str].get("_hum_n", 0)
+        entry = {
+            "date": d,
+            "temp_min": round(days_map[d_str]["temp_min"], 2)
+            if "temp_min" in days_map[d_str]
+            else None,
+            "temp_max": round(days_map[d_str]["temp_max"], 2)
+            if "temp_max" in days_map[d_str]
+            else None,
+            "temp_avg": round(days_map[d_str]["_temp_sum"] / tn, 2) if tn else None,
+            "rain_total": round(days_map[d_str].get("rain_total", 0), 2),
+            "humidity_avg": round(days_map[d_str]["_hum_sum"] / hn, 2) if hn else None,
+        }
+        result.append(entry)
+
+    return result
+
+
 @router.get("/api/v1/nodes")
 async def nodes_list() -> list[dict[str, str | bool]]:
     """Return all known nodes with online status per contract.

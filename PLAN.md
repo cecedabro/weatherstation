@@ -88,7 +88,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_page_soil_detail.py -q
 - [~] T34: `GET /api/v1/daily?node=&days=` (SPEC 10.6) in `readapi.py`: one row per UTC day, oldest first, with `date`, `temp_min`, `temp_max`, `temp_avg`, `rain_total`, `humidity_avg` (null when that day has no such data). `days` 1–366, default 30, otherwise 400; unknown node → `[]`. Put the query in a plain function the history page can reuse. Write `tests/test_daily.py` with hand-computed values for two days. — skipped: $ cd backend && uv run pytest tests/test_daily.py -q  (exit 1)
   accept: cd backend && uv run pytest tests/test_daily.py -q
-- [ ] T35: `/history` page (SPEC 10.5): a table of the last 30 days for the first weather node using the T34 function (date, min/max/avg °C, rain mm, humidity %), newest first, with a node picker (`?node=`) when there are several weather nodes. Empty state. Write `tests/test_page_history.py`.
+- [x] T35: `/history` page (SPEC 10.5): a table of the last 30 days for the first weather node using the T34 function (date, min/max/avg °C, rain mm, humidity %), newest first, with a node picker (`?node=`) when there are several weather nodes. Empty state. Write `tests/test_page_history.py`.
   accept: cd backend && uv run pytest tests/test_page_history.py -q
 - [ ] T36: `GET /api/v1/export.csv?node=&metric=&from=&to=` (SPEC 10.7): `text/csv` with header `ts,node_id,metric,value`, ISO-8601 UTC timestamps, time-ordered, `Content-Disposition: attachment`. `metric` is optional (all metrics). Same date validation as `/series` (bad dates → 400). Write `tests/test_export.py`.
   accept: cd backend && uv run pytest tests/test_export.py -q
