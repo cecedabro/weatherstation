@@ -240,6 +240,13 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Gotcha: HTML entities like `&#176;` inside Jinja2 `{{ }}` expressions cause a `TemplateSyntaxError` ("unexpected char '&'"). Must place the entity or the Unicode degree symbol outside the expression (e.g. `{{ value }}°C`).
 - `make check` passes: ruff clean, mypy clean, 286 tests pass (13 new + 273 existing), 98.02% coverage.
 
+## T33: Soil detail page GET /soil/{node_id} (SPEC 10.4) - DONE 2026-11-02
+- Updated `backend/app/web.py`: replaced `/soil/{node_id}` stub with full route that validates node existence and type, fetches latest soil metrics, computes `offline` flag (>15 min), and renders `soil_detail.html` with metrics, badges, and chart selectors.
+- Created `backend/app/templates/soil_detail.html`: extends `base.html`, displays moisture/soil-temp/battery stat cards, "Needs Water" badge (<25%), online/offline indicator with `<time>` tags, and "History" section with soil moisture + soil temp chart containers and day/week/month selector buttons.
+- Created `backend/tests/test_page_soil_detail.py` with 26 tests: 200 status, content-type, metric display (moisture/temp/battery), nav active state, badges (needs water, online/offline), chart containers/attributes, selector links with query params, 404 for unknown/non-soil nodes, empty metrics (no charts), and partial metric (single chart).
+- Fixed `backend/app/templates/soil_detail.html`: changed `&#xB0;C` HTML entity to literal `°` character to match Jinja2 rendering behavior and test expectations (matching the pattern from `weather.html`).
+- `make check` passes: ruff clean, mypy clean, 312 tests pass (26 new + 286 existing), 98.10% coverage.
+
 ## T31: Charts on GET /weather (SPEC 10.2) - DONE 2026-11-02
 - Updated `backend/app/web.py`: added `chart_selectors=_selector_links()` to the `/weather` route context.
 - Updated `backend/app/templates/weather.html`: added "History" section with shared day/week/month chart selector and one `<div data-chart>` container per metric per node (temp_c, humidity_pct, pressure_hpa, rain_mm, wind_speed_ms, wind_dir_deg). uPlot assets loaded via `{% block head %}`.

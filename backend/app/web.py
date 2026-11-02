@@ -176,6 +176,38 @@ async def soil_page() -> HTMLResponse:
         db.close()
 
 
+@router.get("/soil/{node_id}")
+async def soil_detail_page(node_id: str) -> HTMLResponse:
+    """Render a single soil node detail page per SPEC 10.4."""
+    from fastapi import HTTPException
+
+    db = SessionLocal()
+    try:
+        all_nodes = _current_readings(db)
+        now = datetime.now(UTC)
+        for node in all_nodes:
+            rt = node.get("reading_time")
+            if rt is not None:
+                offline = (now - rt) > timedelta(minutes=15)
+                node["offline"] = offline
+            else:
+                node["offline"] = True
+        soil_nodes = [n for n in all_nodes if n["node_type"] == "soil"]
+        detail = next((n for n in soil_nodes if n["node_id"] == node_id), None)
+        if detail is None:
+            raise HTTPException(status_code=404, detail="Node not found")
+        template = _jinja_env.get_template("soil_detail.html")
+        html = template.render(
+            node=detail,
+            chart_selectors=_selector_links(),
+            active="soil",
+            page_title=f"Soil — {node_id}",
+        )
+        return HTMLResponse(content=html)
+    finally:
+        db.close()
+
+
 @router.get("/history")
 async def history_page() -> HTMLResponse:
     """Render the history page per SPEC 10.5."""

@@ -84,7 +84,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_page_weather_charts.py -q && node --check app/static/chart.js
 - [x] T32: `/soil` page (SPEC 10.3): one card per soil node with moisture, soil temperature, battery voltage, online/offline and last seen (`ago`), plus a "needs water" badge when moisture < 25 %. Each card links to `/soil/<node_id>`. Empty state. Write `tests/test_page_soil.py` (24.9 % shows the badge, 25.0 % does not; a node last seen 16 min ago is offline).
   accept: cd backend && uv run pytest tests/test_page_soil.py -q
-- [ ] T33: `/soil/{node_id}` page (SPEC 10.4): current values plus moisture and soil-temperature charts (same chart contract and selector). An unknown or non-soil node returns the styled 404 page. Write `tests/test_page_soil_detail.py`.
+- [x] T33: `/soil/{node_id}` page (SPEC 10.4): current values plus moisture and soil-temperature charts (same chart contract and selector). An unknown or non-soil node returns the styled 404 page. Write `tests/test_page_soil_detail.py`.
   accept: cd backend && uv run pytest tests/test_page_soil_detail.py -q
 - [ ] T34: `GET /api/v1/daily?node=&days=` (SPEC 10.6) in `readapi.py`: one row per UTC day, oldest first, with `date`, `temp_min`, `temp_max`, `temp_avg`, `rain_total`, `humidity_avg` (null when that day has no such data). `days` 1–366, default 30, otherwise 400; unknown node → `[]`. Put the query in a plain function the history page can reuse. Write `tests/test_daily.py` with hand-computed values for two days.
   accept: cd backend && uv run pytest tests/test_daily.py -q
