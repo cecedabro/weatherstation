@@ -219,3 +219,8 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added `GET /partials/current` route in `backend/app/web.py`: same DB query and offline logic as the index route, but renders only `_current.html` (no `<html>`, no nav, no header/footer). Returns `HTMLResponse` fragment for HTMX `hx-get` polling.
 - Created `backend/tests/test_partials.py` with 21 tests: 200 status, HTML content-type, no `<html`/`<head`/`<body`/`<nav`/`<header`/`<footer`, weather node ID, soil node ID, both node IDs, Current Conditions header, Latest Soil header, temperature/humidity/soil moisture/soil temperature values, empty-state fragment (no data, weather-only, soil-only, both present), card section classes, and content-parity with home page.
 - `make check` passes: ruff clean, mypy clean, 244 tests pass (21 new + 223 existing), 98.34% coverage.
+
+## T29: Auto-refresh on `/` (SPEC 10.10) - DONE 2026-11-02
+- Added `<div id="current-conditions" hx-get="/partials/current" hx-trigger="every 60s" hx-swap="outerHTML">` wrapper as the root element of `backend/app/templates/_current.html`, wrapping all conditional section blocks.
+- Created `backend/tests/test_autorefresh.py` with 10 tests: asserts `id="current-conditions"` and all three HTMX attributes (`hx-get`, `hx-trigger`, `hx-swap`) are present on both `GET /` (home page) and `GET /partials/current` (fragment).
+- `make check` passes: ruff clean, mypy clean, 254 tests pass (10 new + 244 existing), 98.34% coverage.

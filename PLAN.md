@@ -76,7 +76,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_404.py -q
 - [x] T28: `GET /partials/current` (SPEC 10.10): move the current-conditions and soil markup of the home page into `templates/_current.html`; `/` includes it and the new route returns only that fragment (no `<html>`, no nav). Write `tests/test_partials.py` (node ids present, no `<html`, empty-state fragment when there is no data). Existing home tests must still pass.
   accept: cd backend && uv run pytest tests/test_partials.py tests/test_page_current.py tests/test_page_home.py -q
-- [ ] T29: Auto-refresh on `/` (SPEC 10.10): the root element of `_current.html` carries `hx-get="/partials/current" hx-trigger="every 60s" hx-swap="outerHTML"`, so it keeps refreshing after each swap. Write `tests/test_autorefresh.py` asserting those attributes on `/` and on the fragment.
+- [x] T29: Auto-refresh on `/` (SPEC 10.10): the root element of `_current.html` carries `hx-get="/partials/current" hx-trigger="every 60s" hx-swap="outerHTML"`, so it keeps refreshing after each swap. Write `tests/test_autorefresh.py` asserting those attributes on `/` and on the fragment.
   accept: cd backend && uv run pytest tests/test_autorefresh.py -q
 - [ ] T30: `/weather` page (SPEC 10.2, first half): route in `web.py`, `templates/weather.html`, nav active "weather". Per weather node: every current metric with label, value and unit (wind as compass), and its last-updated time. Empty state when there are no weather nodes. Write `tests/test_page_weather.py`.
   accept: cd backend && uv run pytest tests/test_page_weather.py -q
