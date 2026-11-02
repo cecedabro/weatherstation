@@ -170,3 +170,12 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added `<script src="/static/vendor/htmx.min.js"></script>` to `backend/app/templates/base.html` in the `<head>` block so HTMX loads on every page.
 - Created `backend/tests/test_static_assets.py` with 4 tests: htmx.min.js serves 200 with JS content type, uPlot.iife.min.js serves 200 with JS content type, uPlot.min.css serves 200 with CSS content type, and `/` HTML contains a reference to htmx.min.js.
 - `make check` passes: ruff clean, mypy clean, 163 tests pass (4 new + 159 existing), 98% coverage.
+
+## T22: Fix home empty states per SPEC 5.3 (done)
+- Fixed `backend/app/templates/home.html` empty state logic: changed three separate `{% if %}` blocks into a single `{% if %}{% elif %}{% elif %}{% endif %}` chain.
+  - No data at all → only the "No Readings Yet" card (not "No Weather Data" + "No Soil Data")
+  - Weather data only → "No Soil Data" (not "No Weather Data")
+  - Soil data only → "No Weather Data" (not "No Soil Data")
+  - Both kinds present → no empty-state cards
+- Created `backend/tests/test_page_empty.py` with 11 tests covering: no data (generic card only, both specific absent), weather-only (soil empty shown, weather empty absent, generic absent), soil-only (weather empty shown, soil empty absent, generic absent), both present (no empty cards), and empty-state card count assertions (exactly 1 in all partial/empty cases).
+- `make check` passes: ruff clean, mypy clean, 174 tests pass (11 new + 163 existing), 98% coverage.

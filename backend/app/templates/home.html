@@ -71,9 +71,7 @@
     </p>
   </div>
 </section>
-{% endif %}
-
-{% if not weather_nodes %}
+{% elif not weather_nodes %}
 <section class="card">
   <div class="empty-state">
     <div class="empty-icon">&#x1F326;&#xFE0F;</div>
@@ -83,9 +81,7 @@
     </p>
   </div>
 </section>
-{% endif %}
-
-{% if not soil_nodes %}
+{% elif not soil_nodes %}
 <section class="card">
   <div class="empty-state">
     <div class="empty-icon">&#x1F331;</div>

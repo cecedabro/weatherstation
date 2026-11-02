@@ -37,6 +37,7 @@ def test_chart_selector_query_values(client) -> None:
 
     # Extract href values from chart buttons
     import re
+
     hrefs = re.findall(
         r'href="/api/v1/series\?([^"]+)"',
         r.text,
@@ -58,6 +59,4 @@ def test_chart_selector_query_values(client) -> None:
 
         hours = _SELECTOR_HOURS[expected["label"]]
         diff = (to_dt - from_dt).total_seconds() / 3600
-        assert diff == hours, (
-            f"Expected {hours}h window, got {diff}h"
-        )
+        assert diff == hours, f"Expected {hours}h window, got {diff}h"
