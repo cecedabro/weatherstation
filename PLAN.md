@@ -90,7 +90,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_daily.py -q
 - [x] T35: `/history` page (SPEC 10.5): a table of the last 30 days for the first weather node using the T34 function (date, min/max/avg °C, rain mm, humidity %), newest first, with a node picker (`?node=`) when there are several weather nodes. Empty state. Write `tests/test_page_history.py`.
   accept: cd backend && uv run pytest tests/test_page_history.py -q
-- [ ] T36: `GET /api/v1/export.csv?node=&metric=&from=&to=` (SPEC 10.7): `text/csv` with header `ts,node_id,metric,value`, ISO-8601 UTC timestamps, time-ordered, `Content-Disposition: attachment`. `metric` is optional (all metrics). Same date validation as `/series` (bad dates → 400). Write `tests/test_export.py`.
+- [x] T36: `GET /api/v1/export.csv?node=&metric=&from=&to=` (SPEC 10.7): `text/csv` with header `ts,node_id,metric,value`, ISO-8601 UTC timestamps, time-ordered, `Content-Disposition: attachment`. `metric` is optional (all metrics). Same date validation as `/series` (bad dates → 400). Write `tests/test_export.py`.
   accept: cd backend && uv run pytest tests/test_export.py -q
 - [ ] T37: Download form on `/history`: a plain GET form (node, metric including "all", from/to as `<input type="date">`) that submits to `/api/v1/export.csv`; the endpoint also accepts plain `YYYY-MM-DD` (from = start of that day, to = end of that day, UTC). Write `tests/test_page_history_export.py`.
   accept: cd backend && uv run pytest tests/test_page_history_export.py tests/test_export.py -q

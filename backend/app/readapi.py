@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Query
+from fastapi.responses import Response
 from pydantic import BaseModel, field_validator
 from sqlalchemy import ColumnElement, func, literal_column, select
 from sqlalchemy.exc import ProgrammingError
@@ -53,6 +54,8 @@ def _parse_dt(s: str | None) -> datetime | None:
     """Parse an RFC3339 datetime string to UTC datetime."""
     if s is None or s == "":
         return None
+    # Handle URL-decoded + as space and also space-separated timezone offsets
+    s = s.replace(" ", "+")
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
@@ -320,6 +323,67 @@ def _daily_aggregation(
         result.append(entry)
 
     return result
+
+
+@router.get("/api/v1/export.csv")
+async def export_csv(
+    node: str | None = Query(None),
+    metric: str | None = Query(None),
+    from_ts: str | None = Query(None, alias="from"),
+    to_ts: str | None = Query(None, alias="to"),
+) -> Response:
+    """Return raw readings as CSV per SPEC 10.7.
+
+    Header: ts,node_id,metric,value
+    ISO-8601 UTC timestamps, time-ordered.
+    Same date validation as /series (bad dates -> 400).
+    metric is optional (all metrics when omitted).
+    """
+    from fastapi import HTTPException
+
+    # Validate date params (same validation as /series)
+    try:
+        SeriesParams(
+            node=node,
+            metric=metric,
+            from_ts=from_ts,
+            to_ts=to_ts,
+        )
+    except Exception as err:
+        raise HTTPException(status_code=400, detail="Invalid query parameter") from err
+
+    from_dt = _parse_dt(from_ts)
+    to_dt = _parse_dt(to_ts)
+
+    # Build filter conditions
+    conditions: list[ColumnElement[Any]] = []
+    if node:
+        conditions.append(Reading.node_id == node)
+    if metric:
+        conditions.append(Reading.metric == metric)
+    if from_dt:
+        conditions.append(Reading.ts >= from_dt)  # type: ignore[arg-type]
+    if to_dt:
+        conditions.append(Reading.ts <= to_dt)  # type: ignore[arg-type]
+
+    db = SessionLocal()
+    try:
+        stmt = select(Reading).where(*conditions).order_by(Reading.ts.asc())
+        rows = db.execute(stmt).scalars().all()
+
+        # Build CSV content
+        csv_lines = ["ts,node_id,metric,value"]
+        for r in rows:
+            csv_lines.append(f"{r.ts.isoformat()},{r.node_id},{r.metric},{r.value}")
+        csv_content = "\n".join(csv_lines) + "\n"
+
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=readings.csv"},
+        )
+    finally:
+        db.close()
 
 
 @router.get("/api/v1/nodes")

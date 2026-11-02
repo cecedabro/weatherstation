@@ -253,3 +253,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Rewrote `backend/app/static/chart.js`: now finds chart sections by scanning `section.card` elements for `[data-chart]` children, registers multiple charts per section, sets `_section` ID on ranges, and handles selector button clicks to update all charts in the matching section. `rain_mm` renders as bars via `barPath()` function.
 - Created `backend/tests/test_page_weather_charts.py` with 10 tests: chart section existence, selector presence/query params, chart containers per metric, data-node/data-chart attributes, rain_mm presence, barPath JS function, empty state behavior.
 - `make check` passes: ruff clean, mypy clean, 273 tests pass (10 new + 263 existing), 98.17% coverage.
+
+## T36: GET /api/v1/export.csv (done)
+- Created `backend/tests/test_export.py` with 19 tests covering: content-type (`text/csv`), `Content-Disposition: attachment` header, CSV header row (`ts,node_id,metric,value`), body data presence, ISO-8601 UTC timestamp format, time ordering, all metrics included, node IDs in rows, filtering by `node`, filtering by `metric`, combined filters, empty results (unknown node/metric), valid `from`/`to` date range filtering, combined filters with dates, row count matching DB, and numeric value parsing.
+- Added `GET /api/v1/export.csv` endpoint to `backend/app/readapi.py`: accepts `node`, `metric`, `from`, `to` query params, validates dates via `SeriesParams` (400 on bad dates), queries readings ordered by `ts`, and returns `Response` with CSV content.
+- Updated `_parse_dt()` in `readapi.py` to handle space-separated timezone offsets (URL-decoded `+` → space) by normalizing spaces to `+` before `fromisoformat`.
+- `make check` passes: ruff clean, mypy clean, 349 tests pass (19 new + 330 existing), 97.9% coverage.
