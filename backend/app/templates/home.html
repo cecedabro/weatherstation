@@ -22,12 +22,25 @@
         {% if metric_name in node.metrics %}
         <div class="stat-card">
           <div class="stat-icon">{{ metric_icon }}</div>
+          {% if metric_name == "wind_dir_deg" %}
+          <div class="stat-value">{{ compass(node.metrics[metric_name]) }} {{ "%.0f"|format(node.metrics[metric_name]) }}{{ metric_unit }}</div>
+          {% else %}
           <div class="stat-value">{{ "%.1f"|format(node.metrics[metric_name]) }}{{ metric_unit }}</div>
+          {% endif %}
           <div class="stat-label">{{ metric_name.replace("_", " ") | title }}</div>
         </div>
         {% endif %}
       {% endfor %}
     </div>
+    {% if node.offline %}
+    <div class="offline-indicator">
+      Offline since {{ node.reading_time|local_time if node.reading_time else 'N/A' }}
+    </div>
+    {% else %}
+    <time class="updated-time" datetime="{{ node.reading_time.isoformat() if node.reading_time else '' }}" title="{{ node.reading_time|local_time if node.reading_time else '' }}">
+      Updated {{ ago(node.reading_time) if node.reading_time else 'N/A' }}
+    </time>
+    {% endif %}
   </div>
   {% endfor %}
 </section>
@@ -55,6 +68,15 @@
       </div>
       {% endif %}
     </div>
+    {% if node.offline %}
+    <div class="offline-indicator">
+      Offline since {{ node.reading_time|local_time if node.reading_time else 'N/A' }}
+    </div>
+    {% else %}
+    <time class="updated-time" datetime="{{ node.reading_time.isoformat() if node.reading_time else '' }}" title="{{ node.reading_time|local_time if node.reading_time else '' }}">
+      Updated {{ ago(node.reading_time) if node.reading_time else 'N/A' }}
+    </time>
+    {% endif %}
   </div>
   {% endfor %}
 </section>

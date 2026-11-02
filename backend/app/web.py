@@ -1,5 +1,6 @@
 """HTML routes: GET / (home page)."""
 
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TypedDict
 from urllib.parse import quote
@@ -70,6 +71,14 @@ async def index() -> HTMLResponse:
     db = SessionLocal()
     try:
         all_nodes = _current_readings(db)
+        now = datetime.now(UTC)
+        for node in all_nodes:
+            rt = node.get("reading_time")
+            if rt is not None:
+                offline = (now - rt) > timedelta(minutes=15)
+                node["offline"] = offline
+            else:
+                node["offline"] = True
         weather_nodes = [n for n in all_nodes if n["node_type"] == "weather"]
         soil_nodes = [n for n in all_nodes if n["node_type"] == "soil"]
         first_weather_node = weather_nodes[0]["node_id"] if weather_nodes else None

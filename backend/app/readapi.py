@@ -184,11 +184,14 @@ def _current_readings(db: Session) -> list[dict[str, Any]]:
     reading_rows = db.execute(reading_stmt).scalars().all()
 
     by_node: dict[str, dict[str, float]] = {}
+    node_reading_time: dict[str, datetime] = {}
     for r in reading_rows:
         nid = str(r.node_id)
         if nid not in by_node:
             by_node[nid] = {}
         by_node[nid][str(r.metric)] = float(r.value)
+        if nid not in node_reading_time or r.ts > node_reading_time[nid]:
+            node_reading_time[nid] = r.ts  # type: ignore[assignment]
 
     node_stmt = select(Node)
     nodes_rows = db.execute(node_stmt).scalars().all()
@@ -200,6 +203,7 @@ def _current_readings(db: Session) -> list[dict[str, Any]]:
             for m in sorted(by_node[nid]):
                 metrics[m] = by_node[nid][m]
         battery_v = float(node.last_battery_v) if node.last_battery_v is not None else None
+        reading_time = node_reading_time.get(nid)
         result.append(
             {
                 "node_id": nid,
@@ -208,6 +212,7 @@ def _current_readings(db: Session) -> list[dict[str, Any]]:
                 "battery_v": battery_v,
                 "rssi_dbm": node.last_rssi_dbm,
                 "metrics": metrics,
+                "reading_time": reading_time,
             }
         )
     return result

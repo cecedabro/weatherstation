@@ -190,3 +190,11 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Registered all three as Jinja2 filters (and `ago` as a template global) via `_register_filters()` called from `web.py` on the shared `_jinja_env`.
 - Created `backend/tests/test_fmt.py` with 19 tests: compass 0→N, 360→N, 12→NNE, 225→SW, all 16 cardinal/intercardinal points, boundary tests; winter (CET) and summer (CEST) UTC offset for local_time; 59 s, 61 min, 25 h, 2 days for ago; filter registration check.
 - `make check` passes: ruff clean, mypy clean, 193 tests pass (19 new + 174 existing), 98% coverage.
+
+## T25: Wind direction compass formatting, <time> tags, offline state on GET / (done)
+- Updated `backend/app/readapi.py`: added `node_reading_time` dict tracking to `_current_readings()`, returning `reading_time` (datetime or None) per node in the result dict. Added `# type: ignore[assignment]` for SQLAlchemy column type.
+- Updated `backend/app/web.py`: added imports for `UTC`, `datetime`, `timedelta`; computed `offline` boolean per node (`(now - rt) > timedelta(minutes=15)`) and added it to the template context.
+- Updated `backend/app/templates/home.html`: wind direction values now render as "SW 225°" (compass name + degrees); added `<time>` tags with `datetime` ISO attribute and `title` (local_time), showing relative age ("just now", "X min ago"); added offline indicator ("Offline since ...") for readings >15 min old. Guarded `local_time` filter against `None` in offline messages.
+- Updated `backend/app/fmt.py`: registered `compass` in both `env.globals` and `env.filters` so it works as both a template function call and a pipe filter.
+- Created `backend/tests/test_page_home_fmt.py` with 16 tests covering: `reading_time` datetime/None behavior, max-across-metrics logic, compass formatting (N, S, 225°), `<time>` tag presence/attributes/content, offline state for old readings, offline message with local time, online state for recent readings, 15-min boundary, and node with no readings.
+- `make check` passes: ruff clean, mypy clean, 209 tests pass (16 new + 193 existing), 98% coverage.

@@ -71,6 +71,7 @@ def ago(dt: datetime, now: datetime | None = None) -> str:
 def _register_filters(env: Environment) -> None:
     """Register :func:`compass`, :func:`local_time`, :func:`ago` as Jinja filters."""
     env.globals["ago"] = ago  # also available in templates directly
+    env.globals["compass"] = compass
     env.filters["compass"] = compass
     env.filters["local_time"] = local_time
     env.filters["ago"] = ago
