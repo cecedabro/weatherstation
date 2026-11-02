@@ -36,6 +36,9 @@ idempotent and backward-compatible (add columns/tables; never drop or rename in 
 same release that stops using them), and each new migration gets a test that runs
 `alembic upgrade head` on an empty and on an existing database.
 
+The check that enforces this is human-owned: `tests/ci/check-migrations.sh`, run by
+`make migcheck`, `make check` and `.github/workflows/migrations.yml`.
+
 ## Runtime facts (agreed with the homelab side, do not change)
 | What | Value |
 | --- | --- |

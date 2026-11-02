@@ -48,7 +48,6 @@ class Reading(Base):
         String(64),
         ForeignKey("node.node_id", ondelete="CASCADE"),
         nullable=False,
-        index=True,
     )
     metric = Column(String(64), nullable=False)
     ts = Column(DateTime(timezone=True), nullable=False)

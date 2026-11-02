@@ -43,7 +43,8 @@ So: **run `make check` yourself before you stop, and fix what fails.**
 - Change only what the task needs. Do not start other tasks.
 - Stay inside the repo. You are not allowed to touch `/tmp` or any path outside it;
   such commands are rejected. For scratch files use `.agent/tmp/` (git-ignored).
-- Never edit `contract/`, `SPEC.md`, `PLAN.md`, or `AGENTS.md`. If a contract
+- Never edit `contract/`, `tests/` (the root one: human-owned CI checks), `.github/workflows/migrations.yml`,
+  `SPEC.md`, `PLAN.md`, or `AGENTS.md`. If a contract
   test seems wrong, make your code satisfy it and note the concern in `PROGRESS.md`.
 - You write the code **and its tests** (except the contract tests, which exist
   already). Read `docs/testing.md` — weak tests that pass trivially are treated
@@ -74,6 +75,7 @@ So: **run `make check` yourself before you stop, and fix what fails.**
 ## Commands
 - `make setup` — install backend deps (`uv sync`). Tests start their own throwaway Postgres (see `docs/testing.md`); there is no Docker here.
 - `make check` — lint + type-check + all tests of every part that exists (also the contract tests), backend coverage of at least 90%, and a `bandit` security scan (medium or higher). Must pass after every task, so write tests for the code you add.
+- `make migcheck` — the migration check (also part of `make check`). If you change `app/models.py`, add a new Alembic migration in the same task; never edit an old one.
 - `make fmt` — autoformat (ruff). Run before `make check`.
 - `make dev` — run the site on :8000 with a throwaway Postgres and fake readings (for humans previewing; don't use it in tests).
 - `make run` — run the backend locally (needs a Postgres at `DATABASE_URL`; usually you only need the tests).

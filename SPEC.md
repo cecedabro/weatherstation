@@ -94,6 +94,10 @@ Requirements as testable sentences. Each section maps to one or more tasks in
       with a migrate initContainer, Service, Postgres StatefulSet + Service + 5 Gi
       Longhorn PVC) that pass `kustomize build | kubeconform -strict`. They are drafts:
       the homelab repo holds the live copy.
+- 9.6 A human-owned migration check (`tests/ci/check-migrations.sh`, workflow
+      `migrations.yml`) passes: one Alembic head, empty DB → head, models match the
+      migrations (`alembic check`), re-running is a no-op, downgrade to base and back,
+      and data written by the last release survives the upgrade. No release when it fails.
 - 9.5 Secrets are referenced by name (`weatherstation-app`, `weatherstation-db`),
       never inline; `deploy/secret.example.yaml` documents every key.
 
