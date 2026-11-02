@@ -316,3 +316,8 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added a preview instruction: "Preview locally with `make dev` (runs on :8000 with a throwaway Postgres)."
 - No code changes — documentation only. No new tests needed.
 - `make check` passes: ruff clean, mypy clean, all 425 tests pass, 97.95% coverage.
+
+## T45: Dev seed — 30-day data generator + tests (done)
+- Updated `backend/scripts/dev.py`: refactored `fake_readings()` to generate 30 days of data instead of 7. Weather nodes publish every 30 min; soil nodes every 60 min. Added sinusoidal temperature model with seasonal trend and a frost event (~1.0 °C on day 21 at 04:00). Implemented concentrated rain probability across three shower windows. Set `soil-bed-1` to oscillate between 20–30% moisture to guarantee <25% readings. Fixed a timestamp bug where soil node intervals used `timedelta(hours=60*i)` instead of `timedelta(minutes=60*i)`, causing an 1800-day span.
+- Created `backend/tests/test_dev_seed.py` with 11 tests (typed with `mypy strict`): structure validation, node diversity (4 nodes), 30-day span (≥29 days), frost night detection (≤2.0 °C), bed below 25% moisture, rain shower count (>5), rain concentration (≥2 days), daily temperature curves (>2 °C variation), all expected metrics present, and deterministic output (same seed → same count).
+- `make check` passes: ruff clean, mypy clean, 436 tests pass (11 new + 425 existing), 97.95% coverage, bandit clean.
