@@ -179,3 +179,8 @@ Appended by the agent after each task: what changed, where, and gotchas for late
   - Both kinds present → no empty-state cards
 - Created `backend/tests/test_page_empty.py` with 11 tests covering: no data (generic card only, both specific absent), weather-only (soil empty shown, weather empty absent, generic absent), soil-only (weather empty shown, soil empty absent, generic absent), both present (no empty cards), and empty-state card count assertions (exactly 1 in all partial/empty cases).
 - `make check` passes: ruff clean, mypy clean, 174 tests pass (11 new + 163 existing), 98% coverage.
+
+## T23: Move inline styles from home.html into style.css (done)
+- Moved 12 inline `style="..."` attributes from `backend/app/templates/home.html` to named CSS classes in `backend/app/static/style.css`.
+- New classes: `.card-spaced` (card bottom margin), `.node-title` (h3 with font-size/color/margin), `.stats-row--soil` (2-column grid variant), `.empty-state h2` (margin override), `.empty-state p` (color + font-size), `.chart-container` (width + height).
+- No new tests needed: all 174 existing tests pass unmodified, confirming no visual or behavioral change. `make check` passes: ruff clean, mypy clean, 98% coverage.

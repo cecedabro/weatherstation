@@ -64,7 +64,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_static_assets.py -q
 - [x] T22: Fix the home empty states (SPEC 5.3): with no data at all show only the single "No readings yet" card; show "No weather data" or "No soil data" only when the other kind exists. Write `tests/test_page_empty.py` covering nothing / only weather / only soil, asserting which messages appear and which do not.
   accept: cd backend && uv run pytest tests/test_page_empty.py -q
-- [ ] T23: Move every inline `style="..."` in `templates/home.html` into named classes in `static/style.css`. No visual or behaviour change; existing tests must pass unmodified.
+- [x] T23: Move every inline `style="..."` in `templates/home.html` into named classes in `static/style.css`. No visual or behaviour change; existing tests must pass unmodified.
   accept: ! grep -n 'style="' backend/app/templates/home.html && cd backend && uv run pytest -q
 - [ ] T24: `app/fmt.py` with pure helpers registered as Jinja filters on the shared environment: `compass(deg)` → 16-point name (N, NNE, … NNW; 0 and 360 → N), `local_time(dt)` → Europe/Amsterdam like "14:05, 2 Nov" via `zoneinfo`, `ago(dt, now)` → "just now" (< 1 min), "5 min ago", "3 h ago", "2 days ago". Write `tests/test_fmt.py` (350→N, 12→NNE, 225→SW, a winter and a summer date for the UTC offset, 59 s, 61 min, 25 h).
   accept: cd backend && uv run pytest tests/test_fmt.py -q

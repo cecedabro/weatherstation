@@ -8,8 +8,8 @@
 <section class="card">
   <h2><span class="icon">&#x1F326;&#xFE0F;</span> Current Conditions</h2>
   {% for node in weather_nodes %}
-  <div class="card" style="margin-bottom: var(--space-lg);">
-    <h3 style="font-size: var(--font-size-h2); color: var(--color-text-strong); margin-bottom: var(--space-md);">{{ node.node_id }}</h3>
+  <div class="card card-spaced">
+    <h3 class="node-title">{{ node.node_id }}</h3>
     <div class="stats-row">
       {% for metric_name, metric_icon, metric_unit in [
         ("temp_c", "\u2600\uFE0F", "\u00B0C"),
@@ -37,9 +37,9 @@
 <section class="card">
   <h2><span class="icon">&#x1F33F;</span> Latest Soil Readings</h2>
   {% for node in soil_nodes %}
-  <div class="card" style="margin-bottom: var(--space-lg);">
-    <h3 style="font-size: var(--font-size-h2); color: var(--color-text-strong); margin-bottom: var(--space-md);">{{ node.node_id }}</h3>
-    <div class="stats-row" style="grid-template-columns: repeat(2, 1fr);">
+  <div class="card card-spaced">
+    <h3 class="node-title">{{ node.node_id }}</h3>
+    <div class="stats-row stats-row--soil">
       {% if "soil_moisture_pct" in node.metrics %}
       <div class="stat-card">
         <div class="stat-icon">&#x1F331;</div>
@@ -64,8 +64,8 @@
 <section class="card">
   <div class="empty-state">
     <div class="empty-icon">&#x1F332;</div>
-    <h2 style="margin-bottom: var(--space-md);">No Readings Yet</h2>
-    <p style="color: var(--color-text-muted); font-size: 15px;">
+    <h2>No Readings Yet</h2>
+    <p>
       The weather station is setting up. Once the sensors start reporting,
       live conditions will appear here.
     </p>
@@ -75,8 +75,8 @@
 <section class="card">
   <div class="empty-state">
     <div class="empty-icon">&#x1F326;&#xFE0F;</div>
-    <h2 style="margin-bottom: var(--space-md);">No Weather Data</h2>
-    <p style="color: var(--color-text-muted); font-size: 15px;">
+    <h2>No Weather Data</h2>
+    <p>
       Waiting for the weather node to send its first reading.
     </p>
   </div>
@@ -85,8 +85,8 @@
 <section class="card">
   <div class="empty-state">
     <div class="empty-icon">&#x1F331;</div>
-    <h2 style="margin-bottom: var(--space-md);">No Soil Data</h2>
-    <p style="color: var(--color-text-muted); font-size: 15px;">
+    <h2>No Soil Data</h2>
+    <p>
       Waiting for the soil sensor node to send its first reading.
     </p>
   </div>
@@ -107,10 +107,10 @@
     {% endfor %}
   </div>
   <div id="chart-container"
-       data-chart
-       data-node="{{ first_weather_node or '' }}"
-       data-metric="temp_c"
-       style="width: 100%; height: 320px;"></div>
+        class="chart-container"
+        data-chart
+        data-node="{{ first_weather_node or '' }}"
+        data-metric="temp_c"></div>
 </section>
 
 {% endblock %}
