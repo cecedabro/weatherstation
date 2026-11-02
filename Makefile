@@ -13,6 +13,7 @@ check:
 	@if [ -d backend ]; then cd backend && uv run ruff check . && uv run mypy app && uv run pytest -q ../contract/tests tests --cov=app --cov-fail-under=90 && bandit -r app -q -ll; fi
 	@for f in $(wildcard backend/app/static/*.js); do node --check $$f || exit 1; done
 	@if [ -d gateway ]; then cd gateway && uv run ruff check . && uv run mypy gateway && uv run pytest -q; fi
+	@if [ -f deploy/Makefile ]; then $(MAKE) -s -C deploy validate; fi
 	@if [ -d firmware ]; then cd firmware && pio test -e native; fi
 
 run:
