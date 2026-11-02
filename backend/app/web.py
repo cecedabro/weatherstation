@@ -88,7 +88,41 @@ async def index() -> HTMLResponse:
             soil_nodes=soil_nodes,
             chart_selectors=_selector_links(),
             first_weather_node=first_weather_node,
+            active="home",
+            page_title="Current Conditions",
         )
         return HTMLResponse(content=html)
     finally:
         db.close()
+
+
+@router.get("/weather")
+async def weather_page() -> HTMLResponse:
+    """Render the weather page per SPEC 10.2."""
+    template = _jinja_env.get_template("weather.html")
+    html = template.render(active="weather", page_title="Weather")
+    return HTMLResponse(content=html)
+
+
+@router.get("/soil")
+async def soil_page() -> HTMLResponse:
+    """Render the soil page per SPEC 10.3."""
+    template = _jinja_env.get_template("soil.html")
+    html = template.render(active="soil", page_title="Soil")
+    return HTMLResponse(content=html)
+
+
+@router.get("/history")
+async def history_page() -> HTMLResponse:
+    """Render the history page per SPEC 10.5."""
+    template = _jinja_env.get_template("history.html")
+    html = template.render(active="history", page_title="History")
+    return HTMLResponse(content=html)
+
+
+@router.get("/about")
+async def about_page() -> HTMLResponse:
+    """Render the about page per SPEC 10.8."""
+    template = _jinja_env.get_template("about.html")
+    html = template.render(active="about", page_title="About")
+    return HTMLResponse(content=html)

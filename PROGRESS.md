@@ -198,3 +198,11 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `backend/app/fmt.py`: registered `compass` in both `env.globals` and `env.filters` so it works as both a template function call and a pipe filter.
 - Created `backend/tests/test_page_home_fmt.py` with 16 tests covering: `reading_time` datetime/None behavior, max-across-metrics logic, compass formatting (N, S, 225°), `<time>` tag presence/attributes/content, offline state for old readings, offline message with local time, online state for recent readings, 15-min boundary, and node with no readings.
 - `make check` passes: ruff clean, mypy clean, 209 tests pass (16 new + 193 existing), 98% coverage.
+
+### T26 - Shared navigation (SPEC 10.1) - DONE 2026-11-02
+- Added `<nav aria-label="Main">` with 5 links and `aria-current="page"` conditional to `backend/app/templates/base.html`.
+- Updated `backend/app/web.py`: added `active` context to index route; created stub routes for `/weather`, `/soil`, `/history`, `/about`.
+- Created stub templates: `weather.html`, `soil.html`, `history.html`, `about.html`.
+- Added `.nav` responsive CSS (`flex-wrap: wrap`) to `backend/app/static/style.css`.
+- Created `backend/tests/test_nav.py` (7 tests covering link presence, active state switching, CSS wrap).
+- `make check` passes: ruff clean, mypy clean, 216 tests pass, 98.45% coverage.

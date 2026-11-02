@@ -23,6 +23,14 @@
     <div class="header-logo">{% block header_logo %}&#x1F33B;{% endblock %}</div>
   </header>
 
+  <nav aria-label="Main" class="nav">
+    <a href="/" {% if active == "home" %}aria-current="page"{% endif %}>Home</a>
+    <a href="/weather" {% if active == "weather" %}aria-current="page"{% endif %}>Weather</a>
+    <a href="/soil" {% if active == "soil" %}aria-current="page"{% endif %}>Soil</a>
+    <a href="/history" {% if active == "history" %}aria-current="page"{% endif %}>History</a>
+    <a href="/about" {% if active == "about" %}aria-current="page"{% endif %}>About</a>
+  </nav>
+
   <main class="container">
     {% block content %}{% endblock %}
   </main>
