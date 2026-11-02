@@ -651,6 +651,36 @@ body {
   border: 1px solid #50b8e0;
 }
 
+/* ---- Back to Website link ---- */
+.back-to-site {
+  margin-bottom: 12px;
+}
+
+.back-to-site a {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--color-glass-top), var(--color-glass-bottom));
+  border: 1px solid var(--color-glass-border);
+  color: var(--color-text-strong);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: background 0.2s;
+}
+
+.back-to-site a:hover {
+  background: linear-gradient(180deg, var(--color-glass-highlight), var(--color-glass-top));
+}
+
+.last-seen-local {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
 /* ---- Chart selector ---- */
 .chart-selector {
   display: flex;

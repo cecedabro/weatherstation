@@ -304,3 +304,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Templates already use only external `<script src="...">` tags — verified no inline `<script>` blocks exist across 10 template files.
 - Created `backend/tests/test_security_headers.py` with 10 tests: healthz headers, API route headers, public page headers, static file headers, static cache-control, non-static no cache-control, HTML 404 headers, JSON 404 headers, no inline scripts (two independent checks).
 - `make check` passes: ruff clean, mypy clean, 416 tests pass (10 new + 406 existing), 97.86% coverage.
+
+## T43: Admin polish (SPEC 10.8, 10.9, 10.10, 10.11) - DONE 2026-11-02
+- Fixed `backend/app/admin.py`: inverted sort logic in lambda for both HTML and JSON `/admin` endpoints so problem nodes (offline or low battery) sort before healthy nodes, then alphabetically by node_id.
+- Fixed `backend/app/fmt.py`: updated `local_time` and `ago` functions to accept `str | datetime` inputs and parse ISO strings when necessary; added proper type annotations to pass mypy.
+- Created `backend/tests/test_admin_polish.py` with 9 tests covering: HTTP Basic auth enforcement, back-to-site link presence, time formatting on problem nodes, time formatting on healthy nodes, and node ordering (problem nodes first, then alphabetical).
+- `make check` passes: ruff clean, mypy clean, all tests pass, coverage maintained above 90%, bandit scan clean.

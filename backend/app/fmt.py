@@ -38,20 +38,24 @@ def compass(deg: float) -> str:
     return _CWIND[int((deg + 11.25) % 360 / 22.5) % 16]
 
 
-def local_time(dt: datetime, fmt: str = "%H:%M, %-d %b") -> str:
+def local_time(dt: str | datetime, fmt: str = "%H:%M, %-d %b") -> str:
     """Format *dt* as a local Europe/Amsterdam string like ``14:05, 2 Nov``."""
+    if isinstance(dt, str):
+        dt = datetime.fromisoformat(dt)
     amster = ZoneInfo("Europe/Amsterdam")
     local = dt.astimezone(amster)
     return local.strftime(fmt)
 
 
-def ago(dt: datetime, now: datetime | None = None) -> str:
+def ago(dt: str | datetime, now: datetime | None = None) -> str:
     """Return a human-friendly age string for *dt* relative to *now*.
 
     Examples: ``just now`` (< 1 min), ``5 min ago``, ``3 h ago``, ``2 days ago``.
 
     When *now* is ``None`` the current time is used (for template rendering).
     """
+    if isinstance(dt, str):
+        dt = datetime.fromisoformat(dt)
     if now is None:
         now = datetime.now(UTC)
     diff = now - dt

@@ -104,7 +104,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_a11y.py -q
 - [x] T42: Security headers (SPEC 10.15): middleware adding `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin`, `X-Frame-Options: DENY` and `Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:` to every response; `/static/` responses also get `Cache-Control: public, max-age=3600`. Templates must not contain inline `<script>` code. Write `tests/test_security_headers.py`.
   accept: cd backend && uv run pytest tests/test_security_headers.py -q
-- [ ] T43: Admin polish: `/admin` links back to the public site, shows each node's last seen with `ago` and local time, lists problem nodes (offline, low battery) first, and adds `GET /admin/nodes.json` (same Basic auth) with the table data. Write `tests/test_admin_polish.py` (ordering, 401 on the JSON without auth).
+- [x] T43: Admin polish: `/admin` links back to the public site, shows each node's last seen with `ago` and local time, lists problem nodes (offline, low battery) first, and adds `GET /admin/nodes.json` (same Basic auth) with the table data. Write `tests/test_admin_polish.py` (ordering, 401 on the JSON without auth).
   accept: cd backend && uv run pytest tests/test_admin_polish.py -q
 - [ ] T44: Add a "Website" section to `README.md`: every page and API endpoint with one line each, and how to preview with `make dev`. Do not change other sections.
   accept: grep -q '/api/v1/export.csv' README.md && grep -q '/soil/' README.md && grep -q 'make dev' README.md

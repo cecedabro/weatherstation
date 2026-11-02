@@ -7,6 +7,10 @@
 
 {% block content %}
 
+<nav class="back-to-site" aria-label="Admin navigation">
+  <a href="/">← Back to Website</a>
+</nav>
+
 <section class="card">
   <h2><span class="icon" aria-hidden="true">&#x1F4CA;</span> Node Health</h2>
 
@@ -29,7 +33,12 @@
         <tr class="{% if not node.online %}row-offline{% endif %}{% if node.low_battery %} row-low-battery{% endif %}">
           <td class="node-id">{{ node.node_id }}</td>
           <td>{{ node.node_type }}</td>
-          <td>{{ node.last_seen }}</td>
+          <td>
+            <time datetime="{{ node.last_seen }}" title="{{ node.last_seen|local_time }}">
+              {{ node.last_seen|ago(now)|escape }}
+            </time>
+            <span class="last-seen-local">{{ node.last_seen|local_time|escape }}</span>
+          </td>
           <td>
             {% if node.online %}
               <span class="badge badge-online">Online</span>
