@@ -2,21 +2,24 @@
 
 ---
 
-**Onderwerp:** Verzoek thesisbegeleiding geneeskunde
+**Onderwerp:** Thesisbegeleiding
 
-Geachte [naam],
+Beste [naam],
 
-Mijn naam is [naam van je vriendin] en ik studeer geneeskunde aan de [universiteit, bijv. VU/UvA]. Voor mijn afstudeerthesis in het vakgebied [vakgebied] ben ik op zoek naar een geschikte thesisbegeleider.
+Mijn naam is [naam] en ik ben nu in mijn laatste jaar geneeskunde aan de [universiteit]. Ik ben op zoek naar een begeleider voor mijn afstudeerthesis, en uw werk viel me op — vooral [noem één specifiek onderwerp/paper/direction]. Dat sluit precies aan bij wat ik wil doen.
 
-Uw werk in [noem iets specifieks] sprak mij zeer aan, en ik zou mijn thesis graag onder uw begeleiding willen schrijven. Naar mijn weten begeleidt u mogelijk al een student. Mocht dat zo zijn, dan verneem ik graag of u nog capaciteit heeft. Als dat niet schikt, zou ik het waarderen als u mij kunt verwijzen naar andere mogelijke begeleiders in uw vakgebied.
+Ik weet dat u mogelijk al studenten begeleidt. Geen probleem als u het druk hebt, maar ik vroeg me af of u nog ruimte heeft. Zo niet, dan hoor ik ook graag of u collega's kent die misschien interesse hebben.
 
-De thesis is bedoeld ter aanvulling op mijn stage, die loopt van [startdatum] tot [einddatum]. Ik werk momenteel aan het uitwerken van mijn concept-onderwerp en deel dit graag met u in een kennismakingsgesprek.
+Mijn stage loopt van [datum] tot [datum], en de thesis sluit daarop aan. Ik heb al een concept-onderwerp uitgewerkt dat ik graag met u deel, als dat schikt.
 
-Zou er ruimte zijn voor een (virtueel) gesprek?
+Zou u tijd hebben voor een kort gesprek? Ik denk aan 20 minuten, online of op de afdeling — helemaal naar uw schema.
+
+Alvast bedankt voor uw tijd,
 
 Met vriendelijke groet,
 
 [naam]
-[contactgegevens]
+[studie, jaargang]
+[telefoon] | [email]
 
 ---
