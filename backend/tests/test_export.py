@@ -47,9 +47,7 @@ def _make_batch(
     for metric, value in metrics.items():
         reading = db.execute(
             select(Reading).where(
-                (Reading.node_id == node_id)
-                & (Reading.metric == metric)
-                & (Reading.ts == ts)
+                (Reading.node_id == node_id) & (Reading.metric == metric) & (Reading.ts == ts)
             )
         ).scalar_one_or_none()
         if reading is None:
@@ -284,9 +282,7 @@ def test_export_csv_valid_date_range(client, db: Session, export_data):
     base = now - timedelta(hours=2)
     from_str = (base + timedelta(minutes=20)).isoformat()
     to_str = (base + timedelta(minutes=40)).isoformat()
-    resp = client.get(
-        f"/api/v1/export.csv?from={from_str}&to={to_str}"
-    )
+    resp = client.get(f"/api/v1/export.csv?from={from_str}&to={to_str}")
     assert resp.status_code == 200
     body = resp.text
     lines = body.strip().split("\n")
@@ -348,3 +344,62 @@ def test_export_csv_value_precision(client, db: Session, export_data):
         assert len(parts) == 4, f"Expected 4 columns, got {len(parts)}: {line}"
         # value should be parseable as float
         float(parts[3])
+
+
+# ---------------------------------------------------------------------------
+# Plain date format expansion (T37)
+# ---------------------------------------------------------------------------
+
+
+def test_export_csv_plain_date_accepted(client):
+    """T37: plain YYYY-MM-DD date is accepted without 400."""
+    resp = client.get("/api/v1/export.csv?from=2024-01-01&to=2024-12-31")
+    assert resp.status_code == 200
+
+
+def test_export_csv_plain_date_from_returns_200(client):
+    """T37: plain YYYY-MM-DD from date is accepted."""
+    resp = client.get("/api/v1/export.csv?from=2024-06-15")
+    assert resp.status_code == 200
+
+
+def test_export_csv_plain_date_to_returns_200(client):
+    """T37: plain YYYY-MM-DD to date is accepted."""
+    resp = client.get("/api/v1/export.csv?to=2024-06-15")
+    assert resp.status_code == 200
+
+
+def test_export_csv_mixed_date_formats(client, db: Session, export_data):
+    """T37: RFC3339 from with plain to date works together."""
+    now = _now()
+    base = now - timedelta(hours=2)
+    from_str = base.isoformat()
+    to_str = (base + timedelta(hours=1)).strftime("%Y-%m-%d")
+    resp = client.get(f"/api/v1/export.csv?from={from_str}&to={to_str}")
+    assert resp.status_code == 200
+
+
+def test_export_csv_plain_date_invalid_returns_400(client):
+    """T37: invalid plain date still returns 400."""
+    resp = client.get("/api/v1/export.csv?from=2024-13-45")
+    assert resp.status_code == 400
+
+
+def test_export_csv_plain_date_only_from(client, db: Session, export_data):
+    """T37: plain date from without to returns data (no upper bound)."""
+    resp = client.get("/api/v1/export.csv?from=2020-01-01")
+    assert resp.status_code == 200
+    body = resp.text
+    lines = body.strip().split("\n")
+    # Should return all data since from is in the past and to is unset
+    assert len(lines) > 1
+
+
+def test_export_csv_plain_date_only_to(client, db: Session, export_data):
+    """T37: plain date to without from returns data (no lower bound)."""
+    resp = client.get("/api/v1/export.csv?to=2099-12-31")
+    assert resp.status_code == 200
+    body = resp.text
+    lines = body.strip().split("\n")
+    # Should return all data since to is far in the future and from is unset
+    assert len(lines) > 1

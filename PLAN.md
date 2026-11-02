@@ -92,7 +92,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_page_history.py -q
 - [x] T36: `GET /api/v1/export.csv?node=&metric=&from=&to=` (SPEC 10.7): `text/csv` with header `ts,node_id,metric,value`, ISO-8601 UTC timestamps, time-ordered, `Content-Disposition: attachment`. `metric` is optional (all metrics). Same date validation as `/series` (bad dates → 400). Write `tests/test_export.py`.
   accept: cd backend && uv run pytest tests/test_export.py -q
-- [ ] T37: Download form on `/history`: a plain GET form (node, metric including "all", from/to as `<input type="date">`) that submits to `/api/v1/export.csv`; the endpoint also accepts plain `YYYY-MM-DD` (from = start of that day, to = end of that day, UTC). Write `tests/test_page_history_export.py`.
+- [x] T37: Download form on `/history`: a plain GET form (node, metric including "all", from/to as `<input type="date">`) that submits to `/api/v1/export.csv`; the endpoint also accepts plain `YYYY-MM-DD` (from = start of that day, to = end of that day, UTC). Write `tests/test_page_history_export.py`.
   accept: cd backend && uv run pytest tests/test_page_history_export.py tests/test_export.py -q
 - [ ] T38: `/about` page (SPEC 10.8): what the station is, the data path (nodes → MQTT → Pi → backend → website) as a simple HTML/CSS diagram or list, the units used, and a table of known nodes from the registry (id, type, first seen, last seen). Write `tests/test_page_about.py`.
   accept: cd backend && uv run pytest tests/test_page_about.py -q

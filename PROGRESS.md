@@ -259,3 +259,12 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added `GET /api/v1/export.csv` endpoint to `backend/app/readapi.py`: accepts `node`, `metric`, `from`, `to` query params, validates dates via `SeriesParams` (400 on bad dates), queries readings ordered by `ts`, and returns `Response` with CSV content.
 - Updated `_parse_dt()` in `readapi.py` to handle space-separated timezone offsets (URL-decoded `+` → space) by normalizing spaces to `+` before `fromisoformat`.
 - `make check` passes: ruff clean, mypy clean, 349 tests pass (19 new + 330 existing), 97.9% coverage.
+
+## T37: Export form on /history + plain date support for export endpoint (done)
+- Added plain `YYYY-MM-DD` date expansion to `backend/app/readapi.py`: `_expand_export_dates()` helper detects 10-character date strings, parses them with `date.fromisoformat()`, and converts to UTC-aware datetimes — `from` gets `00:00:00`, `to` gets `23:59:59.999999`.
+- Added "Export Data" form to `backend/app/templates/history.html`: GET form to `/api/v1/export.csv` with `node` select (all nodes + each weather/soil node), `metric` select (All metrics + temp_c, humidity_pct, rain_mm, pressure_hpa, soil_moisture_pct, soil_temp_c), and `from`/`to` `<input type="date">` fields.
+- Updated `backend/app/web.py`: passes `soil_nodes` alongside `weather_nodes` to `history.html` template context.
+- Created `backend/tests/test_page_history_export.py` with 15 tests: form presence, attributes, node/metric selects, date inputs, labels, submit button, node options, and metric options.
+- Added 8 new tests to `backend/tests/test_export.py` for plain date format acceptance, mixed formats, and validation.
+- Moved `_now()`, `_make_batch()`, `_make_daily()`, `history_data`, and `multi_node_history` from `test_page_history.py` to `conftest.py` for cross-module fixture availability.
+- `make check` passes: ruff clean, mypy clean, 374 tests pass (23 new + 351 existing), 97.69% coverage.

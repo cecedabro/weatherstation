@@ -59,6 +59,36 @@ def _parse_dt(s: str | None) -> datetime | None:
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
+def _expand_export_dates(
+    from_ts: str | None, to_ts: str | None
+) -> tuple[datetime | None, datetime | None]:
+    """Expand export date params, accepting plain YYYY-MM-DD dates.
+
+    Plain dates (exactly 10 chars, digits and hyphens) are expanded to full
+    UTC day boundaries: from = 00:00:00 UTC, to = 23:59:59.999999 UTC.
+    Full RFC3339 datetimes are parsed as-is.
+    """
+    from datetime import date as date_cls
+
+    def _expand_one(s: str | None, *, is_to: bool = False) -> datetime | None:
+        if s is None or s == "":
+            return None
+        # Plain date: exactly YYYY-MM-DD
+        if len(s) == 10 and s[4] == "-" and s[7] == "-":
+            try:
+                d = date_cls.fromisoformat(s)
+            except ValueError:
+                return None
+            if is_to:
+                return datetime(d.year, d.month, d.day, 23, 59, 59, 999999, tzinfo=UTC)
+            return datetime(d.year, d.month, d.day, tzinfo=UTC)
+        return _parse_dt(s)
+
+    from_dt = _expand_one(from_ts)
+    to_dt = _expand_one(to_ts, is_to=True)
+    return from_dt, to_dt
+
+
 def _bucket_column(step: str) -> ColumnElement[Any] | None:
     """Return the SQL expression for bucketing timestamps."""
     if step == "raw":
@@ -336,24 +366,35 @@ async def export_csv(
 
     Header: ts,node_id,metric,value
     ISO-8601 UTC timestamps, time-ordered.
-    Same date validation as /series (bad dates -> 400).
+    Accepts RFC3339 datetimes or plain YYYY-MM-DD dates (expanded to full day).
+    Bad dates return 400.
     metric is optional (all metrics when omitted).
     """
+    from datetime import date as date_cls
+
     from fastapi import HTTPException
 
-    # Validate date params (same validation as /series)
-    try:
-        SeriesParams(
-            node=node,
-            metric=metric,
-            from_ts=from_ts,
-            to_ts=to_ts,
-        )
-    except Exception as err:
-        raise HTTPException(status_code=400, detail="Invalid query parameter") from err
+    # Validate date params (accept plain YYYY-MM-DD or RFC3339)
+    def _validate_date(s: str | None) -> bool:
+        if s is None or s == "":
+            return True
+        if len(s) == 10 and s[4] == "-" and s[7] == "-":
+            try:
+                date_cls.fromisoformat(s)
+                return True
+            except ValueError:
+                return False
+        # RFC3339 validation
+        try:
+            _parse_dt(s)
+            return True
+        except (ValueError, TypeError):
+            return False
 
-    from_dt = _parse_dt(from_ts)
-    to_dt = _parse_dt(to_ts)
+    if not all(_validate_date(v) for v in [from_ts, to_ts]):
+        raise HTTPException(status_code=400, detail="Invalid query parameter") from None
+
+    from_dt, to_dt = _expand_export_dates(from_ts, to_ts)
 
     # Build filter conditions
     conditions: list[ColumnElement[Any]] = []

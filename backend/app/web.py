@@ -237,10 +237,12 @@ async def history_page(node: str | None = Query(None)) -> HTMLResponse:
         # Reverse for newest-first display
         daily_data = list(reversed(daily_data))
 
+        soil_nodes = [n for n in all_nodes if n["node_type"] == "soil"]
         template = _jinja_env.get_template("history.html")
         html = template.render(
             daily_data=daily_data,
             weather_nodes=weather_nodes,
+            soil_nodes=soil_nodes,
             selected_node=selected_node,
             active="history",
             page_title="History",
