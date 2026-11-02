@@ -1,11 +1,13 @@
 """Application factory and entry point."""
 
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader
+from starlette.responses import Response
 
 from app.config import Settings
 
@@ -15,6 +17,24 @@ _STATIC_DIR = Path(__file__).resolve().parent / "static"
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     application = FastAPI(title="Weather Station")
+
+    # SECURITY HEADERS per SPEC 10.15
+    @application.middleware("http")
+    async def security_headers(  # noqa: ANN202
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        """Add security headers to every response per SPEC 10.15."""
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "same-origin"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+        )
+        if request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "public, max-age=3600"
+        return response
+
     _ = Settings()  # validate defaults at startup
 
     # Serve static files (CSS, JS, vendor libs)

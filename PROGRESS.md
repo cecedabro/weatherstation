@@ -297,3 +297,10 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Verified form controls in `history.html` already have associated `<label>` elements.
 - Created `backend/tests/test_a11y.py` with 6 tests using Python's `html.parser` to validate: chart `role`/`aria-label` presence, noscript fallback blocks on chart pages, emoji `aria-hidden` attributes, and form control/label associations. Fixed parser logic to use two-pass approach (collect labels first, then check controls) since labels and controls are DOM siblings.
 - `make check` passes: ruff clean, mypy clean, 406 tests pass (6 new + 400 existing), 97.82% coverage.
+
+## T42: Security headers (SPEC 10.15) - DONE 2026-11-02
+- Added HTTP middleware in `backend/app/main.py`: `security_headers` middleware that adds `X-Content-Type-Options: nosniff`, `Referrer-Policy: same-origin`, `X-Frame-Options: DENY`, and `Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:` to every response.
+- The middleware also adds `Cache-Control: public, max-age=3600` to responses for paths starting with `/static/`.
+- Templates already use only external `<script src="...">` tags — verified no inline `<script>` blocks exist across 10 template files.
+- Created `backend/tests/test_security_headers.py` with 10 tests: healthz headers, API route headers, public page headers, static file headers, static cache-control, non-static no cache-control, HTML 404 headers, JSON 404 headers, no inline scripts (two independent checks).
+- `make check` passes: ruff clean, mypy clean, 416 tests pass (10 new + 406 existing), 97.86% coverage.
