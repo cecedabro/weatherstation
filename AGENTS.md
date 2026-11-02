@@ -43,8 +43,8 @@ So: **run `make check` yourself before you stop, and fix what fails.**
 - Change only what the task needs. Do not start other tasks.
 - Stay inside the repo. You are not allowed to touch `/tmp` or any path outside it;
   such commands are rejected. For scratch files use `.agent/tmp/` (git-ignored).
-- Never edit `contract/`, `tests/` (the root one: human-owned CI checks), `.github/workflows/migrations.yml`,
-  `SPEC.md`, `PLAN.md`, or `AGENTS.md`. If a contract
+- Never edit `contract/`, `tests/` (the root one: human-owned CI checks), `docs/`, `SPEC.md`, `PLAN.md`,
+  `AGENTS.md`, or anything listed in `.agent-protected`. The harness rejects such changes. If a contract
   test seems wrong, make your code satisfy it and note the concern in `PROGRESS.md`.
 - You write the code **and its tests** (except the contract tests, which exist
   already). Read `docs/testing.md` — weak tests that pass trivially are treated

@@ -1,0 +1,4 @@
+# Paths the coding agent may not change, on top of agent-loop's defaults
+# (tests/, contract/, PLAN.md, SPEC.md, AGENTS.md). This file protects itself.
+.github/workflows/migrations.yml   # human-owned migration check (tests/ci/ is covered by tests/)
+docs/                              # area docs: the human's instructions to the agent
