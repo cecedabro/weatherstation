@@ -106,7 +106,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
   accept: cd backend && uv run pytest tests/test_security_headers.py -q
 - [x] T43: Admin polish: `/admin` links back to the public site, shows each node's last seen with `ago` and local time, lists problem nodes (offline, low battery) first, and adds `GET /admin/nodes.json` (same Basic auth) with the table data. Write `tests/test_admin_polish.py` (ordering, 401 on the JSON without auth).
   accept: cd backend && uv run pytest tests/test_admin_polish.py -q
-- [ ] T44: Add a "Website" section to `README.md`: every page and API endpoint with one line each, and how to preview with `make dev`. Do not change other sections.
+- [x] T44: Add a "Website" section to `README.md`: every page and API endpoint with one line each, and how to preview with `make dev`. Do not change other sections.
   accept: grep -q '/api/v1/export.csv' README.md && grep -q '/soil/' README.md && grep -q 'make dev' README.md
 - [ ] T45: Preview data: make the seed in `backend/scripts/dev.py` a function that generates 30 days with daily temperature curves, a few rain showers, one frost night (≤ 2 °C) and one bed below 25 % moisture, so every page has something to show under `make dev`. Write `tests/test_dev_seed.py` that calls the generator (no server, no database) and checks those properties.
   accept: cd backend && uv run pytest tests/test_dev_seed.py -q

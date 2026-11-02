@@ -310,3 +310,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Fixed `backend/app/fmt.py`: updated `local_time` and `ago` functions to accept `str | datetime` inputs and parse ISO strings when necessary; added proper type annotations to pass mypy.
 - Created `backend/tests/test_admin_polish.py` with 9 tests covering: HTTP Basic auth enforcement, back-to-site link presence, time formatting on problem nodes, time formatting on healthy nodes, and node ordering (problem nodes first, then alphabetical).
 - `make check` passes: ruff clean, mypy clean, all tests pass, coverage maintained above 90%, bandit scan clean.
+
+## T44: Website section in README.md (done)
+- Added a "Website" section to `README.md`: two tables listing all 8 pages (/, /weather, /soil, /soil/{node_id}, /history, /about, /admin, /partials/current) and all 7 API endpoints (POST /api/v1/readings, GET /api/v1/series, GET /api/v1/current, GET /api/v1/nodes, GET /api/v1/export.csv, GET /admin/nodes.json, GET /healthz) with one-line descriptions each.
+- Added a preview instruction: "Preview locally with `make dev` (runs on :8000 with a throwaway Postgres)."
+- No code changes — documentation only. No new tests needed.
+- `make check` passes: ruff clean, mypy clean, all 425 tests pass, 97.95% coverage.
