@@ -1,6 +1,8 @@
-"""POST /api/v1/readings — reading ingestion per SPEC 3.1–3.3."""
+"""POST /api/v1/readings — reading ingestion per SPEC 3.1–3.8."""
 
 import hmac
+import time
+from collections import deque
 from collections.abc import Sequence
 from typing import Any
 
@@ -16,6 +18,49 @@ from app.store import upsert_readings
 _MAX_BODY = 1024 * 1024  # 1 MiB
 
 router = APIRouter()
+
+_MAX_REQUESTS = 60
+_WINDOW_SECONDS = 60
+
+
+class RateLimiter:
+    """In-process sliding-window rate limiter: _MAX_REQUESTS per _WINDOW_SECONDS per client."""
+
+    def __init__(self) -> None:
+        self._clients: dict[str, deque[float]] = {}
+
+    def is_allowed(self, client_key: str) -> bool:
+        """Return ``True`` if the request should be accepted (sliding window)."""
+        now = self._now() if hasattr(self, "_now") and callable(self._now) else time.time()
+        cutoff = now - _WINDOW_SECONDS
+
+        if client_key not in self._clients:
+            self._clients[client_key] = deque()
+
+        timestamps = self._clients[client_key]
+        while timestamps and timestamps[0] <= cutoff:
+            timestamps.popleft()
+
+        if len(timestamps) >= _MAX_REQUESTS:
+            return False
+
+        timestamps.append(now)
+        return True
+
+
+# Module-level singleton (created at import time)
+_limiter = RateLimiter()
+
+
+def get_limiter() -> RateLimiter:
+    """Return the global rate-limiter singleton."""
+    return _limiter
+
+
+def reset_rate_limiter() -> None:
+    """Clear rate-limiter state (mainly for tests)."""
+    _limiter._clients.clear()
+
 
 Rejected = dict[str, Any]
 
@@ -63,6 +108,17 @@ async def ingest_readings(request: Request) -> JSONResponse:
         raise HTTPException(status_code=401, detail="Missing or invalid token")
     if not hmac.compare_digest(auth[len("Bearer ") :], settings.INGEST_TOKEN):
         raise HTTPException(status_code=401, detail="Invalid token")
+
+    # SPEC 3.8: rate-limit — 60 requests per minute per client
+    client_key = request.headers.get("CF-Connecting-IP") or (
+        request.client.host if request.client else "unknown"
+    )
+    if not _limiter.is_allowed(client_key):
+        return JSONResponse(
+            status_code=429,
+            content={"detail": "Rate limit exceeded (60 req/min)"},
+            headers={"Retry-After": "60"},
+        )
 
     # SPEC 3.7: reject bodies larger than 1 MiB before parsing
     content_length = request.headers.get("content-length")

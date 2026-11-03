@@ -121,7 +121,7 @@ Read SPEC §1, §3, §9 and docs/deployment.md first. Do them in order.
   accept: test "$(grep -rE 'type: ignore|noqa' backend/app | wc -l)" -le 3 && cd backend && uv run pytest -q
 - [x] T49: Ingest hardening (SPEC 3.6, 3.7): compare the bearer token with `hmac.compare_digest`; reject bodies over 1 MiB with 413 before parsing (check `Content-Length` and the bytes actually read), storing nothing. Write `tests/test_ingest_limits.py`.
   accept: cd backend && uv run pytest tests/test_ingest_limits.py tests/test_ingest_auth.py -q
-- [ ] T50: Ingest rate limit (SPEC 3.8): an in-process sliding window of 60 requests per minute per client on `POST /api/v1/readings` → 429 with a JSON error and a `Retry-After` header. Client key is `CF-Connecting-IP` if present, else `request.client.host`. Make the clock injectable so tests don't sleep, and reset state between tests. Write `tests/test_ingest_ratelimit.py`.
+- [x] T50: Ingest rate limit (SPEC 3.8): an in-process sliding window of 60 requests per minute per client on `POST /api/v1/readings` → 429 with a JSON error and a `Retry-After` header. Client key is `CF-Connecting-IP` if present, else `request.client.host`. Make the clock injectable so tests don't sleep, and reset state between tests. Write `tests/test_ingest_ratelimit.py`.
   accept: cd backend && uv run pytest tests/test_ingest_ratelimit.py -q
 - [ ] T51: `GET /readyz` (SPEC 1.5): runs `SELECT 1`; 200 `{"status": "ready"}` or 503 `{"status": "unavailable"}` on any database error. `/healthz` stays DB-free. Write `tests/test_readyz.py` (the failure case by pointing the session at an unreachable database or overriding the dependency).
   accept: cd backend && uv run pytest tests/test_readyz.py tests/test_health.py -q
