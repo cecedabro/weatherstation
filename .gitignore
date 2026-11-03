@@ -8,3 +8,7 @@ __pycache__/
 .mypy_cache/
 backend/.devdb/
 .coverage
+.env
+backend/.DS_Store
+contract/.DS_Store
+.DS_Store
