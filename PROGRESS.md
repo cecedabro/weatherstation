@@ -356,3 +356,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - `/healthz` remains DB-free (unchanged).
 - Created `backend/tests/test_readyz.py` with 2 tests: success case (200 + `{"status": "ready"}`) using the normal `client` fixture, and failure case (503 + `{"status": "unavailable"}`) by mocking `app.db.engine` to raise on connect.
 - `make check` passes: ruff clean, mypy clean, 466 tests pass (2 new + 464 existing), 97.85% coverage. No migration changes needed (read-only query).
+
+## T52: Production settings (SPEC 1.4) - DONE 2026-11-03
+- Updated `backend/app/config.py`: added `APP_ENV` (default `"development"`) and `LOG_LEVEL` (default `"INFO"`) to `Settings`. Extracted `_DEV_INGEST_TOKEN` and `_DEV_ADMIN_PASSWORD` constants so they can be imported by `main.py`.
+- Updated `backend/app/main.py`: added production hardening check — when `APP_ENV=production`, `create_app()` raises `RuntimeError` if `INGEST_TOKEN` equals `"dev-token"` or `ADMIN_PASSWORD` equals `"admin"`. Added logging setup that configures stdout with the level from `LOG_LEVEL`.
+- Created `backend/tests/test_config_prod.py` with 10 tests: settings defaults, env overrides, production rejection with default secrets, production success with strong secrets, logging level configuration, and error message content checks.
+- `make check` passes: ruff clean, mypy clean, 476 tests pass (10 new + 466 existing), 97.90% coverage, bandit clean. No migration changes needed.

@@ -125,7 +125,7 @@ Read SPEC §1, §3, §9 and docs/deployment.md first. Do them in order.
   accept: cd backend && uv run pytest tests/test_ingest_ratelimit.py -q
 - [x] T51: `GET /readyz` (SPEC 1.5): runs `SELECT 1`; 200 `{"status": "ready"}` or 503 `{"status": "unavailable"}` on any database error. `/healthz` stays DB-free. Write `tests/test_readyz.py` (the failure case by pointing the session at an unreachable database or overriding the dependency).
   accept: cd backend && uv run pytest tests/test_readyz.py tests/test_health.py -q
-- [ ] T52: Production settings (SPEC 1.4): add `APP_ENV` (default `development`) to `Settings`; when it is `production`, `create_app()` raises a clear error if `INGEST_TOKEN` or `ADMIN_PASSWORD` is still the default. Log to stdout with the level from `LOG_LEVEL` (default `INFO`). Write `tests/test_config_prod.py`.
+- [x] T52: Production settings (SPEC 1.4): add `APP_ENV` (default `development`) to `Settings`; when it is `production`, `create_app()` raises a clear error if `INGEST_TOKEN` or `ADMIN_PASSWORD` is still the default. Log to stdout with the level from `LOG_LEVEL` (default `INFO`). Write `tests/test_config_prod.py`.
   accept: cd backend && uv run pytest tests/test_config_prod.py -q
 - [ ] T53: Root `Dockerfile` and `.dockerignore` exactly as docs/deployment.md §image says (multi-stage, uv, python slim pinned, uid 10001, port 8000, contract at `/contract`). Write `backend/tests/test_dockerfile.py` that reads the Dockerfile as text and asserts USER 10001, EXPOSE 8000, no `:latest`, that `contract/` is copied, and that `.dockerignore` excludes `.git`, `.agent` and `.venv`.
   accept: uvx --from hadolint-py hadolint --failure-threshold warning Dockerfile && cd backend && uv run pytest tests/test_dockerfile.py -q
