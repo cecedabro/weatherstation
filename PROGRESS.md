@@ -328,6 +328,19 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `test_page_weather_charts.py` and `test_page_soil_detail.py` to assert `barPath` exists in `chart-helpers.js` instead of `chart.js`.
 - `make check` passes: 443 tests, 97.97% coverage, ruff/mypy/bandit clean, syntax check passes on both files.
 
+## T48: Remove lint/type suppressions in backend/app (done)
+- Removed unused `# type: ignore[import-untyped]` from `backend/app/ingest.py` and `schema.py`.
+- Removed unused `# noqa: ANN201`/`ANN202` from `backend/app/main.py` (ANN rules not in ruff config).
+- Removed `# type: ignore[var-annotated]`, `[arg-type]`, `[assignment]` from `backend/app/admin.py` and `readapi.py`.
+- Refactored `backend/app/models.py` to use SQLAlchemy 2.x `Mapped[T]` and `mapped_column()` syntax, resolving column comparison and `var-annotated` mypy errors.
+- Fixed `backend/app/readapi.py` `_daily_aggregation` scoping: split ambiguous `rows` into `raw_rows` and `mapped_rows` to resolve mypy `Sequence[Reading]` vs `Sequence[RowMapping]` assignment error.
+- Added `types-jsonschema` dev dependency via `uv add --dev types-jsonschema`.
+- Updated `backend/pyproject.toml`: added `[tool.ruff.lint.flake8-bugbear]` with `extend-immutable-calls = ["fastapi.param_functions.Depends"]`.
+- Removed `# noqa: B008` from `admin.py` by defining `Depends` at module level: `admin_auth = Depends(basic_auth)` after `basic_auth = HTTPBasic()`.
+- Removed `# noqa: F401` from `backend/app/__init__.py`.
+- Result: 1 suppression remaining (`# type: ignore[no-redef]` in `__init__.py`), well within the ≤3 limit.
+- `make check` passes: ruff clean, mypy clean, 443 tests pass, 97.98% coverage, bandit clean.
+
 ## T46: GET /api/v1/daily endpoint (SPEC 10.6) - DONE 2026-11-03
 - Added `GET /api/v1/daily` endpoint to `backend/app/readapi.py`: accepts optional `node` (node_id) and `days` (1–366, default 30) query params, delegates to existing `_daily_aggregation()` function, returns `[]` for unknown nodes. Returns HTTP 400 JSON error when `days` is out of range.
 - Created `backend/tests/test_daily.py` with 7 hand-computed tests: two-day aggregation with exact expected values, unknown node returning empty list, `days=0` (400), `days=400` (400), `days=366` (ok), `days=1` (ok), and default `days=30` behavior.

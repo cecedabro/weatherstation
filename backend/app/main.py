@@ -20,7 +20,7 @@ def create_app() -> FastAPI:
 
     # SECURITY HEADERS per SPEC 10.15
     @application.middleware("http")
-    async def security_headers(  # noqa: ANN202
+    async def security_headers(
         request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
         """Add security headers to every response per SPEC 10.15."""
@@ -70,7 +70,7 @@ def create_app() -> FastAPI:
     @application.exception_handler(404)
     async def not_found_handler(
         request: Request, exc: HTTPException
-    ) -> HTMLResponse | JSONResponse:  # noqa: ANN201
+    ) -> HTMLResponse | JSONResponse:
         """SPEC 10.9: HTML 404 for non-API paths, JSON 404 for /api/ paths."""
         if request.url.path.startswith("/api/"):
             return JSONResponse(status_code=404, content={"detail": "Not found"})

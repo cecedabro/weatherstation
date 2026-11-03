@@ -5,7 +5,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
-from jsonschema import ValidationError  # type: ignore[import-untyped]
+from jsonschema import ValidationError
 
 from app.config import Settings
 from app.db import get_db_context

@@ -117,7 +117,7 @@ Read SPEC §1, §3, §9 and docs/deployment.md first. Do them in order.
   accept: cd backend && uv run pytest tests/test_daily.py -q
 - [x] T47: Bring `static/chart.js` under 150 lines (split helpers into a second file in `static/` if needed; update the templates that load it). No behaviour change; existing tests must still pass.
   accept: test "$(wc -l < backend/app/static/chart.js)" -le 150 && cd backend && uv run pytest -q
-- [ ] T48: Remove lint/type suppressions in `backend/app`: fix the code instead of `# type: ignore`, and replace the FastAPI `Depends` `# noqa: B008` lines with ruff's `lint.flake8-bugbear.extend-immutable-calls` setting in `pyproject.toml`. At most 3 suppressions may remain, each with a reason comment.
+- [x] T48: Remove lint/type suppressions in `backend/app`: fix the code instead of `# type: ignore`, and replace the FastAPI `Depends` `# noqa: B008` lines with ruff's `lint.flake8-bugbear.extend-immutable-calls` setting in `pyproject.toml`. At most 3 suppressions may remain, each with a reason comment.
   accept: test "$(grep -rE 'type: ignore|noqa' backend/app | wc -l)" -le 3 && cd backend && uv run pytest -q
 - [ ] T49: Ingest hardening (SPEC 3.6, 3.7): compare the bearer token with `hmac.compare_digest`; reject bodies over 1 MiB with 413 before parsing (check `Content-Length` and the bytes actually read), storing nothing. Write `tests/test_ingest_limits.py`.
   accept: cd backend && uv run pytest tests/test_ingest_limits.py tests/test_ingest_auth.py -q
