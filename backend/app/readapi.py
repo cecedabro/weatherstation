@@ -531,3 +531,25 @@ async def nodes_list() -> list[dict[str, str | bool]]:
         return result
     finally:
         db.close()
+
+
+@router.get("/api/v1/daily")
+async def daily(
+    node: str | None = Query(None),
+    days: int = Query(30),
+) -> list[dict[str, Any]]:
+    """Return daily aggregation per SPEC 10.6.
+
+    One row per UTC day with date, temp_min, temp_max, temp_avg,
+    rain_total, humidity_avg. days is 1-366 (default 30), otherwise 400.
+    """
+    from fastapi import HTTPException
+
+    if days < 1 or days > 366:
+        raise HTTPException(status_code=400, detail="days must be 1-366")
+
+    db = SessionLocal()
+    try:
+        return _daily_aggregation(db, node=node, days=days)
+    finally:
+        db.close()

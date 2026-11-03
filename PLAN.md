@@ -113,7 +113,7 @@ ones before. Every new page extends `base.html` and reuses the design tokens in 
 
 ## Round 4: leftovers, hardening, and a deployable image
 Read SPEC §1, §3, §9 and docs/deployment.md first. Do them in order.
-- [ ] T46: `GET /api/v1/daily?node=&days=` (SPEC 10.6) in `readapi.py`, reusing `_daily_aggregation` (the history page already uses it). `days` 1–366, default 30, else 400 with a JSON error; unknown node → `[]`. Write `tests/test_daily.py` with hand-computed values for two fixed days. Build timestamps with `timedelta` (docs/testing.md §dates).
+- [x] T46: `GET /api/v1/daily?node=&days=` (SPEC 10.6) in `readapi.py`, reusing `_daily_aggregation` (the history page already uses it). `days` 1–366, default 30, else 400 with a JSON error; unknown node → `[]`. Write `tests/test_daily.py` with hand-computed values for two fixed days. Build timestamps with `timedelta` (docs/testing.md §dates).
   accept: cd backend && uv run pytest tests/test_daily.py -q
 - [ ] T47: Bring `static/chart.js` under 150 lines (split helpers into a second file in `static/` if needed; update the templates that load it). No behaviour change; existing tests must still pass.
   accept: test "$(wc -l < backend/app/static/chart.js)" -le 150 && cd backend && uv run pytest -q
