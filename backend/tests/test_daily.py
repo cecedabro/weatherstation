@@ -41,9 +41,7 @@ def _insert_node_and_readings(
     for metric, value in metrics.items():
         reading = db.execute(
             select(Reading).where(
-                (Reading.node_id == node_id)
-                & (Reading.metric == metric)
-                & (Reading.ts == ts)
+                (Reading.node_id == node_id) & (Reading.metric == metric) & (Reading.ts == ts)
             )
         ).scalar_one_or_none()
         if reading is None:
@@ -63,26 +61,50 @@ def _daily_fixture(db: Session):
 
     # Day offset 2 -- two readings on this UTC day
     ts_d2 = now - timedelta(days=2, hours=2)  # 22 hours before now, same UTC day
-    _insert_node_and_readings(db, node_id, "weather", ts_d2, {
-        "temp_c": 15.0,
-        "humidity_pct": 55.0,
-        "rain_mm": 2.0,
-    })
-    _insert_node_and_readings(db, node_id, "weather", ts_d2 + timedelta(hours=4), {
-        "temp_c": 18.0,
-    })
+    _insert_node_and_readings(
+        db,
+        node_id,
+        "weather",
+        ts_d2,
+        {
+            "temp_c": 15.0,
+            "humidity_pct": 55.0,
+            "rain_mm": 2.0,
+        },
+    )
+    _insert_node_and_readings(
+        db,
+        node_id,
+        "weather",
+        ts_d2 + timedelta(hours=4),
+        {
+            "temp_c": 18.0,
+        },
+    )
 
     # Day offset 1 -- two readings on this UTC day
     ts_d1 = now - timedelta(days=1, hours=2)  # 22 hours before now, same UTC day
-    _insert_node_and_readings(db, node_id, "weather", ts_d1, {
-        "temp_c": 20.0,
-        "humidity_pct": 60.0,
-    })
-    _insert_node_and_readings(db, node_id, "weather", ts_d1 + timedelta(hours=8), {
-        "temp_c": 24.0,
-        "humidity_pct": 70.0,
-        "rain_mm": 5.5,
-    })
+    _insert_node_and_readings(
+        db,
+        node_id,
+        "weather",
+        ts_d1,
+        {
+            "temp_c": 20.0,
+            "humidity_pct": 60.0,
+        },
+    )
+    _insert_node_and_readings(
+        db,
+        node_id,
+        "weather",
+        ts_d1 + timedelta(hours=8),
+        {
+            "temp_c": 24.0,
+            "humidity_pct": 70.0,
+            "rain_mm": 5.5,
+        },
+    )
 
     return now
 

@@ -322,6 +322,12 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `backend/tests/test_dev_seed.py` with 11 tests (typed with `mypy strict`): structure validation, node diversity (4 nodes), 30-day span (≥29 days), frost night detection (≤2.0 °C), bed below 25% moisture, rain shower count (>5), rain concentration (≥2 days), daily temperature curves (>2 °C variation), all expected metrics present, and deterministic output (same seed → same count).
 - `make check` passes: ruff clean, mypy clean, 436 tests pass (11 new + 425 existing), 97.95% coverage, bandit clean.
 
+## T47: Split chart.js under 150 lines (done)
+- Split `backend/app/static/chart.js` (94 lines, down from 180+) and `backend/app/static/chart-helpers.js` (78 lines): moved `_findSections`, `_selectorButtons`, `_fetchSeries`, `_initSelectors`, and `barPath` into the helpers module so the main chart module only handles `_renderChart` and DOM event wiring.
+- Updated `home.html`, `weather.html`, and `soil_detail.html` to load `chart-helpers.js` in the `<head>` before `chart.js` (uPlot assets unchanged).
+- Updated `test_page_weather_charts.py` and `test_page_soil_detail.py` to assert `barPath` exists in `chart-helpers.js` instead of `chart.js`.
+- `make check` passes: 443 tests, 97.97% coverage, ruff/mypy/bandit clean, syntax check passes on both files.
+
 ## T46: GET /api/v1/daily endpoint (SPEC 10.6) - DONE 2026-11-03
 - Added `GET /api/v1/daily` endpoint to `backend/app/readapi.py`: accepts optional `node` (node_id) and `days` (1–366, default 30) query params, delegates to existing `_daily_aggregation()` function, returns `[]` for unknown nodes. Returns HTTP 400 JSON error when `days` is out of range.
 - Created `backend/tests/test_daily.py` with 7 hand-computed tests: two-day aggregation with exact expected values, unknown node returning empty list, `days=0` (400), `days=400` (400), `days=366` (ok), `days=1` (ok), and default `days=30` behavior.

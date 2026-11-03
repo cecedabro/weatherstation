@@ -331,8 +331,8 @@ def test_soil_detail_single_metric(client, db):
 
 
 def test_soil_detail_chart_js_barPath_exists() -> None:
-    """chart.js defines barPath for rain_mm-style rendering (existing contract)."""
+    """chart-helpers.js defines barPath for rain_mm-style rendering (existing contract)."""
     static_dir = Path(__file__).resolve().parent.parent / "app" / "static"
-    with open(static_dir / "chart.js") as f:
+    with open(static_dir / "chart-helpers.js") as f:
         source = f.read()
     assert "function barPath" in source
