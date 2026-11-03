@@ -345,3 +345,8 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Added `GET /api/v1/daily` endpoint to `backend/app/readapi.py`: accepts optional `node` (node_id) and `days` (1–366, default 30) query params, delegates to existing `_daily_aggregation()` function, returns `[]` for unknown nodes. Returns HTTP 400 JSON error when `days` is out of range.
 - Created `backend/tests/test_daily.py` with 7 hand-computed tests: two-day aggregation with exact expected values, unknown node returning empty list, `days=0` (400), `days=400` (400), `days=366` (ok), `days=1` (ok), and default `days=30` behavior.
 - `make check` passes: ruff clean, mypy clean, 443 tests pass (7 new + 436 existing), 97.97% coverage. No migration changes needed (read-only aggregation endpoint).
+
+## T49: Ingest hardening (SPEC 3.6, 3.7) - DONE 2026-11-03
+- Updated `backend/app/ingest.py`: replaced `!=` token comparison with `hmac.compare_digest()` for constant-time auth (SPEC 3.6). Added 1 MiB body size limit (SPEC 3.7): checks `Content-Length` header first, then verifies actual bytes read (`request.body()`), returning HTTP 413 before any parsing. Auth is checked before size checks so oversized requests with wrong tokens still get 401.
+- Created `backend/tests/test_ingest_limits.py` with 7 tests: source inspection for `compare_digest`, token comparison behavior, body > 1 MiB rejected (413), body < 1 MiB accepted, large body with wrong token returns 401, 413 enforced with valid token, oversized body stores nothing, exact 1 MiB boundary test.
+- `make check` passes: ruff clean, mypy clean, 451 tests pass (8 new + 443 existing), 97.75% coverage, bandit clean. No migration changes needed.

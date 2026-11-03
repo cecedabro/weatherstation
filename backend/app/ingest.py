@@ -1,5 +1,6 @@
 """POST /api/v1/readings — reading ingestion per SPEC 3.1–3.3."""
 
+import hmac
 from collections.abc import Sequence
 from typing import Any
 
@@ -11,6 +12,8 @@ from app.config import Settings
 from app.db import get_db_context
 from app.schema import _VALIDATOR, ALLOWED_METRICS
 from app.store import upsert_readings
+
+_MAX_BODY = 1024 * 1024  # 1 MiB
 
 router = APIRouter()
 
@@ -58,8 +61,21 @@ async def ingest_readings(request: Request) -> JSONResponse:
     auth = request.headers.get("authorization", "")
     if not auth.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid token")
-    if auth[len("Bearer ") :] != settings.INGEST_TOKEN:
+    if not hmac.compare_digest(auth[len("Bearer ") :], settings.INGEST_TOKEN):
         raise HTTPException(status_code=401, detail="Invalid token")
+
+    # SPEC 3.7: reject bodies larger than 1 MiB before parsing
+    content_length = request.headers.get("content-length")
+    if content_length is not None:
+        try:
+            if int(content_length) > _MAX_BODY:
+                raise HTTPException(status_code=413, detail="Body too large (max 1 MiB)")
+        except ValueError:
+            pass
+
+    body_bytes = await request.body()
+    if len(body_bytes) > _MAX_BODY:
+        raise HTTPException(status_code=413, detail="Body too large (max 1 MiB)")
 
     try:
         body = await request.json()
