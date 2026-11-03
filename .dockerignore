@@ -13,3 +13,12 @@ node_modules
 *.egg-info
 dist
 build
+# Same again below the root (backend/.venv from local dev would overwrite the image's venv).
+**/.venv
+**/.devdb
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.DS_Store
+backend/tests

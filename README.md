@@ -40,3 +40,5 @@ Preview locally with `make dev` (runs on `:8000` with a throwaway Postgres).
 1. Fill in `backend/.env.example` → copy to `.env` for local runs.
 2. `make setup && make check` should pass on an empty skeleton once T01 is done.
 3. Hand the repo to the agent loop (`agent-loop`) from the devbox.
+4. Try the production image on your machine: [docs/docker-local.md](docs/docker-local.md)
+   (build, run with Postgres, check it). Short version: `docker build -t weatherstation:local .`
