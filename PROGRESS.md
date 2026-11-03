@@ -362,3 +362,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `backend/app/main.py`: added production hardening check — when `APP_ENV=production`, `create_app()` raises `RuntimeError` if `INGEST_TOKEN` equals `"dev-token"` or `ADMIN_PASSWORD` equals `"admin"`. Added logging setup that configures stdout with the level from `LOG_LEVEL`.
 - Created `backend/tests/test_config_prod.py` with 10 tests: settings defaults, env overrides, production rejection with default secrets, production success with strong secrets, logging level configuration, and error message content checks.
 - `make check` passes: ruff clean, mypy clean, 476 tests pass (10 new + 466 existing), 97.90% coverage, bandit clean. No migration changes needed.
+
+## T53: Root Dockerfile and .dockerignore (done)
+- Created `Dockerfile` at repo root: multi-stage build with `ghcr.io/astral-sh/uv:0.5.18` as builder (installs deps via `uv sync --frozen --no-dev`), runtime stage uses `python:3.11.11-slim`. Layout: `backend/` → `/app`, `contract/` → `/contract`. Sets `PYTHONDONTWRITEBYTECODE=1`, `PYTHONUNBUFFERED=1`, `PATH` includes `.venv/bin`, `USER 10001`, `EXPOSE 8000`. CMD runs uvicorn with proxy-headers and forwarded-allow-ips.
+- Created `.dockerignore` excluding `.git`, `.agent`, `.venv`, `.devdb`, caches, `tests`, `node_modules`, etc.
+- Created `backend/tests/test_dockerfile.py` with 14 tests: multi-stage (≥2 FROM), USER 10001, EXPOSE 8000, no `:latest` on any FROM line, `COPY contract /contract`, `uv sync --frozen`, `WORKDIR /app`, Python env vars, venv PATH, and slim runtime image detection. `.dockerignore` tests for `.git`, `.agent`, `.venv`, `tests` exclusions.
+- `make check` passes: 490 tests, 97.90% coverage, ruff/mypy/bandit clean, hadolint clean.
