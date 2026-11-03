@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader
+from sqlalchemy import text
 from starlette.responses import Response
 
 from app.config import Settings
@@ -43,6 +44,19 @@ def create_app() -> FastAPI:
     @application.get("/healthz")
     async def healthz() -> dict[str, str]:
         return {"status": "ok"}
+
+    @application.get("/readyz", response_model=None)
+    async def readyz() -> JSONResponse | dict[str, str]:
+        from app.db import engine as _engine
+
+        try:
+            with _engine.connect() as _conn:
+                _conn.execute(text("SELECT 1"))
+            return {"status": "ready"}
+        except Exception:
+            return JSONResponse(
+                status_code=503, content={"status": "unavailable"}
+            )
 
     from app.web import router as web_router
 

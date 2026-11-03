@@ -123,7 +123,7 @@ Read SPEC §1, §3, §9 and docs/deployment.md first. Do them in order.
   accept: cd backend && uv run pytest tests/test_ingest_limits.py tests/test_ingest_auth.py -q
 - [x] T50: Ingest rate limit (SPEC 3.8): an in-process sliding window of 60 requests per minute per client on `POST /api/v1/readings` → 429 with a JSON error and a `Retry-After` header. Client key is `CF-Connecting-IP` if present, else `request.client.host`. Make the clock injectable so tests don't sleep, and reset state between tests. Write `tests/test_ingest_ratelimit.py`.
   accept: cd backend && uv run pytest tests/test_ingest_ratelimit.py -q
-- [ ] T51: `GET /readyz` (SPEC 1.5): runs `SELECT 1`; 200 `{"status": "ready"}` or 503 `{"status": "unavailable"}` on any database error. `/healthz` stays DB-free. Write `tests/test_readyz.py` (the failure case by pointing the session at an unreachable database or overriding the dependency).
+- [x] T51: `GET /readyz` (SPEC 1.5): runs `SELECT 1`; 200 `{"status": "ready"}` or 503 `{"status": "unavailable"}` on any database error. `/healthz` stays DB-free. Write `tests/test_readyz.py` (the failure case by pointing the session at an unreachable database or overriding the dependency).
   accept: cd backend && uv run pytest tests/test_readyz.py tests/test_health.py -q
 - [ ] T52: Production settings (SPEC 1.4): add `APP_ENV` (default `development`) to `Settings`; when it is `production`, `create_app()` raises a clear error if `INGEST_TOKEN` or `ADMIN_PASSWORD` is still the default. Log to stdout with the level from `LOG_LEVEL` (default `INFO`). Write `tests/test_config_prod.py`.
   accept: cd backend && uv run pytest tests/test_config_prod.py -q

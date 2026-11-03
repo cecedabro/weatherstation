@@ -9,7 +9,6 @@ Tests verify:
 - Rate-limited requests are NOT stored in the database
 """
 
-
 from sqlalchemy import func, select
 
 from app.ingest import RateLimiter, get_limiter, reset_rate_limiter

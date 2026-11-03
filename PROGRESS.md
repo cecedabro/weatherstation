@@ -350,3 +350,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `backend/app/ingest.py`: replaced `!=` token comparison with `hmac.compare_digest()` for constant-time auth (SPEC 3.6). Added 1 MiB body size limit (SPEC 3.7): checks `Content-Length` header first, then verifies actual bytes read (`request.body()`), returning HTTP 413 before any parsing. Auth is checked before size checks so oversized requests with wrong tokens still get 401.
 - Created `backend/tests/test_ingest_limits.py` with 7 tests: source inspection for `compare_digest`, token comparison behavior, body > 1 MiB rejected (413), body < 1 MiB accepted, large body with wrong token returns 401, 413 enforced with valid token, oversized body stores nothing, exact 1 MiB boundary test.
 - `make check` passes: ruff clean, mypy clean, 451 tests pass (8 new + 443 existing), 97.75% coverage, bandit clean. No migration changes needed.
+
+## T51: GET /readyz endpoint (SPEC 1.5) - DONE 2026-11-03
+- Added `GET /readyz` endpoint to `backend/app/main.py`: runs `SELECT 1` via the SQLAlchemy engine connection; returns 200 `{"status": "ready"}` on success, 503 `{"status": "unavailable"}` on any database error. Used `response_model=None` decorator parameter because `JSONResponse` is not a valid Pydantic response type. Imported `text` from `sqlalchemy`.
+- `/healthz` remains DB-free (unchanged).
+- Created `backend/tests/test_readyz.py` with 2 tests: success case (200 + `{"status": "ready"}`) using the normal `client` fixture, and failure case (503 + `{"status": "unavailable"}`) by mocking `app.db.engine` to raise on connect.
+- `make check` passes: ruff clean, mypy clean, 466 tests pass (2 new + 464 existing), 97.85% coverage. No migration changes needed (read-only query).
