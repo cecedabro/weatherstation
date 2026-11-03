@@ -56,21 +56,17 @@ def test_frost_night_exists(readings: list[dict[str, Any]]) -> None:
     temps = [
         r["metrics"]["temp_c"]
         for r in readings
-        if r["node_type"] == "weather"
-        and "temp_c" in r["metrics"]
+        if r["node_type"] == "weather" and "temp_c" in r["metrics"]
     ]
     assert temps, "No temperature readings found"
     assert any(t <= 2.0 for t in temps), (
-        f"No frost night (<= 2.0 °C) found in {len(temps)} readings; "
-        f"min={min(temps):.1f}"
+        f"No frost night (<= 2.0 °C) found in {len(temps)} readings; min={min(temps):.1f}"
     )
 
 
 def test_daily_temperature_curves(readings: list[dict[str, Any]]) -> None:
     """Temperature readings vary within each day, showing daily cycles."""
-    weather = [
-        r for r in readings if r["node_type"] == "weather" and "temp_c" in r["metrics"]
-    ]
+    weather = [r for r in readings if r["node_type"] == "weather" and "temp_c" in r["metrics"]]
     # Group by date and check that at least one day has >2 °C variation
     by_day: dict[str, list[float]] = {}
     for r in weather:
@@ -85,27 +81,21 @@ def test_daily_temperature_curves(readings: list[dict[str, Any]]) -> None:
             break
     else:
         max_variation = max(max(t) - min(t) for t in by_day.values())
-        pytest.fail(
-            f"No day with > 2 °C variation; max daily variation = {max_variation:.1f} °C"
-        )
+        pytest.fail(f"No day with > 2 °C variation; max daily variation = {max_variation:.1f} °C")
 
 
 def test_rain_showers_multiple(readings: list[dict[str, Any]]) -> None:
     """Multiple rain shower events exist (many readings with rain_mm > 0)."""
     rain_readings = [
-        r for r in readings
-        if r["node_type"] == "weather" and r["metrics"].get("rain_mm", 0) > 0
+        r for r in readings if r["node_type"] == "weather" and r["metrics"].get("rain_mm", 0) > 0
     ]
-    assert len(rain_readings) > 5, (
-        f"Expected more than 5 rain readings, got {len(rain_readings)}"
-    )
+    assert len(rain_readings) > 5, f"Expected more than 5 rain readings, got {len(rain_readings)}"
 
 
 def test_rain_showers_concentrated(readings: list[dict[str, Any]]) -> None:
     """Rain readings are concentrated in periods (showers), not uniform."""
     rain_readings = [
-        r for r in readings
-        if r["node_type"] == "weather" and r["metrics"].get("rain_mm", 0) > 0
+        r for r in readings if r["node_type"] == "weather" and r["metrics"].get("rain_mm", 0) > 0
     ]
     if not rain_readings:
         pytest.fail("No rain readings found")
@@ -124,8 +114,7 @@ def test_bed_below_25_moisture(readings: list[dict[str, Any]]) -> None:
     moistures = [
         r["metrics"]["soil_moisture_pct"]
         for r in readings
-        if r["node_type"] == "soil"
-        and "soil_moisture_pct" in r["metrics"]
+        if r["node_type"] == "soil" and "soil_moisture_pct" in r["metrics"]
     ]
     assert moistures, "No soil moisture readings found"
     assert any(m < 25.0 for m in moistures), (
@@ -147,12 +136,8 @@ def test_30_day_span(readings: list[dict[str, Any]]) -> None:
     ts_max = max(timestamps)
     span_days = (ts_max - ts_min).total_seconds() / 86400
 
-    assert span_days >= 29, (
-        f"Data span is {span_days:.1f} days; expected >= 29 (30-day window)"
-    )
-    assert span_days <= 31, (
-        f"Data span is {span_days:.1f} days; expected <= 31"
-    )
+    assert span_days >= 29, f"Data span is {span_days:.1f} days; expected >= 29 (30-day window)"
+    assert span_days <= 31, f"Data span is {span_days:.1f} days; expected <= 31"
 
 
 def test_node_diversity(readings: list[dict[str, Any]]) -> None:
@@ -161,9 +146,7 @@ def test_node_diversity(readings: list[dict[str, Any]]) -> None:
     soil_nodes = {r["node_id"] for r in readings if r["node_type"] == "soil"}
 
     assert weather_nodes, "No weather nodes found"
-    assert len(soil_nodes) >= 3, (
-        f"Expected >= 3 soil nodes, got {len(soil_nodes)}: {soil_nodes}"
-    )
+    assert len(soil_nodes) >= 3, f"Expected >= 3 soil nodes, got {len(soil_nodes)}: {soil_nodes}"
     assert "weather-main" in weather_nodes
     assert "soil-bed-1" in soil_nodes
     assert "soil-bed-3" in soil_nodes

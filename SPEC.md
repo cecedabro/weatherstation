@@ -9,6 +9,11 @@ Requirements as testable sentences. Each section maps to one or more tasks in
 - 1.3 The app reads config from env vars (`DATABASE_URL`, `INGEST_TOKEN`,
       `ADMIN_USER`, `ADMIN_PASSWORD`) with defaults suitable for local tests.
 
+- 1.4 With `APP_ENV=production`, the app refuses to start when `INGEST_TOKEN` or
+      `ADMIN_PASSWORD` still has its development default.
+- 1.5 `GET /readyz` returns 200 `{"status": "ready"}` when the database answers a
+      trivial query, and 503 `{"status": "unavailable"}` when it does not.
+
 ## 2. Storage
 - 2.1 An Alembic migration creates tables to store readings as (node, metric,
       ts, value) plus a node registry. Running `make migrate` on an empty
@@ -27,6 +32,11 @@ Requirements as testable sentences. Each section maps to one or more tasks in
       on a weather node, or vice versa).
 - 3.4 A request with a missing or wrong bearer token returns 401 and stores nothing.
 - 3.5 A malformed envelope (not JSON, or no `readings` array) returns 400.
+
+- 3.6 The bearer token is compared in constant time.
+- 3.7 A request body larger than 1 MiB returns 413 and stores nothing.
+- 3.8 More than 60 ingest requests per minute from one client return 429. The
+      client is `CF-Connecting-IP` when present (Cloudflare tunnel), else the peer address.
 
 ## 4. Read API
 - 4.1 `GET /api/v1/current` returns the latest reading per node.
@@ -71,13 +81,25 @@ Requirements as testable sentences. Each section maps to one or more tasks in
 - 8.3 A node connects to Wi-Fi, publishes to the right topic at a configurable
       interval, and sleeps between readings (deep sleep for battery/soil nodes).
 
-## 9. Deployment
-- 9.1 `deploy/` has Kustomize manifests for the backend Deployment+Service,
-      Postgres StatefulSet with a Longhorn PVC, and ingress via the existing
-      Cloudflare tunnel to garden.cedricschippers.dev.
-- 9.2 `kubeconform` passes on the rendered manifests (`make -C deploy validate`).
-- 9.3 Secrets (`INGEST_TOKEN`, `ADMIN_PASSWORD`, DB password) are referenced from
-      a Secret, never inline; a `*.example.yaml` documents the keys.
+## 9. Deployment (round 4)
+- 9.1 The root `Dockerfile` builds one image, `ghcr.io/cecedabro/weatherstation`, that
+      runs the backend on port 8000 as uid 10001 and works with a read-only root
+      filesystem (only `/tmp` writable).
+- 9.2 CI (GitHub Actions) runs `make check` on every pull request and push to `main`.
+- 9.3 Every push to `main` that passes `make check` is a release: the next version
+      `vX.Y.Z` (patch +1; `[minor]` or `[major]` in the commit message bumps more;
+      the first is `v0.1.0`), images `:X.Y.Z` and `:sha-<short>`, then the git tag.
+      Flux deploys `X.Y.Z` automatically.
+- 9.4 `deploy/` has Kustomize manifests (namespace `weatherstation`, app Deployment
+      with a migrate initContainer, Service, Postgres StatefulSet + Service + 5 Gi
+      Longhorn PVC) that pass `kustomize build | kubeconform -strict`. They are drafts:
+      the homelab repo holds the live copy.
+- 9.6 A human-owned migration check (`tests/ci/check-migrations.sh`, workflow
+      `migrations.yml`) passes: one Alembic head, empty DB → head, models match the
+      migrations (`alembic check`), re-running is a no-op, downgrade to base and back,
+      and data written by the last release survives the upgrade. No release when it fails.
+- 9.5 Secrets are referenced by name (`weatherstation-app`, `weatherstation-db`),
+      never inline; `deploy/secret.example.yaml` documents every key.
 
 ## 10. Website pages (round 3)
 - 10.1 Every public page shares one layout with a navigation bar linking Home `/`,

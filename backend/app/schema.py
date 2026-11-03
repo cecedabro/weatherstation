@@ -3,7 +3,7 @@
 import json
 import pathlib
 
-from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
+from jsonschema import Draft202012Validator
 
 _ROOT = pathlib.Path(__file__).resolve().parents[2]
 _VALIDATOR = Draft202012Validator(

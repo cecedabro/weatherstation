@@ -162,11 +162,11 @@ def test_weather_chart_selector_query_params(client, weather_data_with_all_metri
 
 
 def test_chart_js_has_bar_path() -> None:
-    """chart.js defines a barPath function for rain_mm rendering."""
+    """chart-helpers.js defines a barPath function for rain_mm rendering."""
     import pathlib
 
     static_dir = pathlib.Path(__file__).resolve().parent.parent / "app" / "static"
-    with open(static_dir / "chart.js") as f:
+    with open(static_dir / "chart-helpers.js") as f:
         source = f.read()
     assert "barPath" in source
     assert "function barPath" in source

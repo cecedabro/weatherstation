@@ -321,3 +321,50 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `backend/scripts/dev.py`: refactored `fake_readings()` to generate 30 days of data instead of 7. Weather nodes publish every 30 min; soil nodes every 60 min. Added sinusoidal temperature model with seasonal trend and a frost event (~1.0 °C on day 21 at 04:00). Implemented concentrated rain probability across three shower windows. Set `soil-bed-1` to oscillate between 20–30% moisture to guarantee <25% readings. Fixed a timestamp bug where soil node intervals used `timedelta(hours=60*i)` instead of `timedelta(minutes=60*i)`, causing an 1800-day span.
 - Created `backend/tests/test_dev_seed.py` with 11 tests (typed with `mypy strict`): structure validation, node diversity (4 nodes), 30-day span (≥29 days), frost night detection (≤2.0 °C), bed below 25% moisture, rain shower count (>5), rain concentration (≥2 days), daily temperature curves (>2 °C variation), all expected metrics present, and deterministic output (same seed → same count).
 - `make check` passes: ruff clean, mypy clean, 436 tests pass (11 new + 425 existing), 97.95% coverage, bandit clean.
+
+## T47: Split chart.js under 150 lines (done)
+- Split `backend/app/static/chart.js` (94 lines, down from 180+) and `backend/app/static/chart-helpers.js` (78 lines): moved `_findSections`, `_selectorButtons`, `_fetchSeries`, `_initSelectors`, and `barPath` into the helpers module so the main chart module only handles `_renderChart` and DOM event wiring.
+- Updated `home.html`, `weather.html`, and `soil_detail.html` to load `chart-helpers.js` in the `<head>` before `chart.js` (uPlot assets unchanged).
+- Updated `test_page_weather_charts.py` and `test_page_soil_detail.py` to assert `barPath` exists in `chart-helpers.js` instead of `chart.js`.
+- `make check` passes: 443 tests, 97.97% coverage, ruff/mypy/bandit clean, syntax check passes on both files.
+
+## T48: Remove lint/type suppressions in backend/app (done)
+- Removed unused `# type: ignore[import-untyped]` from `backend/app/ingest.py` and `schema.py`.
+- Removed unused `# noqa: ANN201`/`ANN202` from `backend/app/main.py` (ANN rules not in ruff config).
+- Removed `# type: ignore[var-annotated]`, `[arg-type]`, `[assignment]` from `backend/app/admin.py` and `readapi.py`.
+- Refactored `backend/app/models.py` to use SQLAlchemy 2.x `Mapped[T]` and `mapped_column()` syntax, resolving column comparison and `var-annotated` mypy errors.
+- Fixed `backend/app/readapi.py` `_daily_aggregation` scoping: split ambiguous `rows` into `raw_rows` and `mapped_rows` to resolve mypy `Sequence[Reading]` vs `Sequence[RowMapping]` assignment error.
+- Added `types-jsonschema` dev dependency via `uv add --dev types-jsonschema`.
+- Updated `backend/pyproject.toml`: added `[tool.ruff.lint.flake8-bugbear]` with `extend-immutable-calls = ["fastapi.param_functions.Depends"]`.
+- Removed `# noqa: B008` from `admin.py` by defining `Depends` at module level: `admin_auth = Depends(basic_auth)` after `basic_auth = HTTPBasic()`.
+- Removed `# noqa: F401` from `backend/app/__init__.py`.
+- Result: 1 suppression remaining (`# type: ignore[no-redef]` in `__init__.py`), well within the ≤3 limit.
+- `make check` passes: ruff clean, mypy clean, 443 tests pass, 97.98% coverage, bandit clean.
+
+## T46: GET /api/v1/daily endpoint (SPEC 10.6) - DONE 2026-11-03
+- Added `GET /api/v1/daily` endpoint to `backend/app/readapi.py`: accepts optional `node` (node_id) and `days` (1–366, default 30) query params, delegates to existing `_daily_aggregation()` function, returns `[]` for unknown nodes. Returns HTTP 400 JSON error when `days` is out of range.
+- Created `backend/tests/test_daily.py` with 7 hand-computed tests: two-day aggregation with exact expected values, unknown node returning empty list, `days=0` (400), `days=400` (400), `days=366` (ok), `days=1` (ok), and default `days=30` behavior.
+- `make check` passes: ruff clean, mypy clean, 443 tests pass (7 new + 436 existing), 97.97% coverage. No migration changes needed (read-only aggregation endpoint).
+
+## T49: Ingest hardening (SPEC 3.6, 3.7) - DONE 2026-11-03
+- Updated `backend/app/ingest.py`: replaced `!=` token comparison with `hmac.compare_digest()` for constant-time auth (SPEC 3.6). Added 1 MiB body size limit (SPEC 3.7): checks `Content-Length` header first, then verifies actual bytes read (`request.body()`), returning HTTP 413 before any parsing. Auth is checked before size checks so oversized requests with wrong tokens still get 401.
+- Created `backend/tests/test_ingest_limits.py` with 7 tests: source inspection for `compare_digest`, token comparison behavior, body > 1 MiB rejected (413), body < 1 MiB accepted, large body with wrong token returns 401, 413 enforced with valid token, oversized body stores nothing, exact 1 MiB boundary test.
+- `make check` passes: ruff clean, mypy clean, 451 tests pass (8 new + 443 existing), 97.75% coverage, bandit clean. No migration changes needed.
+
+## T51: GET /readyz endpoint (SPEC 1.5) - DONE 2026-11-03
+- Added `GET /readyz` endpoint to `backend/app/main.py`: runs `SELECT 1` via the SQLAlchemy engine connection; returns 200 `{"status": "ready"}` on success, 503 `{"status": "unavailable"}` on any database error. Used `response_model=None` decorator parameter because `JSONResponse` is not a valid Pydantic response type. Imported `text` from `sqlalchemy`.
+- `/healthz` remains DB-free (unchanged).
+- Created `backend/tests/test_readyz.py` with 2 tests: success case (200 + `{"status": "ready"}`) using the normal `client` fixture, and failure case (503 + `{"status": "unavailable"}`) by mocking `app.db.engine` to raise on connect.
+- `make check` passes: ruff clean, mypy clean, 466 tests pass (2 new + 464 existing), 97.85% coverage. No migration changes needed (read-only query).
+
+## T52: Production settings (SPEC 1.4) - DONE 2026-11-03
+- Updated `backend/app/config.py`: added `APP_ENV` (default `"development"`) and `LOG_LEVEL` (default `"INFO"`) to `Settings`. Extracted `_DEV_INGEST_TOKEN` and `_DEV_ADMIN_PASSWORD` constants so they can be imported by `main.py`.
+- Updated `backend/app/main.py`: added production hardening check — when `APP_ENV=production`, `create_app()` raises `RuntimeError` if `INGEST_TOKEN` equals `"dev-token"` or `ADMIN_PASSWORD` equals `"admin"`. Added logging setup that configures stdout with the level from `LOG_LEVEL`.
+- Created `backend/tests/test_config_prod.py` with 10 tests: settings defaults, env overrides, production rejection with default secrets, production success with strong secrets, logging level configuration, and error message content checks.
+- `make check` passes: ruff clean, mypy clean, 476 tests pass (10 new + 466 existing), 97.90% coverage, bandit clean. No migration changes needed.
+
+## T53: Root Dockerfile and .dockerignore (done)
+- Created `Dockerfile` at repo root: multi-stage build with `ghcr.io/astral-sh/uv:0.5.18` as builder (installs deps via `uv sync --frozen --no-dev`), runtime stage uses `python:3.11.11-slim`. Layout: `backend/` → `/app`, `contract/` → `/contract`. Sets `PYTHONDONTWRITEBYTECODE=1`, `PYTHONUNBUFFERED=1`, `PATH` includes `.venv/bin`, `USER 10001`, `EXPOSE 8000`. CMD runs uvicorn with proxy-headers and forwarded-allow-ips.
+- Created `.dockerignore` excluding `.git`, `.agent`, `.venv`, `.devdb`, caches, `tests`, `node_modules`, etc.
+- Created `backend/tests/test_dockerfile.py` with 14 tests: multi-stage (≥2 FROM), USER 10001, EXPOSE 8000, no `:latest` on any FROM line, `COPY contract /contract`, `uv sync --frozen`, `WORKDIR /app`, Python env vars, venv PATH, and slim runtime image detection. `.dockerignore` tests for `.git`, `.agent`, `.venv`, `tests` exclusions.
+- `make check` passes: 490 tests, 97.90% coverage, ruff/mypy/bandit clean, hadolint clean.

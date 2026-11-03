@@ -65,3 +65,9 @@ def test_ingest_stores_one_row_per_metric(db):
     assert {row.metric for row in rows} == set(WEATHER_BATCH["metrics"])
     assert any(r.metric == "temp_c" and r.value == 14.2 for r in rows)
 ```
+
+## Dates in tests
+Build timestamps with `datetime(2026, 5, 1, 12, tzinfo=UTC) + timedelta(...)` or
+`now - timedelta(days=n)`. Never `now.replace(day=now.day + 1)` or similar: it
+crashes at the end of a month (this already cost one skipped task). Prefer fixed
+dates over `now()` unless the behaviour depends on "now".

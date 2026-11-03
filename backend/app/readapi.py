@@ -143,23 +143,23 @@ async def series(
     if params.metric:
         conditions.append(Reading.metric == params.metric)
     if from_dt:
-        conditions.append(Reading.ts >= from_dt)  # type: ignore[arg-type]
+        conditions.append(Reading.ts >= from_dt)
     if to_dt:
-        conditions.append(Reading.ts <= to_dt)  # type: ignore[arg-type]
+        conditions.append(Reading.ts <= to_dt)
 
     db = SessionLocal()
     try:
         if params.step == "raw":
             # Return all individual points, ordered by timestamp
             stmt = select(Reading).where(*conditions).order_by(Reading.ts.asc())
-            rows = db.execute(stmt).scalars().all()
+            raw_rows = db.execute(stmt).scalars().all()
             result = [
                 {
                     "ts": r.ts.isoformat(),
                     "metric": str(r.metric),
                     "value": float(r.value),
                 }
-                for r in rows
+                for r in raw_rows
             ]
         else:
             # Bucketed aggregation
@@ -180,15 +180,14 @@ async def series(
                 .order_by(bucket.asc())
             )
 
-            rows = db.execute(stmt).mappings().all()
-
+            mapped_rows = db.execute(stmt).mappings().all()
             result = [
                 {
                     "ts": r["bucket"].isoformat(),
                     "metric": str(r["metric"]),
                     "value": (float(r["avg_value"]) if r["avg_value"] is not None else 0.0),
                 }
-                for r in rows
+                for r in mapped_rows
             ]
 
         return result
@@ -224,7 +223,7 @@ def _current_readings(db: Session) -> list[dict[str, Any]]:
             by_node[nid] = {}
         by_node[nid][str(r.metric)] = float(r.value)
         if nid not in node_reading_time or r.ts > node_reading_time[nid]:
-            node_reading_time[nid] = r.ts  # type: ignore[assignment]
+            node_reading_time[nid] = r.ts
 
     node_stmt = select(Node)
     nodes_rows = db.execute(node_stmt).scalars().all()
@@ -283,7 +282,7 @@ def _daily_aggregation(
     from_dt = now - timedelta(days=days)
 
     conditions: list[ColumnElement[Any]] = []
-    conditions.append(Reading.ts >= from_dt)  # type: ignore[arg-type]
+    conditions.append(Reading.ts >= from_dt)
     if node:
         conditions.append(Reading.node_id == node)
 
@@ -418,7 +417,7 @@ def _garden_alerts(db: Session) -> dict[str, Any]:
 
     # 24h rain total: sum all rain_mm readings in the last 24 hours
     rain_stmt: Select[Any] = select(func.coalesce(func.sum(Reading.value), 0.0)).where(
-        (Reading.metric == "rain_mm") & (Reading.ts >= yesterday)  # type: ignore[arg-type]
+        (Reading.metric == "rain_mm") & (Reading.ts >= yesterday)
     )
     rain_24h_mm = float(db.execute(rain_stmt).scalar() or 0.0)
 
@@ -477,9 +476,9 @@ async def export_csv(
     if metric:
         conditions.append(Reading.metric == metric)
     if from_dt:
-        conditions.append(Reading.ts >= from_dt)  # type: ignore[arg-type]
+        conditions.append(Reading.ts >= from_dt)
     if to_dt:
-        conditions.append(Reading.ts <= to_dt)  # type: ignore[arg-type]
+        conditions.append(Reading.ts <= to_dt)
 
     db = SessionLocal()
     try:
@@ -529,5 +528,27 @@ async def nodes_list() -> list[dict[str, str | bool]]:
                 }
             )
         return result
+    finally:
+        db.close()
+
+
+@router.get("/api/v1/daily")
+async def daily(
+    node: str | None = Query(None),
+    days: int = Query(30),
+) -> list[dict[str, Any]]:
+    """Return daily aggregation per SPEC 10.6.
+
+    One row per UTC day with date, temp_min, temp_max, temp_avg,
+    rain_total, humidity_avg. days is 1-366 (default 30), otherwise 400.
+    """
+    from fastapi import HTTPException
+
+    if days < 1 or days > 366:
+        raise HTTPException(status_code=400, detail="days must be 1-366")
+
+    db = SessionLocal()
+    try:
+        return _daily_aggregation(db, node=node, days=days)
     finally:
         db.close()

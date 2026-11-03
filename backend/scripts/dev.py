@@ -94,15 +94,12 @@ def fake_readings(now: datetime | None = None) -> list[dict]:
         temp = _temp_c(now, ts)
         temp = round(temp + rng.uniform(-0.5, 0.5), 1)
         humidity = round(
-            60 + 15 * math.sin((ts.hour + ts.minute / 60 - 9) / 24 * 2 * math.pi)
+            60
+            + 15 * math.sin((ts.hour + ts.minute / 60 - 9) / 24 * 2 * math.pi)
             + rng.uniform(-3, 3),
             0,
         )
-        rain_mm = (
-            round(rng.uniform(0.3, 1.5), 1)
-            if rng.random() < _rain_prob(ts, now)
-            else 0.0
-        )
+        rain_mm = round(rng.uniform(0.3, 1.5), 1) if rng.random() < _rain_prob(ts, now) else 0.0
         out.append(
             _batch(
                 "weather-main",
@@ -140,9 +137,7 @@ def fake_readings(now: datetime | None = None) -> list[dict]:
     # soil-bed-3: healthy moisture
     for i in range(30 * 24, -1, -1):
         ts = now - timedelta(minutes=60 * i + 15)
-        moist = round(
-            35 + 10 * math.sin(i / 13) + rng.uniform(-0.5, 0.5), 1
-        )
+        moist = round(35 + 10 * math.sin(i / 13) + rng.uniform(-0.5, 0.5), 1)
         out.append(
             _batch(
                 "soil-bed-3",
@@ -159,9 +154,7 @@ def fake_readings(now: datetime | None = None) -> list[dict]:
     # soil-bed-7: low battery, older readings
     for i in range(30 * 24, 48, -1):
         ts = now - timedelta(minutes=60 * i + 20)
-        moist = round(
-            30 + 5 * math.sin(i / 7) + rng.uniform(-0.5, 0.5), 1
-        )
+        moist = round(30 + 5 * math.sin(i / 7) + rng.uniform(-0.5, 0.5), 1)
         out.append(
             _batch(
                 "soil-bed-7",

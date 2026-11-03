@@ -18,6 +18,7 @@ from app.web import _jinja_env
 router = APIRouter()
 
 basic_auth = HTTPBasic()
+admin_auth = Depends(basic_auth)
 
 
 def _check_auth(credentials: HTTPBasicCredentials) -> None:
@@ -39,8 +40,8 @@ def _readings_24h(db: Session) -> dict[str, int]:
     """Return a dict mapping node_id → count of readings in the last 24 h."""
     cutoff = datetime.now(UTC) - timedelta(hours=24)
     stmt = (
-        select(Reading.node_id, func.count().label("cnt"))  # type: ignore[var-annotated]
-        .where(Reading.ts >= cutoff)  # type: ignore[arg-type]
+        select(Reading.node_id, func.count().label("cnt"))
+        .where(Reading.ts >= cutoff)
         .group_by(Reading.node_id)
     )
     rows = db.execute(stmt).all()
@@ -50,7 +51,7 @@ def _readings_24h(db: Session) -> dict[str, int]:
 @router.get("/admin")
 async def admin(
     request: Request,
-    credentials: HTTPBasicCredentials = Depends(basic_auth),  # noqa: B008
+    credentials: HTTPBasicCredentials = admin_auth,
 ) -> HTMLResponse:
     """Admin page with node health table per SPEC 6."""
     _check_auth(credentials)
@@ -99,7 +100,7 @@ async def admin(
 
 @router.get("/admin/nodes.json")
 async def admin_nodes_json(
-    credentials: HTTPBasicCredentials = Depends(basic_auth),  # noqa: B008
+    credentials: HTTPBasicCredentials = admin_auth,
 ) -> JSONResponse:
     """Return node health table data as JSON per SPEC 6."""
     _check_auth(credentials)
