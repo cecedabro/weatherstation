@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: weatherstation-db
+  namespace: weatherstation
+spec:
+  selector:
+    app: weatherstation-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: weatherstation-db
+  namespace: weatherstation
+spec:
+  serviceName: weatherstation-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weatherstation-db
+  template:
+    metadata:
+      labels:
+        app: weatherstation-db
+    spec:
+      securityContext:
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - k3s-gpu-01
+      containers:
+        - name: postgres
+          image: docker.io/library/postgres:16
+          envFrom:
+            - secretRef:
+                name: weatherstation-db
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: 5432
+              name: postgres
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        storageClassName: longhorn
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi

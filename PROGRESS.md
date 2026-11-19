@@ -389,3 +389,9 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `deploy/app.yaml`: Deployment (initContainers: `wait-for-db` using `pg_isready` from `postgres:16-alpine`, `migrate` running `alembic upgrade head` from app image; liveness/readiness probes on `/healthz`/`/readyz`; security context with runAsNonRoot, readOnlyRootFilesystem, drop ALL, seccomp RuntimeDefault; resources 25m/128Mi request, 256Mi limit; emptyDir on `/tmp`; `Recreate` strategy; replicas 1; image `ghcr.io/cecedabro/weatherstation:0.1.0` with flux imagepolicy marker comment) + Service (port 80 -> 8000, ClusterIP). Postgres resources are NOT included (T58).
 - `make -C deploy validate` passes (3 resources valid). `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit clean, migrations clean.
 - T58 must add `postgres.yaml` to `kustomization.yaml` resources (but `validate` passes without it since the initContainer only references the service name, not a live connection).
+
+## T58: Deploy manifests - Postgres StatefulSet + Service + Secret example (done)
+- Created `deploy/postgres.yaml`: ClusterIP Service `weatherstation-db` (port 5432) + StatefulSet `weatherstation-db` using `postgres:16` (pinned to minor tag), `envFrom` Secret `weatherstation-db`, `PGDATA=/var/lib/postgresql/data/pgdata` (subdirectory), 5Gi Longhorn `volumeClaimTemplate` (ReadWriteOnce), `pg_isready` liveness/readiness probes, resources 50m/256Mi request, 512Mi limit, fsGroup 999, node affinity avoiding `k3s-gpu-01`.
+- Updated `deploy/kustomization.yaml`: added `postgres.yaml` to resources.
+- Created `deploy/secret.example.yaml`: documents both `weatherstation-db` (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD) and `weatherstation-app` (DATABASE_URL, INGEST_TOKEN, ADMIN_USER, ADMIN_PASSWORD) Secrets with `REPLACE_ME` values; not included in kustomization.
+- `make -C deploy validate` passes (5 resources valid). `make check` passes: 499 tests, 97.90% coverage.

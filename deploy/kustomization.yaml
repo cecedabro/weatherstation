@@ -6,3 +6,4 @@ namespace: weatherstation
 resources:
   - namespace.yaml
   - app.yaml
+  - postgres.yaml
