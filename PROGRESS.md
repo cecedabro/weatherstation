@@ -372,3 +372,7 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 ## T54: CI workflow (done)
 - Created `.github/workflows/ci.yml`: two jobs — `ci` (checkout, setup-uv@v6, setup-node@v4 with Node 22, `uv tool install bandit`, `make setup && make check`) and `hadolint` (runs `uvx --from hadolint-py hadolint Dockerfile`). Triggered on `pull_request` and push to `main`/`agent/**`. All actions pinned to version tags.
 - `uvx --from actionlint-py actionlint .github/workflows/ci.yml` passes clean. `make check` passes: 490 tests, 97.90% coverage, ruff/mypy/bandit clean, migrations clean.
+
+## T56: Release workflow (SPEC 9.3) - DONE
+- Created `.github/workflows/release.yml`: two-job workflow — `setup` (skip check for `[skip release]` in commit message, full-history checkout, `make setup && make check`, migrations.yml via `uses`, version from `next_version.py`) and `build` (needs setup, docker/login-action@v3, docker/setup-buildx-action@v3, docker/build-push-action@v6 pushing `ghcr.io/cecedabro/weatherstation:X.Y.Z` and `:sha-<short>`, then git tag creation and push). Permissions: contents write, packages write. Concurrency group `release` with no cancel-in-progress.
+- `uvx --from actionlint-py actionlint .github/workflows/release.yml` passes clean. `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit clean, migrations clean.
