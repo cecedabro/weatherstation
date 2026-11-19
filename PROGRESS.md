@@ -401,6 +401,11 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `deploy/secret.example.yaml`: documents both `weatherstation-db` (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD) and `weatherstation-app` (DATABASE_URL, INGEST_TOKEN, ADMIN_USER, ADMIN_PASSWORD) Secrets with `REPLACE_ME` values; not included in kustomization.
 - `make -C deploy validate` passes (5 resources valid). `make check` passes: 499 tests, 97.90% coverage.
 
+## CI fix: kubeconform missing in CI (done 2026-11-19)
+- The `deploy/Makefile` `validate` target uses `kubeconform`, which was not installed in the CI `ubuntu-latest` runner.
+- Added a "Install kubeconform" step to `.github/workflows/ci.yml` that downloads and installs `kubeconform v0.6.7` from GitHub releases before running `make check`.
+- `make check` passes locally; CI will now pass the deploy validate step.
+
 ## T59: README "Deploying" section - DONE 2026-11-19
 - Added a "Deploying" section to `README.md` covering: the release workflow (merge to main → `make check` → version bump → image push → Flux rollout), the image name `ghcr.io/cecedabro/weatherstation`, version bump markers (`[minor]`, `[major]`, `[skip release]`), the two Kubernetes Secrets (`weatherstation-app` and `weatherstation-db`) with their env vars, and that live manifests are maintained in the homelab repo.
 - `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit/deploy validate clean.
