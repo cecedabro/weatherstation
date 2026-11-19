@@ -381,3 +381,11 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 ## T56: Release workflow (SPEC 9.3) - DONE
 - Created `.github/workflows/release.yml`: two-job workflow — `setup` (skip check for `[skip release]` in commit message, full-history checkout, `make setup && make check`, migrations.yml via `uses`, version from `next_version.py`) and `build` (needs setup, docker/login-action@v3, docker/setup-buildx-action@v3, docker/build-push-action@v6 pushing `ghcr.io/cecedabro/weatherstation:X.Y.Z` and `:sha-<short>`, then git tag creation and push). Permissions: contents write, packages write. Concurrency group `release` with no cancel-in-progress.
 - `uvx --from actionlint-py actionlint .github/workflows/release.yml` passes clean. `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit clean, migrations clean.
+
+## T57: Deploy manifests part 1 (Makefile validate, namespace, app) - DONE
+- Created `deploy/Makefile` with `validate` target: `kustomize build . | kubeconform -strict -summary`.
+- Created `deploy/namespace.yaml`: Namespace `weatherstation`.
+- Created `deploy/kustomization.yaml`: lists `namespace.yaml` and `app.yaml`, sets `namespace: weatherstation`.
+- Created `deploy/app.yaml`: Deployment (initContainers: `wait-for-db` using `pg_isready` from `postgres:16-alpine`, `migrate` running `alembic upgrade head` from app image; liveness/readiness probes on `/healthz`/`/readyz`; security context with runAsNonRoot, readOnlyRootFilesystem, drop ALL, seccomp RuntimeDefault; resources 25m/128Mi request, 256Mi limit; emptyDir on `/tmp`; `Recreate` strategy; replicas 1; image `ghcr.io/cecedabro/weatherstation:0.1.0` with flux imagepolicy marker comment) + Service (port 80 -> 8000, ClusterIP). Postgres resources are NOT included (T58).
+- `make -C deploy validate` passes (3 resources valid). `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit clean, migrations clean.
+- T58 must add `postgres.yaml` to `kustomization.yaml` resources (but `validate` passes without it since the initContainer only references the service name, not a live connection).
