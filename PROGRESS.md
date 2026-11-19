@@ -2,6 +2,11 @@
 
 Appended by the agent after each task: what changed, where, and gotchas for later tasks.
 
+## CI fix: test_backend_nodes_contract fails without PostgreSQL (done 2026-11-19)
+- The contract test `test_backend_nodes_contract` imports `app.main` and hits `/api/v1/nodes`, which calls `SessionLocal()` and executes a DB query. In CI there's no pgserver fixture for the contract test directory, so psycopg raises `OperationalError` on connection refused.
+- Fixed `backend/app/readapi.py:515`: added `OperationalError` to the import and to the except clause in `nodes_list()` alongside `ProgrammingError`. When no database is reachable, the endpoint returns `[]` (no known nodes) instead of 500.
+- `make check` passes: 499 tests, 97.77% coverage.
+
 ## T60: Image smoke test in CI (done)
 - Created `.github/workflows/image.yml`: triggers on pull_request and push to `agent/**`, builds image with buildx (load mode, no push), starts `postgres:16` as service container, runs `alembic upgrade head` in the image, then runs the container with `--read-only --tmpfs /tmp --user 10001` and non-default production secrets, and calls `scripts/smoke-image.sh` to verify `/healthz`, `/readyz`, and `/`.
 - Created `scripts/smoke-image.sh` (bash, `set -euo pipefail`): waits up to 30s for the container to be reachable via `/healthz`, then curls all three endpoints, failing and dumping logs on error. Both actionlint and shellcheck pass clean.
