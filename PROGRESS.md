@@ -395,3 +395,7 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Updated `deploy/kustomization.yaml`: added `postgres.yaml` to resources.
 - Created `deploy/secret.example.yaml`: documents both `weatherstation-db` (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD) and `weatherstation-app` (DATABASE_URL, INGEST_TOKEN, ADMIN_USER, ADMIN_PASSWORD) Secrets with `REPLACE_ME` values; not included in kustomization.
 - `make -C deploy validate` passes (5 resources valid). `make check` passes: 499 tests, 97.90% coverage.
+
+## T59: README "Deploying" section - DONE 2026-11-19
+- Added a "Deploying" section to `README.md` covering: the release workflow (merge to main → `make check` → version bump → image push → Flux rollout), the image name `ghcr.io/cecedabro/weatherstation`, version bump markers (`[minor]`, `[major]`, `[skip release]`), the two Kubernetes Secrets (`weatherstation-app` and `weatherstation-db`) with their env vars, and that live manifests are maintained in the homelab repo.
+- `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit/deploy validate clean.
