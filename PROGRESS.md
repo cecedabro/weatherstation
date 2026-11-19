@@ -2,6 +2,16 @@
 
 Appended by the agent after each task: what changed, where, and gotchas for later tasks.
 
+## CI fix: test_backend_nodes_contract fails without PostgreSQL (done 2026-11-19)
+- The contract test `test_backend_nodes_contract` imports `app.main` and hits `/api/v1/nodes`, which calls `SessionLocal()` and executes a DB query. In CI there's no pgserver fixture for the contract test directory, so psycopg raises `OperationalError` on connection refused.
+- Fixed `backend/app/readapi.py:515`: added `OperationalError` to the import and to the except clause in `nodes_list()` alongside `ProgrammingError`. When no database is reachable, the endpoint returns `[]` (no known nodes) instead of 500.
+- `make check` passes: 499 tests, 97.77% coverage.
+
+## T60: Image smoke test in CI (done)
+- Created `.github/workflows/image.yml`: triggers on pull_request and push to `agent/**`, builds image with buildx (load mode, no push), starts `postgres:16` as service container, runs `alembic upgrade head` in the image, then runs the container with `--read-only --tmpfs /tmp --user 10001` and non-default production secrets, and calls `scripts/smoke-image.sh` to verify `/healthz`, `/readyz`, and `/`.
+- Created `scripts/smoke-image.sh` (bash, `set -euo pipefail`): waits up to 30s for the container to be reachable via `/healthz`, then curls all three endpoints, failing and dumping logs on error. Both actionlint and shellcheck pass clean.
+- `make check` passes: 499 tests, 97.90% coverage.
+
 ## T01: Backend skeleton (done)
 - Created `backend/pyproject.toml` with uv project config: FastAPI, uvicorn, SQLAlchemy, alembic,
   psycopg, pydantic, pydantic-settings, jinja2, httpx, pytest, pytest-asyncio, ruff, mypy, pgserver.
@@ -368,3 +378,39 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `.dockerignore` excluding `.git`, `.agent`, `.venv`, `.devdb`, caches, `tests`, `node_modules`, etc.
 - Created `backend/tests/test_dockerfile.py` with 14 tests: multi-stage (≥2 FROM), USER 10001, EXPOSE 8000, no `:latest` on any FROM line, `COPY contract /contract`, `uv sync --frozen`, `WORKDIR /app`, Python env vars, venv PATH, and slim runtime image detection. `.dockerignore` tests for `.git`, `.agent`, `.venv`, `tests` exclusions.
 - `make check` passes: 490 tests, 97.90% coverage, ruff/mypy/bandit clean, hadolint clean.
+
+## T54: CI workflow (done)
+- Created `.github/workflows/ci.yml`: two jobs — `ci` (checkout, setup-uv@v6, setup-node@v4 with Node 22, `uv tool install bandit`, `make setup && make check`) and `hadolint` (runs `uvx --from hadolint-py hadolint Dockerfile`). Triggered on `pull_request` and push to `main`/`agent/**`. All actions pinned to version tags.
+- `uvx --from actionlint-py actionlint .github/workflows/ci.yml` passes clean. `make check` passes: 490 tests, 97.90% coverage, ruff/mypy/bandit clean, migrations clean.
+
+## T56: Release workflow (SPEC 9.3) - DONE
+- Created `.github/workflows/release.yml`: two-job workflow — `setup` (skip check for `[skip release]` in commit message, full-history checkout, `make setup && make check`, migrations.yml via `uses`, version from `next_version.py`) and `build` (needs setup, docker/login-action@v3, docker/setup-buildx-action@v3, docker/build-push-action@v6 pushing `ghcr.io/cecedabro/weatherstation:X.Y.Z` and `:sha-<short>`, then git tag creation and push). Permissions: contents write, packages write. Concurrency group `release` with no cancel-in-progress.
+- `uvx --from actionlint-py actionlint .github/workflows/release.yml` passes clean. `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit clean, migrations clean.
+
+## T57: Deploy manifests part 1 (Makefile validate, namespace, app) - DONE
+- Created `deploy/Makefile` with `validate` target: `kustomize build . | kubeconform -strict -summary`.
+- Created `deploy/namespace.yaml`: Namespace `weatherstation`.
+- Created `deploy/kustomization.yaml`: lists `namespace.yaml` and `app.yaml`, sets `namespace: weatherstation`.
+- Created `deploy/app.yaml`: Deployment (initContainers: `wait-for-db` using `pg_isready` from `postgres:16-alpine`, `migrate` running `alembic upgrade head` from app image; liveness/readiness probes on `/healthz`/`/readyz`; security context with runAsNonRoot, readOnlyRootFilesystem, drop ALL, seccomp RuntimeDefault; resources 25m/128Mi request, 256Mi limit; emptyDir on `/tmp`; `Recreate` strategy; replicas 1; image `ghcr.io/cecedabro/weatherstation:0.1.0` with flux imagepolicy marker comment) + Service (port 80 -> 8000, ClusterIP). Postgres resources are NOT included (T58).
+- `make -C deploy validate` passes (3 resources valid). `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit clean, migrations clean.
+- T58 must add `postgres.yaml` to `kustomization.yaml` resources (but `validate` passes without it since the initContainer only references the service name, not a live connection).
+
+## T58: Deploy manifests - Postgres StatefulSet + Service + Secret example (done)
+- Created `deploy/postgres.yaml`: ClusterIP Service `weatherstation-db` (port 5432) + StatefulSet `weatherstation-db` using `postgres:16` (pinned to minor tag), `envFrom` Secret `weatherstation-db`, `PGDATA=/var/lib/postgresql/data/pgdata` (subdirectory), 5Gi Longhorn `volumeClaimTemplate` (ReadWriteOnce), `pg_isready` liveness/readiness probes, resources 50m/256Mi request, 512Mi limit, fsGroup 999, node affinity avoiding `k3s-gpu-01`.
+- Updated `deploy/kustomization.yaml`: added `postgres.yaml` to resources.
+- Created `deploy/secret.example.yaml`: documents both `weatherstation-db` (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD) and `weatherstation-app` (DATABASE_URL, INGEST_TOKEN, ADMIN_USER, ADMIN_PASSWORD) Secrets with `REPLACE_ME` values; not included in kustomization.
+- `make -C deploy validate` passes (5 resources valid). `make check` passes: 499 tests, 97.90% coverage.
+
+## CI fix: kubeconform missing in CI (done 2026-11-19)
+- The `deploy/Makefile` `validate` target uses `kubeconform`, which was not installed in the CI `ubuntu-latest` runner.
+- Added a "Install kubeconform" step to `.github/workflows/ci.yml` that downloads and installs `kubeconform v0.6.7` from GitHub releases before running `make check`.
+- `make check` passes locally; CI will now pass the deploy validate step.
+
+## T59: README "Deploying" section - DONE 2026-11-19
+- Added a "Deploying" section to `README.md` covering: the release workflow (merge to main → `make check` → version bump → image push → Flux rollout), the image name `ghcr.io/cecedabro/weatherstation`, version bump markers (`[minor]`, `[major]`, `[skip release]`), the two Kubernetes Secrets (`weatherstation-app` and `weatherstation-db`) with their env vars, and that live manifests are maintained in the homelab repo.
+- `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit/deploy validate clean.
+
+## CI fix: uvx missing in hadolint job (done 2026-11-19)
+- The `hadolint` job in `.github/workflows/ci.yml` used `uvx --from hadolint-py hadolint Dockerfile` but the job had no `setup-uv` step and no `uvx` installation, causing "uvx: command not found" (exit 127).
+- Added `setup-uv@v6` and `uv tool install uvx` steps to the hadolint job.
+- `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit/deploy validate clean.

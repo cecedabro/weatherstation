@@ -1,0 +1,129 @@
+# {"$imagepolicy": "flux-system:weatherstation"}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weatherstation
+  namespace: weatherstation
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: weatherstation
+  template:
+    metadata:
+      labels:
+        app: weatherstation
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: wait-for-db
+          image: docker.io/library/postgres:16-alpine
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h weatherstation-db -p 5432; do
+                echo "waiting for postgres..."
+                sleep 2
+              done
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+        - name: migrate
+          image: ghcr.io/cecedabro/weatherstation:0.1.0
+          command:
+            - alembic
+            - upgrade
+            - head
+          envFrom:
+            - secretRef:
+                name: weatherstation-app
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 25m
+              memory: 128Mi
+            limits:
+              cpu: 256Mi
+              memory: 256Mi
+      containers:
+        - name: weatherstation
+          image: ghcr.io/cecedabro/weatherstation:0.1.0
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: weatherstation-app
+          env:
+            - name: APP_ENV
+              value: production
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 25m
+              memory: 128Mi
+            limits:
+              cpu: 256Mi
+              memory: 256Mi
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weatherstation
+  namespace: weatherstation
+spec:
+  selector:
+    app: weatherstation
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+  type: ClusterIP

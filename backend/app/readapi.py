@@ -7,7 +7,7 @@ from fastapi import APIRouter, Query
 from fastapi.responses import Response
 from pydantic import BaseModel, field_validator
 from sqlalchemy import ColumnElement, Select, func, literal_column, select
-from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal
@@ -513,7 +513,7 @@ async def nodes_list() -> list[dict[str, str | bool]]:
         stmt = select(Node).order_by(Node.node_id.asc())
         try:
             rows = db.execute(stmt).scalars().all()
-        except ProgrammingError:
+        except (ProgrammingError, OperationalError):
             return []
         result: list[dict[str, Any]] = []
         for n in rows:

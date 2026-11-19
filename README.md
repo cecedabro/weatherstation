@@ -42,3 +42,22 @@ Preview locally with `make dev` (runs on `:8000` with a throwaway Postgres).
 3. Hand the repo to the agent loop (`agent-loop`) from the devbox.
 4. Try the production image on your machine: [docs/docker-local.md](docs/docker-local.md)
    (build, run with Postgres, check it). Short version: `docker build -t weatherstation:local .`
+
+## Deploying
+
+A merge to `main` triggers the release workflow: it runs `make check`, computes
+the next version, builds and pushes
+`ghcr.io/cecedabro/weatherstation:X.Y.Z` (plus `:sha-<short>`), and creates the
+git tag `vX.Y.Z`. Flux then rolls out the new image on the k3s homelab.
+
+Bump control in the commit message: `[minor]` increments the minor version,
+`[major]` the major version; `[skip release]` skips the build entirely while
+still running checks.
+
+The app reads secrets from two Kubernetes Secrets (see
+`deploy/secret.example.yaml`): `weatherstation-app` provides
+`DATABASE_URL`, `INGEST_TOKEN`, `ADMIN_USER`, `ADMIN_PASSWORD`; `weatherstation-db`
+provides `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`.
+
+Draft manifests live in `deploy/` (Kustomize). The live copy is maintained in the
+homelab repo and applied by Flux.

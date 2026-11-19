@@ -1,0 +1,69 @@
+name: image
+
+on:
+  pull_request:
+  push:
+    branches: [agent/**]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: weather
+          POSTGRES_PASSWORD: weather
+          POSTGRES_DB: weather
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: weatherstation:test
+
+      - name: Run migrations
+        run: |
+          docker run --rm \
+            --network host \
+            -e DATABASE_URL=postgresql+psycopg://weather:weather@localhost:5432/weather \
+            weatherstation:test \
+            alembic upgrade head
+
+      - name: Start container
+        run: |
+          docker run -d --rm \
+            --name weather-test \
+            --network host \
+            --read-only \
+            --tmpfs /tmp \
+            --user 10001 \
+            -e APP_ENV=production \
+            -e INGEST_TOKEN=strong-secret-token-do-not-use \
+            -e ADMIN_PASSWORD=strong-admin-password \
+            -e ADMIN_USER=admin \
+            -e DATABASE_URL=postgresql+psycopg://weather:weather@localhost:5432/weather \
+            weatherstation:test
+
+      - name: Wait for startup
+        run: sleep 5
+
+      - name: Health checks
+        run: scripts/smoke-image.sh
