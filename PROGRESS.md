@@ -409,3 +409,8 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 ## T59: README "Deploying" section - DONE 2026-11-19
 - Added a "Deploying" section to `README.md` covering: the release workflow (merge to main → `make check` → version bump → image push → Flux rollout), the image name `ghcr.io/cecedabro/weatherstation`, version bump markers (`[minor]`, `[major]`, `[skip release]`), the two Kubernetes Secrets (`weatherstation-app` and `weatherstation-db`) with their env vars, and that live manifests are maintained in the homelab repo.
 - `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit/deploy validate clean.
+
+## CI fix: uvx missing in hadolint job (done 2026-11-19)
+- The `hadolint` job in `.github/workflows/ci.yml` used `uvx --from hadolint-py hadolint Dockerfile` but the job had no `setup-uv` step and no `uvx` installation, causing "uvx: command not found" (exit 127).
+- Added `setup-uv@v6` and `uv tool install uvx` steps to the hadolint job.
+- `make check` passes: 499 tests, 97.90% coverage, ruff/mypy/bandit/deploy validate clean.
