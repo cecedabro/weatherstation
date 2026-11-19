@@ -2,6 +2,11 @@
 
 Appended by the agent after each task: what changed, where, and gotchas for later tasks.
 
+## T60: Image smoke test in CI (done)
+- Created `.github/workflows/image.yml`: triggers on pull_request and push to `agent/**`, builds image with buildx (load mode, no push), starts `postgres:16` as service container, runs `alembic upgrade head` in the image, then runs the container with `--read-only --tmpfs /tmp --user 10001` and non-default production secrets, and calls `scripts/smoke-image.sh` to verify `/healthz`, `/readyz`, and `/`.
+- Created `scripts/smoke-image.sh` (bash, `set -euo pipefail`): waits up to 30s for the container to be reachable via `/healthz`, then curls all three endpoints, failing and dumping logs on error. Both actionlint and shellcheck pass clean.
+- `make check` passes: 499 tests, 97.90% coverage.
+
 ## T01: Backend skeleton (done)
 - Created `backend/pyproject.toml` with uv project config: FastAPI, uvicorn, SQLAlchemy, alembic,
   psycopg, pydantic, pydantic-settings, jinja2, httpx, pytest, pytest-asyncio, ruff, mypy, pgserver.
