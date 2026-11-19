@@ -368,3 +368,7 @@ Appended by the agent after each task: what changed, where, and gotchas for late
 - Created `.dockerignore` excluding `.git`, `.agent`, `.venv`, `.devdb`, caches, `tests`, `node_modules`, etc.
 - Created `backend/tests/test_dockerfile.py` with 14 tests: multi-stage (≥2 FROM), USER 10001, EXPOSE 8000, no `:latest` on any FROM line, `COPY contract /contract`, `uv sync --frozen`, `WORKDIR /app`, Python env vars, venv PATH, and slim runtime image detection. `.dockerignore` tests for `.git`, `.agent`, `.venv`, `tests` exclusions.
 - `make check` passes: 490 tests, 97.90% coverage, ruff/mypy/bandit clean, hadolint clean.
+
+## T54: CI workflow (done)
+- Created `.github/workflows/ci.yml`: two jobs — `ci` (checkout, setup-uv@v6, setup-node@v4 with Node 22, `uv tool install bandit`, `make setup && make check`) and `hadolint` (runs `uvx --from hadolint-py hadolint Dockerfile`). Triggered on `pull_request` and push to `main`/`agent/**`. All actions pinned to version tags.
+- `uvx --from actionlint-py actionlint .github/workflows/ci.yml` passes clean. `make check` passes: 490 tests, 97.90% coverage, ruff/mypy/bandit clean, migrations clean.
