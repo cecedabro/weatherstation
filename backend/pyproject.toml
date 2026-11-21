@@ -49,3 +49,6 @@ packages = "app"
 testpaths = ["tests", "../contract/tests"]
 python_files = "test_*.py"
 asyncio_mode = "auto"
+markers = [
+    "accept: acceptance tests of a running loop; make check skips them until the human removes the mark",
+]
