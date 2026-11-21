@@ -9,11 +9,12 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.auth import RequireUser
 from app.config import Settings
 from app.db import SessionLocal
 from app.models import Reading
 from app.readapi import _current_readings
-from app.web import _jinja_env
+from app.templating import render
 
 router = APIRouter()
 
@@ -49,12 +50,8 @@ def _readings_24h(db: Session) -> dict[str, int]:
 
 
 @router.get("/admin")
-async def admin(
-    request: Request,
-    credentials: HTTPBasicCredentials = admin_auth,
-) -> HTMLResponse:
-    """Admin page with node health table per SPEC 6."""
-    _check_auth(credentials)
+async def admin(request: Request, user: str = RequireUser) -> HTMLResponse:
+    """Admin page with node health table per SPEC 6 (signed-in users, app.auth)."""
 
     db = SessionLocal()
     try:
@@ -88,12 +85,7 @@ async def admin(
         # Problem nodes (offline or low battery) first, then alphabetical
         node_rows.sort(key=lambda n: (n["online"] and not n["low_battery"], n["node_id"]))
 
-        template = _jinja_env.get_template("admin.html")
-        html = template.render(
-            nodes=node_rows,
-            now=now,
-        )
-        return HTMLResponse(content=html)
+        return render(request, "admin.html", active="", nodes=node_rows, now=now)
     finally:
         db.close()
 

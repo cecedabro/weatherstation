@@ -1,93 +1,22 @@
 {% extends "base.html" %}
-{% block title %}About — Weather Station{% endblock %}
-{% block description %}About the garden weather station: how sensor nodes collect data over MQTT, the data pipeline, and the list of registered sensor nodes.{% endblock %}
+{% block title %}About{% endblock %}
+{% block description %}How the garden station works: sensor nodes, the data path and the registered nodes.{% endblock %}
 {% block content %}
-<div class="about-page">
-  <h1>About the Garden Weather Station</h1>
-
-  <section class="about-section">
-    <h2>The Station</h2>
-    <p>
-      This is a private weather station for a garden (volkstuin) near Landsmeer.
-      Multiple ESP32 sensor nodes collect temperature, humidity, light, soil moisture,
-      rainfall, and wind data and publish their readings over MQTT. A Raspberry Pi
-      aggregates the data and forwards it to this backend for storage and display.
-    </p>
-  </section>
-
-  <section class="about-section">
-    <h2>Data Path</h2>
-    <div class="data-path-diagram">
-      <div class="path-node">ESP32 Nodes</div>
-      <div class="path-arrow">→</div>
-      <div class="path-node">MQTT (Mosquitto)</div>
-      <div class="path-arrow">→</div>
-      <div class="path-node">Raspberry Pi</div>
-      <div class="path-arrow">→</div>
-      <div class="path-node">Backend (k3s)</div>
-      <div class="path-arrow">→</div>
-      <div class="path-node">Website</div>
-    </div>
-  </section>
-
-  <section class="about-section">
-    <h2>Units</h2>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Metric</th>
-          <th>Unit</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Air temperature</td><td>°C</td></tr>
-        <tr><td>Relative humidity</td><td>%</td></tr>
-        <tr><td>Atmospheric pressure</td><td>hPa</td></tr>
-        <tr><td>Rainfall</td><td>mm</td></tr>
-        <tr><td>Wind speed</td><td>m/s</td></tr>
-        <tr><td>Wind direction</td><td>degrees (0–360)</td></tr>
-        <tr><td>Soil moisture</td><td>% (volumetric)</td></tr>
-        <tr><td>Solar radiation</td><td>W/m²</td></tr>
-        <tr><td>Battery level</td><td>V</td></tr>
-        <tr><td>Signal strength</td><td>dBm</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="about-section">
-    <h2>Known Nodes</h2>
+{{ ui.page_head("About the station", "A private weather and soil station in a volkstuin near Landsmeer.") }}
+<div class="grid-2">
+  {% call ui.card("How it works", "🔌", "sky") %}
+    <p>ESP32 sensor nodes measure the air, rain, wind and soil. They publish over MQTT to a Raspberry Pi in the garden, which forwards the readings to this site on the home server.</p>
+    <div class="row small">{% for step in ["ESP32 nodes", "MQTT", "Raspberry Pi", "Server", "This site"] %}{{ ui.chip(step, "info") }}{% if not loop.last %}<span class="muted" aria-hidden="true">→</span>{% endif %}{% endfor %}</div>
+  {% endcall %}
+  {% call ui.card("Units", "📏", "leaf") %}
+    {{ ui.kv([("Temperature", "°C"), ("Humidity", "%"), ("Pressure", "hPa"), ("Rain", "mm"), ("Wind", "m/s, direction in degrees"), ("Soil moisture", "% (volumetric)"), ("Battery", "V"), ("Signal", "dBm")]) }}
+  {% endcall %}
+  {% call ui.card("Known nodes", "📡", cls="span-all") %}
     {% if nodes %}
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Node ID</th>
-          <th>Type</th>
-          <th>First Seen</th>
-          <th>Last Seen</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for node in nodes %}
-        <tr>
-          <td>{{ node.node_id }}</td>
-          <td>{{ node.node_type or "unknown" }}</td>
-          <td>{{ node.first_seen.strftime('%Y-%m-%d %H:%M UTC') }}</td>
-          <td>{{ node.last_seen.strftime('%Y-%m-%d %H:%M UTC') }}</td>
-          <td>
-            {% if node.online %}
-            <span class="badge badge-online">Online</span>
-            {% else %}
-            <span class="badge badge-offline">Offline</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <p class="empty-state">No sensor nodes registered yet.</p>
-    {% endif %}
-  </section>
+    {% call ui.table(["Node", "Type", "First seen", "Last seen", "Status"]) %}
+      {% for n in nodes %}<tr><td class="strong">{{ n.node_id }}</td><td>{{ n.node_type }}</td><td class="small">{{ n.first_seen|local_time }}</td><td class="small">{{ ui.when(n.last_seen) }}</td><td>{{ ui.online(n.online) }}</td></tr>{% endfor %}
+    {% endcall %}
+    {% else %}{{ ui.empty("No sensor nodes yet", "Nodes appear here after their first reading.", "📡") }}{% endif %}
+  {% endcall %}
 </div>
 {% endblock %}

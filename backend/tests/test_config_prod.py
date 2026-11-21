@@ -113,12 +113,13 @@ def test_create_app_production_default_admin_password_raises():
 def test_create_app_production_with_all_secrets_set():
     """SPEC 1.4: production with non-default secrets works."""
     old = {}
-    for key in ("APP_ENV", "INGEST_TOKEN", "ADMIN_PASSWORD"):
+    for key in ("APP_ENV", "INGEST_TOKEN", "ADMIN_PASSWORD", "SESSION_SECRET"):
         old[key] = os.environ.get(key)
     try:
         os.environ["APP_ENV"] = "production"
         os.environ["INGEST_TOKEN"] = "production-token-abc"
         os.environ["ADMIN_PASSWORD"] = "strong-admin-password"
+        os.environ["SESSION_SECRET"] = "a-long-random-session-secret"
         app = create_app()
         assert app is not None
     finally:

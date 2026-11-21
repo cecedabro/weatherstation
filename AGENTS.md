@@ -6,10 +6,11 @@ and the human. Then read the area doc for the task (table below) and the part of
 
 You are a local model working one small task at a time with no human to ask.
 Prefer the boring, explicit option. When unsure about **code**, follow the area
-doc. When unsure about **look and feel**, you decide (see `docs/design.md`).
+doc. Look and feel is finished: build pages from the components in `docs/design.md`.
 
 ## What this builds
-A weather station for a private garden (the *volkstuin* / Landsmeer garden).
+A garden companion for a private allotment (the *volkstuin* near Landsmeer): a weather and soil
+station, plus a private planner with a 3D map of the plot, a seed log, tasks and a species list.
 Several ESP32 sensor nodes publish readings over MQTT to a Raspberry Pi. The Pi
 forwards them to a backend on a k3s homelab, which stores them in Postgres and
 serves a public website with live conditions and history charts, plus a private
@@ -27,10 +28,10 @@ Data path:
 | `firmware/` | ESP32 nodes, Arduino C++ via PlatformIO | `docs/firmware.md` |
 | `deploy/` | k3s manifests (Kustomize) for the backend + Postgres | `docs/deployment.md` |
 | `docs/` | The area docs | — |
-| `index.html` | Approved look-and-feel mock (Frutiger Aero). Reference for T11; do not edit or serve it. | `docs/design.md` |
 | `SPEC.md` | Testable requirements. **Do not edit.** | — |
 | `PLAN.md` | The task list. **Do not edit.** | — |
-| `PROGRESS.md` | You append to this after each task | — |
+| `PROGRESS.md` | You append to this after each task (create it if missing) | — |
+| `backend/tests/judge/` | Acceptance tests written by the human. **Do not edit.** Your own tests go in `backend/tests/`. | — |
 
 ## How you are judged (the loop)
 After you stop, the harness runs the task's `accept:` command and then
@@ -58,19 +59,20 @@ So: **run `make check` yourself before you stop, and fix what fails.**
 ## Fixed technical decisions (do not revisit)
 - Backend: Python 3.11+, FastAPI, SQLAlchemy 2.x, Alembic, Postgres. Managed with `uv`.
 - Website: server-rendered Jinja2 + HTMX, served by the same FastAPI app. No SPA.
-- Charts: one small client library loaded from a vendored file (see `docs/frontend.md`).
+- Charts: uPlot via `ui.chart()` and `static/js/charts.js` (see `docs/frontend.md`).
+- Look and feel: the finished design system in `docs/design.md`. You never write CSS; pages use
+  `templates/ui.html` components only (a test checks every class).
+- Private pages (garden, seeds, tasks, species, admin) need sign-in: `user: str = RequireUser`.
 - Firmware: Arduino framework in C++, built with PlatformIO. One source tree, per-node build env.
 - Transport ESP32→Pi: MQTT (plaintext on the Pi's LAN). Pi→backend: HTTPS POST with a bearer token.
 - Deploy: Kustomize manifests under `deploy/`, applied by Flux from the homelab repo. Postgres runs in-cluster with a Longhorn volume.
 - Time is UTC everywhere in code and storage. The website may display a local timezone.
 - Units are SI and fixed by the contract. Never invent new units or field names.
 
-## You decide (design freedom)
-- All visual design: layout, colour, typography, spacing, the Frutiger Aero look
-  (`docs/design.md`), which chart library, how pages are composed.
-- Internal code structure within each top-level directory.
-- Names of internal modules, functions, CSS classes.
-- Copy/wording on the site.
+## You decide
+- How a page is composed from the existing components (which cards, tiles, tables, in what order).
+- Internal code structure within each top-level directory, and module/function names.
+- Copy/wording on the site (short, plain English).
 
 ## Commands
 - `make setup` — install backend deps (`uv sync`). Tests start their own throwaway Postgres (see `docs/testing.md`); there is no Docker here.

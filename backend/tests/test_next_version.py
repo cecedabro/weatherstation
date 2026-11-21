@@ -6,7 +6,7 @@ from scripts.next_version import next_version
 def test_no_tags_returns_v010() -> None:
     """No semver tags at all → first release is v0.1.0."""
     assert next_version(tags=[], commit_messages=[]) == "v0.1.0"
-    assert next_version(tags=[], commit_messages=["[major]"] ) == "v0.1.0"
+    assert next_version(tags=[], commit_messages=["[major]"]) == "v0.1.0"
 
 
 def test_non_semver_tags_ignored() -> None:
