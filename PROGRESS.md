@@ -26,3 +26,9 @@ Implemented `compare_rows()` and `csv_href()` in `backend/app/sensors.py:255-285
 
 ## Task S09 — whole-page tests
 Ran `tests/judge/test_sensors.py` and `tests/judge/test_step_sensors.py`: 37 passed. Ran `make check`: 329 passed, 22 skipped, 96% coverage. All functions from S01–S08 were already implemented and correct; no code changes needed. All whole-page acceptance tests and the full check suite pass.
+
+## Task CI1 — fix CI failures
+Fixed two CI failures:
+1. **`ci` job (hadolint subjob)**: Removed `uv tool install uvx` from `.github/workflows/ci.yml:35`. `uvx` is provided natively by the `uv` binary (installed via `setup-uv`); the PyPI package `uvx` is a dummy that causes build errors.
+2. **`image` job (smoke test)**: Added `-e SESSION_SECRET=smoke-test-session-secret-do-not-use` to the container start command in `.github/workflows/image.yml:63`. The app's production hardening (`main.py:63-67`) rejects startup when `SESSION_SECRET` retains its development default, causing the container to crash before the smoke test can reach it.
+`make check` passes: 351 tests, 96% coverage.

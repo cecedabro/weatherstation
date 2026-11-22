@@ -60,6 +60,7 @@ jobs:
             -e ADMIN_PASSWORD=strong-admin-password \
             -e ADMIN_USER=admin \
             -e DATABASE_URL=postgresql+psycopg://weather:weather@localhost:5432/weather \
+            -e SESSION_SECRET=smoke-test-session-secret-do-not-use \
             weatherstation:test
 
       - name: Wait for startup
