@@ -19,7 +19,7 @@ Rules for every task:
 
 - [x] E01: In backend/app/species.py fill in `verdict_kind` and `to_remove`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e01
-- [ ] E02: In backend/app/species.py fill in `validate_species` (follow the 4 steps in its docstring)
+- [x] E02: In backend/app/species.py fill in `validate_species` (follow the 4 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e02
 - [ ] E03: In backend/app/species.py fill in `validate_sighting` (follow the 4 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e03

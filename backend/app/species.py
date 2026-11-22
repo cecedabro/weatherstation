@@ -69,7 +69,43 @@ def validate_species(
     3. kind not in SPECIES_KINDS → "Pick a kind"; verdict not in SPECIES_VERDICTS → "Pick a verdict".
     4. description over 4000 → "At most 4000 characters".
     """
-    return {k: form.get(k) for k in SPECIES_FIELDS}, {}
+    def get(k: str) -> str:
+        return (form.get(k) or "").strip()
+
+    name = get("name")
+    latin = get("latin") or None
+    kind = get("kind")
+    verdict = get("verdict")
+    description = form.get("description") or ""
+
+    errors: dict[str, str] = {}
+
+    if not name:
+        errors["name"] = "Give it a name"
+    elif len(name) > 120:
+        errors["name"] = "At most 120 characters"
+    elif taken.get(name.lower()) and taken[name.lower()] != current_id:
+        errors["name"] = "There is already a species with this name"
+
+    if len(latin) > 120 if latin else False:
+        errors["latin"] = "At most 120 characters"
+
+    if kind not in SPECIES_KINDS:
+        errors["kind"] = "Pick a kind"
+    if verdict not in SPECIES_VERDICTS:
+        errors["verdict"] = "Pick a verdict"
+
+    if len(description) > 4000:
+        errors["description"] = "At most 4000 characters"
+
+    values = {
+        "name": name,
+        "latin": latin,
+        "kind": kind,
+        "verdict": verdict,
+        "description": description,
+    }
+    return values, errors
 
 
 def validate_sighting(
