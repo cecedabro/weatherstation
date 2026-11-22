@@ -30,3 +30,10 @@ Implemented `rotation_warning` in `backend/app/seeds.py` following the 3 docstri
 - Queries Planting joined with Crop where the crop family matches (case-insensitive), the object matches, and sown_on is in [year-3, year), excluding a given planting id.
 - Returns the newest matching row or None; formats as `"family grew here in year (crop)"`.
 All 7 P05 judge tests pass; `make check` exits 0 with 96% coverage.
+
+## P06 - seeds.py: find_plantings
+Implemented `find_plantings` in `backend/app/seeds.py`.
+- Filters by show: "active" excludes FINISHED statuses, "done" includes only FINISHED, anything else returns all.
+- When year is set, filters sown_on to [year-01-01, year+1-01-01).
+- Orders by sown_on desc, id desc; returns a list.
+All 1 P06 judge test passes; `make check` exits 0 with 96% coverage.

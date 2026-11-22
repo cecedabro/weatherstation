@@ -305,7 +305,20 @@ def find_plantings(db: Session, show: str, year: int | None) -> list[Planting]:
     2. *year* set: only ``sown_on`` from ``date(year, 1, 1)`` up to (not including) ``date(year + 1, 1, 1)``.
     3. ``.order_by(Planting.sown_on.desc(), Planting.id.desc())``; return a list.
     """
-    return []
+    from datetime import date as _date
+
+    stmt = select(Planting)
+    if show == "active":
+        stmt = stmt.where(Planting.status.not_in(FINISHED))
+    elif show == "done":
+        stmt = stmt.where(Planting.status.in_(FINISHED))
+    if year is not None:
+        stmt = stmt.where(
+            Planting.sown_on >= _date(year, 1, 1),
+            Planting.sown_on < _date(year + 1, 1, 1),
+        )
+    stmt = stmt.order_by(Planting.sown_on.desc(), Planting.id.desc())
+    return list(db.execute(stmt).scalars())
 
 
 def group_by_bed(
