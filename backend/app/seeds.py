@@ -390,22 +390,29 @@ def seed_crops(db: Session, path: Path = CROPS_FILE) -> int:
 def apply_form(p: Planting, values: dict[str, Any], days_to_harvest: int | None) -> None:
     """Copy checked form *values* onto *p*.
 
-    TODO (task P10) steps:
+    Steps:
     1. Set ``crop``, ``crop_id``, ``variety``, ``object_id``, ``method``, ``status``, ``sown_on``, ``count`` and
        ``notes`` from *values*.
     2. ``p.expected_harvest = expected_harvest(p.sown_on, days_to_harvest)``.
     3. Leave ``harvested_on`` alone (``set_status`` handles it).
     """
-    return None
+    for key in ("crop", "crop_id", "variety", "object_id", "method", "status", "sown_on", "count", "notes"):
+        setattr(p, key, values[key])
+    p.expected_harvest = expected_harvest(p.sown_on, days_to_harvest)
 
 
 def set_status(p: Planting, status: str, today: date) -> None:
     """Move *p* to *status*.
 
-    TODO (task P10): set ``p.status``; when it becomes "done" and ``harvested_on`` is None, set it to *today*;
+    Set ``p.status``; when it becomes "done" and ``harvested_on`` is None, set it to *today*;
     for any other status set ``harvested_on`` back to None.
     """
-    return None
+    p.status = status
+    if status == "done":
+        if p.harvested_on is None:
+            p.harvested_on = today
+    else:
+        p.harvested_on = None
 
 
 # -- glue (done)

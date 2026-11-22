@@ -57,3 +57,9 @@ Implemented `seed_crops` in `backend/app/seeds.py`.
   adds only new crops via `db.add(Crop(**row))`, flushes, and returns the count added.
 - Idempotent: re-calling with the same data returns 0.
 All 2 P09 judge tests pass; `make check` exits 0 with 96% coverage.
+
+## P10 - seeds.py: apply_form, set_status
+Implemented `apply_form` and `set_status` in `backend/app/seeds.py`.
+- `apply_form(p, values, days_to_harvest)`: sets crop, crop_id, variety, object_id, method, status, sown_on, count, notes from values dict, then computes expected_harvest via `expected_harvest(p.sown_on, days_to_harvest)`. Leaves harvested_on alone.
+- `set_status(p, status, today)`: sets p.status; when status is "done" and harvested_on is None, sets harvested_on to today; for any other status, resets harvested_on to None.
+All 2 P10 judge tests pass; `make check` exits 0 with 96% coverage.
