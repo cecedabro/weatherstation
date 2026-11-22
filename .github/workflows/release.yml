@@ -12,7 +12,11 @@ concurrency:
   group: release
 
 jobs:
+  migrations:
+    uses: ./.github/workflows/migrations.yml
+
   setup:
+    needs: migrations
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -25,9 +29,6 @@ jobs:
           fetch-depth: 0
 
       - uses: astral-sh/setup-uv@v6
-
-      - name: Migrations check
-        uses: ./.github/workflows/migrations.yml
 
       - name: make check
         run: make setup && make check
