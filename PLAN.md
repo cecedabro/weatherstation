@@ -19,7 +19,7 @@ Rules for every task:
 
 - [x] S01: In backend/app/stats.py fill in `summarize` as its docstring says
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s01
-- [ ] S02: In backend/app/stats.py fill in `daily_stats` as its docstring says
+- [x] S02: In backend/app/stats.py fill in `daily_stats` as its docstring says
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s02
 - [ ] S03: In backend/app/sensors.py fill in `parse_compare` and `parse_view`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s03

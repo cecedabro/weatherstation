@@ -95,7 +95,41 @@ def daily_stats(
     """
     if not 1 <= days <= 366:
         raise ValueError("days must be 1-366")
-    return []
+
+    now = now or datetime.now(UTC)
+    start = now.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=days - 1)
+
+    day = func.date_trunc("day", func.timezone("UTC", Reading.ts))
+    stmt = (
+        select(
+            day,
+            func.count(Reading.value),
+            func.min(Reading.value),
+            func.max(Reading.value),
+            func.avg(Reading.value),
+            func.sum(Reading.value),
+        )
+        .where(
+            Reading.node_id == node,
+            Reading.metric == metric,
+            Reading.ts >= start,
+        )
+        .group_by(day)
+        .order_by(day)
+    )
+    rows = db.execute(stmt).all()
+
+    return [
+        {
+            "date": row[0].date().isoformat(),
+            "min": float(row[2]),
+            "max": float(row[3]),
+            "avg": float(row[4]),
+            "sum": float(row[5]),
+            "count": row[1],
+        }
+        for row in rows
+    ]
 
 
 # -- routes (done)
