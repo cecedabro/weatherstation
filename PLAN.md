@@ -21,7 +21,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d01
 - [x] D02: In backend/app/tasks.py fill in `sort_key`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d02
-- [ ] D03: In backend/app/tasks.py fill in `validate_form` (follow the 5 steps in its docstring)
+- [x] D03: In backend/app/tasks.py fill in `validate_form` (follow the 5 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d03
 - [ ] D04: In backend/app/tasks.py fill in `find_tasks`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d04

@@ -3,3 +3,6 @@ Filled in `local_today()` in `backend/app/tasks.py:36` to convert the input date
 
 ## Task D02 — tasks.py: sort_key
 Filled in `sort_key()` in `backend/app/tasks.py:56` to return `(URGENCY_RANK.get(task.urgency, 9), task.deadline or date.max, -task.created_at.timestamp())`. This sorts tasks by urgency (critical first), then by deadline (soonest first, None last), then by created_at (newest first). Judge test `test_d02_sort_key` passes. `make check` passes.
+
+## Task D03 — tasks.py: validate_form
+Filled in `validate_form()` in `backend/app/tasks.py:65` with 5 validation steps: title (stripped, required, max 120 chars), notes (not stripped, max 2000 chars), category/urgency (must be in allowed lists), deadline (parsed as date or kept as raw text on error), object_id (parsed as int, must be in object_ids). All 9 D03 judge tests pass. `make check` passes.

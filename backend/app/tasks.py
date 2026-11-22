@@ -78,7 +78,65 @@ def validate_form(
     4. deadline: "" → None; else ``date.fromisoformat``; ValueError → keep the text, "Use a date (YYYY-MM-DD)".
     5. object_id: "" → None; else ``int(...)`` that is in *object_ids*; otherwise None and "Pick an object from the list".
     """
-    return {k: form.get(k) for k in FORM_FIELDS}, {}
+    def get(k: str) -> str:
+        return (form.get(k) or "").strip()
+
+    values: dict[str, Any] = {}
+    errors: dict[str, str] = {}
+
+    # 1. title
+    title = get("title")
+    values["title"] = title
+    if not title:
+        errors["title"] = "Give the task a title"
+    elif len(title) > 120:
+        errors["title"] = "At most 120 characters"
+
+    # 2. notes
+    notes = form.get("notes") or ""
+    values["notes"] = notes
+    if len(notes) > 2000:
+        errors["notes"] = "At most 2000 characters"
+
+    # 3. category, urgency
+    category = get("category")
+    values["category"] = category
+    if category not in TASK_CATEGORIES:
+        errors["category"] = "Pick a category"
+
+    urgency = get("urgency")
+    values["urgency"] = urgency
+    if urgency not in TASK_URGENCIES:
+        errors["urgency"] = "Pick an urgency"
+
+    # 4. deadline
+    deadline_raw = get("deadline")
+    if not deadline_raw:
+        values["deadline"] = None
+    else:
+        try:
+            values["deadline"] = date.fromisoformat(deadline_raw)
+        except ValueError:
+            values["deadline"] = deadline_raw
+            errors["deadline"] = "Use a date (YYYY-MM-DD)"
+
+    # 5. object_id
+    object_id_raw = get("object_id")
+    if not object_id_raw:
+        values["object_id"] = None
+    else:
+        try:
+            oid = int(object_id_raw)
+            if oid in object_ids:
+                values["object_id"] = oid
+            else:
+                values["object_id"] = None
+                errors["object_id"] = "Pick an object from the list"
+        except ValueError:
+            values["object_id"] = None
+            errors["object_id"] = "Pick an object from the list"
+
+    return values, errors
 
 
 def find_tasks(
