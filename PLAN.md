@@ -16,7 +16,7 @@ Rules for every task:
 - Run the accept command yourself, then `make check`. If a step test fails, read its assert and fix the function.
 - Never edit tests, templates, `Makefile`, `pyproject.toml`, `PLAN.md`, `SPEC.md`, `docs/`.
 
-- [ ] A01: In backend/app/growth.py fill in `daily_gdd`
+- [x] A01: In backend/app/growth.py fill in `daily_gdd`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a01
 - [ ] A02: In backend/app/growth.py fill in `local_daily_temps`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a02

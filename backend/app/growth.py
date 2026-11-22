@@ -35,13 +35,13 @@ BED_KINDS = ("bed", "greenhouse", "patch")
 
 
 def daily_gdd(tmin: float, tmax: float, base: float, cap: float = CAP_C) -> float:
-    """Growing degree days for one day.
-
-    TODO (task A01) steps:
-    1. ``hi = min(tmax, cap)`` and ``lo = max(tmin, base)``; when ``hi < lo`` use ``hi = lo``.
-    2. ``gdd = (hi + lo) / 2 - base``. Never below 0: return ``max(0.0, gdd)``.
-    """
-    return 0.0
+    """Growing degree days for one day."""
+    hi = min(tmax, cap)
+    lo = max(tmin, base)
+    if hi < lo:
+        hi = lo
+    gdd = (hi + lo) / 2 - base
+    return max(0.0, gdd)
 
 
 def local_daily_temps(rows: list[tuple[datetime, float]]) -> dict[date, tuple[float, float]]:
