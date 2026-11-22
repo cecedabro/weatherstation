@@ -42,6 +42,8 @@ def local_time(dt: str | datetime, fmt: str = "%H:%M, %-d %b") -> str:
     """Format *dt* as a local Europe/Amsterdam string like ``14:05, 2 Nov``."""
     if isinstance(dt, str):
         dt = datetime.fromisoformat(dt)
+    if dt.tzinfo is None:  # stored times are UTC; don't let the machine's zone decide
+        dt = dt.replace(tzinfo=UTC)
     amster = ZoneInfo("Europe/Amsterdam")
     local = dt.astimezone(amster)
     return local.strftime(fmt)

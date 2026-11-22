@@ -21,19 +21,18 @@ Status as of 2026-11-22.
 
 The foundation is PR #7 (`garden-v2/foundation`), waiting for review.
 
-## Running and queued loops
+## Finished loops (2026-11-22)
 
-| Job | Branch | Loop | Tasks | State |
+| Job | Branch | Loop | Tasks | Time |
 |---|---|---|---|---|
-| #21 | `agent/sensors-steps` | Sensors page (SPEC §11) | S01–S09 | running; S01–S08 done |
-| #20 | `agent/tasks-steps` | Tasks (SPEC §14) | D01–D08 | queued |
-| #22 | `agent/species-steps` | Species and sightings (SPEC §15) | E01–E10 | queued |
+| #21 | `agent/sensors-steps` | Sensors page (SPEC §11) | S01–S09 + CI1, none skipped | 48 min |
+| #20 | `agent/tasks-steps` | Tasks (SPEC §14) | D01–D08, none skipped | 31 min |
+| #22 | `agent/species-steps` | Species and sightings (SPEC §15) | E01–E10, none skipped | 44 min |
 
-Each loop ends with a PR. After review: merge it into the foundation (conflicts are only in `app/main.py`,
-`app/web.py`, `.agent-protected` and `PLAN.md`), and remove the loop's PLAN.md.
+All three are merged together in `garden-v2/pages` (on top of the foundation, loop files removed). Also fixed
+there: `fmt.local_time` read times without a zone as the machine's zone; they are UTC now.
 
-Stopped and replaced: jobs #16–#18 (`agent/garden-sensors`, `-tasks`, `-species`; draft PRs #8, #9). Their
-tasks were too large. Close those branches.
+Stopped and replaced: jobs #16–#18 (`agent/garden-sensors`, `-tasks`, `-species`; draft PRs #8, #9), closed.
 
 ## Planned (proposals)
 
