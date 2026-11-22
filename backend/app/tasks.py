@@ -33,7 +33,7 @@ def local_today(now: datetime | None = None) -> date:
 
     TODO (task D01): ``(now or datetime.now(UTC)).astimezone(AMSTERDAM).date()``.
     """
-    return date.today()
+    return (now or datetime.now(UTC)).astimezone(AMSTERDAM).date()
 
 
 def deadline_text(deadline: date, today: date) -> tuple[str, bool]:
@@ -43,7 +43,14 @@ def deadline_text(deadline: date, today: date) -> tuple[str, bool]:
     0 → "due today"; 1 → "due tomorrow"; else f"due in {n} days" (all with False).
     Note "overdue by 1 days" is fine (the spec keeps it simple).
     """
-    return "", False
+    n = (deadline - today).days
+    if n < 0:
+        return (f"overdue by {-n} days", True)
+    if n == 0:
+        return ("due today", False)
+    if n == 1:
+        return ("due tomorrow", False)
+    return (f"due in {n} days", False)
 
 
 def sort_key(task: Task) -> tuple[int, date, float]:

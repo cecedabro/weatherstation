@@ -1,0 +1,2 @@
+## Task D01 — tasks.py: local_today & deadline_text
+Filled in `local_today()` in `backend/app/tasks.py:36` to convert the input datetime (or `datetime.now(UTC)`) to Europe/Amsterdam timezone and return the date. Filled in `deadline_text()` at `backend/app/tasks.py:46` to compute the difference in days and return the appropriate ("due today", "due tomorrow", "due in N days", "overdue by N days") text and overdue boolean. Both judge tests pass. `make check` passes.

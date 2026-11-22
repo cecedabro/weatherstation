@@ -17,7 +17,7 @@ Rules for every task:
 - Run the accept command yourself, then `make check`. If a step test fails, read its assert and fix the function.
 - Never edit tests, templates, `Makefile`, `pyproject.toml`, `PLAN.md`, `SPEC.md`, `docs/`.
 
-- [ ] D01: In backend/app/tasks.py fill in `local_today` and `deadline_text`
+- [x] D01: In backend/app/tasks.py fill in `local_today` and `deadline_text`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d01
 - [ ] D02: In backend/app/tasks.py fill in `sort_key`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d02
