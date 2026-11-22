@@ -15,3 +15,6 @@ Filled in `counts()` in `backend/app/tasks.py:169` to load all tasks once and co
 
 ## Task D06 — tasks.py: task_json
 Filled in `task_json()` in `backend/app/tasks.py:189` to return a dict with all Task fields: id, title, notes, category, urgency, status, deadline (as `.isoformat()` or None), object_id, x, y, created_at (as `.isoformat()` or None), and done_at (as `.isoformat()` or None). Dates and datetimes are null-safe via `x.isoformat() if x else None`. Judge test `test_d06_task_json` passes. `make check` passes.
+
+## Task D07 — tasks.py: apply_form & set_done
+Filled in `apply_form()` in `backend/app/tasks.py:213` to copy each key from `FORM_FIELDS` onto the task via `setattr`. Filled in `set_done()` at `backend/app/tasks.py:220` to set status/done_at: when done=True → status="done", done_at=now; when done=False → status="open", done_at=None. Judge test passes. `make check` passes.

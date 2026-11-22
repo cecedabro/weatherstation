@@ -215,6 +215,8 @@ def apply_form(task: Task, values: dict[str, Any]) -> None:
 
     TODO (task D07): one ``setattr`` per key of FORM_FIELDS.
     """
+    for key in FORM_FIELDS:
+        setattr(task, key, values[key])
 
 
 def set_done(task: Task, done: bool, now: datetime) -> None:
@@ -222,6 +224,12 @@ def set_done(task: Task, done: bool, now: datetime) -> None:
 
     TODO (task D07): two assignments per branch.
     """
+    if done:
+        task.status = "done"
+        task.done_at = now
+    else:
+        task.status = "open"
+        task.done_at = None
 
 
 # -- glue (done)
