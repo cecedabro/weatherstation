@@ -20,3 +20,6 @@ Implemented `merge_daily()` in `backend/app/sensors.py:207-232`. The function ta
 
 ## Task S07 — soil_rows
 Implemented `soil_rows()` in `backend/app/sensors.py:240-249`. The function takes a DB session and a list of soil node ids, and returns a list of dicts `{"node": id, "soil_moisture_pct": latest_value, "soil_temp_c": latest_value}` in the order of the input nodes. Uses the existing `latest()` helper to query the newest reading per node/metric. Returns None for a metric when the node has no such reading. All S07 judge tests pass; `make check` passes (326 passed, 96% coverage).
+
+## Task S08 — compare_rows, csv_href
+Implemented `compare_rows()` and `csv_href()` in `backend/app/sensors.py:255-285`. `compare_rows()` iterates over compare dates, calls `summarize()` for each UTC day (`datetime(d.year, d.month, d.day, tzinfo=UTC)` to `+ timedelta(days=1)`), and returns `{"date": iso, "min": s["min"], "max": s["max"], "avg": s["avg"]}`. `csv_href()` formats start/end as RFC3339 UTC with `Z` suffix (stripping microseconds via `.replace(microsecond=0).isoformat().replace("+00:00", "Z")`), then builds `/api/v1/export.csv?node=…&metric=…&from=…&to=…` via `urlencode`. All S08 judge tests pass; `make check` passes (327 passed, 96% coverage).

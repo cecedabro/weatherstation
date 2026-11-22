@@ -256,22 +256,33 @@ def compare_rows(
     db: Session, node: str, metric: str, days: tuple[date, ...]
 ) -> list[dict[str, Any]]:
     """Per compare day: ``{"date": "YYYY-MM-DD", "min", "max", "avg"}`` over that UTC day.
-
-    TODO (task S08): for each day, ``start = datetime(d.year, d.month, d.day, tzinfo=UTC)``,
-    ``s = summarize(db, node, metric, start, start + timedelta(days=1))``, take min/max/avg from *s*.
     """
-    return []
+    result: list[dict[str, Any]] = []
+    for d in days:
+        start = datetime(d.year, d.month, d.day, tzinfo=UTC)
+        s = summarize(db, node, metric, start, start + timedelta(days=1))
+        result.append({
+            "date": d.isoformat(),
+            "min": s["min"],
+            "max": s["max"],
+            "avg": s["avg"],
+        })
+    return result
 
 
 def csv_href(node: str, metric: str, start: datetime, end: datetime) -> str:
     """Link to the CSV export (SPEC 11.6): ``/api/v1/export.csv?node=…&metric=…&from=…&to=…``.
 
     Times as RFC3339 UTC with a ``Z`` and no microseconds, e.g. ``2026-11-21T08:00:00Z``.
-
-    TODO (task S08): format both times (``.astimezone(UTC).replace(microsecond=0).isoformat()`` and
-    swap ``+00:00`` for ``Z``), then ``"/api/v1/export.csv?" + urlencode([...])``.
     """
-    return "/api/v1/export.csv"
+    def fmt(dt: datetime) -> str:
+        return dt.astimezone(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return "/api/v1/export.csv?" + urlencode([
+        ("node", node),
+        ("metric", metric),
+        ("from", fmt(start)),
+        ("to", fmt(end)),
+    ])
 
 
 # -- page (done)

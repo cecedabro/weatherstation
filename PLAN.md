@@ -31,7 +31,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s06
 - [x] S07: In backend/app/sensors.py fill in `soil_rows`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s07
-- [ ] S08: In backend/app/sensors.py fill in `compare_rows` and `csv_href`
+- [x] S08: In backend/app/sensors.py fill in `compare_rows` and `csv_href`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s08
 - [ ] S09: Make the whole-page tests pass: run them, read the first failing assert, fix only the function bodies from S01–S08
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_sensors.py tests/judge/test_step_sensors.py -q
