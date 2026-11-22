@@ -9,3 +9,6 @@ Implemented `validate_sighting()` in `backend/app/species.py:111` following the 
 
 ## E04 - species.py: image_ext and media_name_ok
 Implemented `image_ext()` in `backend/app/species.py:181` with three magic-byte checks: JPEG (`\xff\xd8\xff` prefix), PNG (`\x89PNG\r\n\x1a\n` prefix), WebP (`RIFF` at 0 and `WEBP` at 8). Implemented `media_name_ok()` in `backend/app/species.py:191` using `re.fullmatch(r"[0-9a-f]{16,64}\.(jpg|png|webp)", name)`. Both E04 judge tests pass. `make check` passes (92% coverage, 336 passed).
+
+## E05 - species.py: save_photo
+Implemented `save_photo()` in `backend/app/species.py:208`: checks image type via `image_ext()` and size against `MAX_PHOTO`, creates the `sightings` subdirectory, generates a 32-char hex filename with `secrets.token_hex(16)`, writes the data, and returns the filename. Returns `None` for invalid/unrecognized data or oversized files. Both E05 judge tests pass. `make check` passes (92% coverage, 338 passed).

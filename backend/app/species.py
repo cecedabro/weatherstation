@@ -214,7 +214,14 @@ def save_photo(data: bytes, media_dir: str) -> str | None:
     2. ``folder = Path(media_dir) / "sightings"``; ``folder.mkdir(parents=True, exist_ok=True)``.
     3. ``name = secrets.token_hex(16) + "." + ext``; ``(folder / name).write_bytes(data)``; return name.
     """
-    return None
+    ext = image_ext(data)
+    if ext is None or len(data) > MAX_PHOTO:
+        return None
+    folder = Path(media_dir) / "sightings"
+    folder.mkdir(parents=True, exist_ok=True)
+    name = secrets.token_hex(16) + "." + ext
+    (folder / name).write_bytes(data)
+    return name
 
 
 def sighting_stats(db: Session) -> dict[int, dict[str, Any]]:
