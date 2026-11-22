@@ -20,3 +20,6 @@ Implemented `apply_fields` in `backend/app/objects.py:338`: iterates `fields.ite
 
 ## G07 — idw (objects.py)
 Implemented `idw` in `backend/app/objects.py:360`: inverse-distance-weighted interpolation. Returns None for empty points, returns the exact value when a point is within 1e-9 of the query location, otherwise computes weighted average as `sum(w*value)/sum(w)` where `w = 1/dist^power`. All 1 G07 judge tests pass. `make check` exits 0 (494 passed, 7 skipped).
+
+## G08 — soil_grid (objects.py)
+Implemented `soil_grid` in `backend/app/objects.py:388`: returns `[]` for empty points; computes `cols = ceil(width/cell)`, `rows = ceil(depth/cell)`; for each cell (r, c) computes centre `cx = (c+0.5)*cell`, `cy = (r+0.5)*cell`, calls `idw(cx, cy, points)` falling back to `0.0` when None, rounds to 1 decimal. All G08 judge tests pass. `make check` exits 0 (495 passed, 6 skipped).

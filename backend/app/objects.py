@@ -396,7 +396,20 @@ def soil_grid(
     3. Row ``r`` (0 = south) and column ``c`` (0 = west) hold ``round(idw(cx, cy, points) or 0.0, 1)`` with the cell centre
        ``cx = (c + 0.5) * cell``, ``cy = (r + 0.5) * cell``. Return the list of rows (each a list of floats).
     """
-    return []
+    if not points:
+        return []
+    cols = math.ceil(width / cell)
+    rows = math.ceil(depth / cell)
+    grid: list[list[float]] = []
+    for r in range(rows):
+        row: list[float] = []
+        for c in range(cols):
+            cx = (c + 0.5) * cell
+            cy = (r + 0.5) * cell
+            val = idw(cx, cy, points)
+            row.append(round(val if val is not None else 0.0, 1))
+        grid.append(row)
+    return grid
 
 
 def soil_points(db: Session) -> list[tuple[float, float, float]]:
