@@ -23,3 +23,6 @@ Implemented `soil_rows()` in `backend/app/sensors.py:240-249`. The function take
 
 ## Task S08 — compare_rows, csv_href
 Implemented `compare_rows()` and `csv_href()` in `backend/app/sensors.py:255-285`. `compare_rows()` iterates over compare dates, calls `summarize()` for each UTC day (`datetime(d.year, d.month, d.day, tzinfo=UTC)` to `+ timedelta(days=1)`), and returns `{"date": iso, "min": s["min"], "max": s["max"], "avg": s["avg"]}`. `csv_href()` formats start/end as RFC3339 UTC with `Z` suffix (stripping microseconds via `.replace(microsecond=0).isoformat().replace("+00:00", "Z")`), then builds `/api/v1/export.csv?node=…&metric=…&from=…&to=…` via `urlencode`. All S08 judge tests pass; `make check` passes (327 passed, 96% coverage).
+
+## Task S09 — whole-page tests
+Ran `tests/judge/test_sensors.py` and `tests/judge/test_step_sensors.py`: 37 passed. Ran `make check`: 329 passed, 22 skipped, 96% coverage. All functions from S01–S08 were already implemented and correct; no code changes needed. All whole-page acceptance tests and the full check suite pass.
