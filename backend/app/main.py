@@ -110,6 +110,10 @@ def create_app() -> FastAPI:
     application.include_router(stats_router)
     application.include_router(sensors_router)
 
+    from app.tasks import router as tasks_router
+
+    application.include_router(tasks_router)
+
     from app.readapi import router as readapi_router
 
     application.include_router(readapi_router)

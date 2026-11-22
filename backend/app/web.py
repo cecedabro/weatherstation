@@ -94,11 +94,6 @@ COMING: dict[str, tuple[str, str, str]] = {
         "🌱",
         "What you sowed and planted, where and when, and when it should be ready.",
     ),
-    "tasks": (
-        "Tasks",
-        "✅",
-        "Jobs and reminders with urgency, category and deadline, pinned on the map.",
-    ),
     "species": (
         "Species",
         "🐞",

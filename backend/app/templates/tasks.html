@@ -1,0 +1,43 @@
+{#- Tasks list (SPEC §14). Human-owned; context from app.tasks.tasks_page. -#}
+{% extends "base.html" %}
+{% block title %}Tasks{% endblock %}
+{% block content %}
+{% call ui.page_head("Tasks", "Jobs in the garden, most urgent first.") %}{{ ui.button("New task", href="/tasks/new", variant="primary", icon="＋") }}{% endcall %}
+
+<div class="stats section">
+  {{ ui.stat("Open", n.open, fmt="%d") }}
+  {{ ui.stat("Overdue", n.overdue, fmt="%d", tint="berry" if n.overdue else None) }}
+  {{ ui.stat("Due this week", n.week, fmt="%d") }}
+</div>
+
+{{ ui.tabs(tabs, current_tab) }}
+
+<form class="toolbar" method="get" action="/tasks">
+  <input type="hidden" name="status" value="{{ status }}">
+  <select class="select" name="category" aria-label="Category">{% for v, t in categories %}<option value="{{ v }}"{% if v == category %} selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+  <input class="input search" type="search" name="q" value="{{ q }}" placeholder="Search tasks" aria-label="Search tasks">
+  {{ ui.button("Filter", type="submit", size="sm") }}
+</form>
+
+{% call ui.card(flush=True) %}
+{% if items %}
+<ul class="list">
+  {% for it in items %}{% set t = it.task %}
+  {% set meta = [ui.chip(t.urgency.title(), urgency=t.urgency), t.category.title()] %}
+  {% if it.deadline %}{% set _ = meta.append(ui.chip(it.deadline, "bad") if it.overdue else it.deadline) %}{% endif %}
+  {% if it.object %}{% set _ = meta.append("📍 " ~ it.object) %}{% endif %}
+  {% call ui.list_item(t.title, meta=meta, done=(t.status == "done")) %}
+    {% if t.status == "open" %}
+    <form method="post" action="/tasks/{{ t.id }}/done">{{ ui.button("Done", type="submit", size="sm", variant="primary") }}</form>
+    {% else %}
+    <form method="post" action="/tasks/{{ t.id }}/reopen">{{ ui.button("Reopen", type="submit", size="sm") }}</form>
+    {% endif %}
+    {{ ui.button("Edit", href="/tasks/" ~ t.id ~ "/edit", size="sm", variant="quiet") }}
+  {% endcall %}
+  {% endfor %}
+</ul>
+{% else %}
+{{ ui.empty("No tasks here", "Add the first job for the garden.", "✅", "/tasks/new", "New task") }}
+{% endif %}
+{% endcall %}
+{% endblock %}
