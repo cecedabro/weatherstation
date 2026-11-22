@@ -331,7 +331,15 @@ def group_by_bed(
        "Not placed". Keep the order of *plantings* inside each group.
     2. Return ``[(name, plantings)]`` sorted by name (case-insensitive), with "Not placed" always last.
     """
-    return []
+    groups: dict[str, list[Planting]] = {}
+    for p in plantings:
+        if p.object_id is not None and p.object_id in objects:
+            name = objects[p.object_id]
+        else:
+            name = "Not placed"
+        groups.setdefault(name, []).append(p)
+    keys = [k for k in groups if k != "Not placed"] + (["Not placed"] if "Not placed" in groups else [])
+    return [(k, groups[k]) for k in sorted(keys, key=str.lower)]
 
 
 def planting_json(p: Planting) -> dict[str, Any]:

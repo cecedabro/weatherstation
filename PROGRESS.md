@@ -37,3 +37,10 @@ Implemented `find_plantings` in `backend/app/seeds.py`.
 - When year is set, filters sown_on to [year-01-01, year+1-01-01).
 - Orders by sown_on desc, id desc; returns a list.
 All 1 P06 judge test passes; `make check` exits 0 with 96% coverage.
+
+## P07 - seeds.py: group_by_bed
+Implemented `group_by_bed` in `backend/app/seeds.py`.
+- Groups plantings by bed name using the `objects` dict (object_id → name).
+- Plantings with `object_id` None or not in `objects` go under "Not placed".
+- Returns `[(name, plantings)]` sorted case-insensitively, with "Not placed" always last.
+All 1 P07 judge test passes; `make check` exits 0 with 96% coverage.
