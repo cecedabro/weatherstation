@@ -17,3 +17,9 @@ Implemented `validate_planting` in `backend/app/seeds.py` following the 7 docstr
   count (int >= 1), object_id (int in allowed set), notes (length check, no strip).
 - Returns `(values, errors)` tuple with all FORM_FIELDS + crop_id; keeps raw text for invalid fields.
 All 14 P03 judge tests pass; `make check` exits 0 with 93% overall coverage.
+
+## P04 - seeds.py: next_status, timeline
+Implemented `next_status` and `timeline` in `backend/app/seeds.py`.
+- `next_status(status)`: finds status in PATH ("planned", "sown", "sprouted", "growing", "flowering", "harvesting", "done"), returns the next step or None for "done"/"failed"/unknown.
+- `timeline(status)`: returns [(step, state)] for every PATH step; steps before status are "done", current is "current", rest "todo"; for "failed" all are "todo" plus ("failed", "current") at end.
+All 2 P04 judge tests pass; `make check` exits 0 with 96% coverage.

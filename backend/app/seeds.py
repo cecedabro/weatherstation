@@ -230,6 +230,12 @@ def next_status(status: str) -> str | None:
 
     TODO (task P04): find *status* in PATH; return the next one, or None.
     """
+    try:
+        i = PATH.index(status)
+    except ValueError:
+        return None
+    if i + 1 < len(PATH):
+        return PATH[i + 1]
     return None
 
 
@@ -240,7 +246,12 @@ def timeline(status: str) -> list[tuple[str, str]]:
     1. *status* on PATH: steps before it are "done", it is "current", the rest "todo".
     2. "failed" (or unknown): every PATH step is "todo", then add ``("failed", "current")`` at the end.
     """
-    return [(status, "current")]
+    if status in PATH:
+        i = PATH.index(status)
+        return [(s, "done" if j < i else ("current" if j == i else "todo")) for j, s in enumerate(PATH)]
+    if status == "failed":
+        return [(s, "todo") for s in PATH] + [("failed", "current")]
+    return [(s, "todo") for s in PATH]
 
 
 def rotation_warning(
