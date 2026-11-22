@@ -18,3 +18,6 @@ Filled in `task_json()` in `backend/app/tasks.py:189` to return a dict with all 
 
 ## Task D07 — tasks.py: apply_form & set_done
 Filled in `apply_form()` in `backend/app/tasks.py:213` to copy each key from `FORM_FIELDS` onto the task via `setattr`. Filled in `set_done()` at `backend/app/tasks.py:220` to set status/done_at: when done=True → status="done", done_at=now; when done=False → status="open", done_at=None. Judge test passes. `make check` passes.
+
+## Task D08 — whole-feature tasks tests
+All D01–D07 function bodies were already filled in from previous tasks. Ran `TASKS=all uv run pytest tests/judge/test_tasks.py tests/judge/test_step_tasks.py -q` — 34 passed. Ran `make check` — 323 passed, 18 skipped, coverage 94.85%, all migration checks pass. No code changes needed.

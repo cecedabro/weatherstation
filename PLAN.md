@@ -31,5 +31,5 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d06
 - [x] D07: In backend/app/tasks.py fill in `apply_form` and `set_done`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d07
-- [ ] D08: Make the whole-feature tests pass: run them, read the first failing assert, fix only the function bodies from D01–D07
+- [x] D08: Make the whole-feature tests pass: run them, read the first failing assert, fix only the function bodies from D01–D07
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_tasks.py tests/judge/test_step_tasks.py -q
