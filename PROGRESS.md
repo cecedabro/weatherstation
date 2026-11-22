@@ -11,3 +11,6 @@ Implemented `parse_compare()` and `parse_view()` in `backend/app/sensors.py:67-1
 
 ## Task S04 — view_href, range_window, daily_days
 Implemented three functions in `backend/app/sensors.py`: `view_href()` builds a `/sensors?` query string from a `View` with changes applied, dropping node and compare when cat changes, and omitting None node / empty compare. `range_window()` returns `(now - timedelta(hours=RANGES[key][1]), now)` with a 168-hour default for unknown keys. `daily_days()` computes `hours // 24` clamped to `[1, MAX_DAILY_ROWS]`. All S04 judge tests pass; `make check` passes (321 passed, 96% coverage).
+
+## Task S05 — latest, tiles
+Implemented `latest()` and `tiles()` in `backend/app/sensors.py:171-211`. `latest()` queries `Reading.value` for a given node/metric, ordered by timestamp descending, returning the newest value or None. `tiles()` builds stat tiles per metric: rain_mm shows Latest + Total, wind_dir_deg shows Latest with compass direction (using `fmt.compass`), and all other metrics show Latest, Min, Max, Average. All S05 judge tests pass; `make check` passes (323 passed, 96% coverage).

@@ -169,12 +169,15 @@ def daily_days(range_key: str) -> int:
 
 
 def latest(db: Session, node: str, metric: str) -> float | None:
-    """The value of the newest reading of *node*/*metric*, or None.
-
-    TODO (task S05): ``select(Reading.value).where(node, metric).order_by(Reading.ts.desc()).limit(1)``,
-    ``db.execute(stmt).scalar_one_or_none()``, ``float()`` it when not None.
-    """
-    return None
+    """The value of the newest reading of *node*/*metric*, or None."""
+    stmt = (
+        select(Reading.value)
+        .where(Reading.node_id == node, Reading.metric == metric)
+        .order_by(Reading.ts.desc())
+        .limit(1)
+    )
+    row = db.execute(stmt).scalar_one_or_none()
+    return float(row) if row is not None else None
 
 
 def tiles(metric: str, summary: dict[str, Any], last: float | None) -> list[tuple[str, Any, str]]:
@@ -184,10 +187,21 @@ def tiles(metric: str, summary: dict[str, Any], last: float | None) -> list[tupl
     - ``wind_dir_deg``: ``[("Latest", text, "")]`` where text is ``"W 270°"`` (``compass(last)`` + space +
       the degrees rounded to an int + ``"°"``), or ``None`` when *last* is None.
     - any other metric: ``Latest`` (*last*), ``Min``, ``Max``, ``Average`` (summary min, max, avg).
-
-    TODO (task S05): build the list as above.
     """
-    return []
+    unit = METRICS.get(metric, ("", ""))[1]
+    if metric == "rain_mm":
+        return [("Latest", last, "mm"), ("Total", summary["sum"], "mm")]
+    elif metric == "wind_dir_deg":
+        if last is None:
+            return [("Latest", None, "")]
+        return [("Latest", f"{compass(last)} {round(last)}°", "")]
+    else:
+        return [
+            ("Latest", last, unit),
+            ("Min", summary["min"], unit),
+            ("Max", summary["max"], unit),
+            ("Average", summary["avg"], unit),
+        ]
 
 
 def merge_daily(per_metric: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
