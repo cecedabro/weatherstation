@@ -43,7 +43,34 @@ def parse_months(text: str | None) -> set[int]:
        A part without "-": add ``int(part)``.
     4. Skip a part that ``int`` can't read (ValueError) or whose months are not 1–12.
     """
-    return set()
+    if not text:
+        return set()
+    result: set[int] = set()
+    for part in text.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        try:
+            if "-" in part:
+                a_str, b_str = part.split("-", 1)
+                a, b = int(a_str), int(b_str)
+                if a < 1 or a > 12 or b < 1 or b > 12:
+                    continue
+                if a <= b:
+                    for i in range(a, b + 1):
+                        result.add(i)
+                else:
+                    for i in range(a, 13):
+                        result.add(i)
+                    for i in range(1, b + 1):
+                        result.add(i)
+            else:
+                m = int(part)
+                if 1 <= m <= 12:
+                    result.add(m)
+        except (ValueError, TypeError):
+            continue
+    return result
 
 
 def sowable(crop: Crop, month: int) -> bool:
@@ -51,7 +78,7 @@ def sowable(crop: Crop, month: int) -> bool:
 
     TODO (task P01): ``return month in parse_months(crop.sow_months)``.
     """
-    return False
+    return month in parse_months(crop.sow_months)
 
 
 def expected_harvest(sown_on: date, days_to_harvest: int | None) -> date | None:

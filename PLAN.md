@@ -16,7 +16,7 @@ Rules for every task:
 - Run the accept command yourself, then `make check`. If a step test fails, read its assert and fix the function.
 - Never edit tests, templates, `Makefile`, `pyproject.toml`, `PLAN.md`, `SPEC.md`, `docs/`.
 
-- [ ] P01: In backend/app/seeds.py fill in `parse_months` and `sowable` (follow the 4 steps in the docstring)
+- [x] P01: In backend/app/seeds.py fill in `parse_months` and `sowable` (follow the 4 steps in the docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p01
 - [ ] P02: In backend/app/seeds.py fill in `expected_harvest` and `harvest_text`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p02
