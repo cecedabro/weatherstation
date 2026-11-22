@@ -15,3 +15,6 @@ Implemented `save_photo()` in `backend/app/species.py:208`: checks image type vi
 
 ## E06 - species.py: sighting_stats
 Implemented `sighting_stats()` in `backend/app/species.py:227`: queries `species_id`, `func.count()`, and `func.max(seen_on)` grouped by species_id, returning a dict mapping species_id → `{"count": int, "last": date}`. Only species with sightings appear in the result. All E06 judge tests pass. `make check` passes (93% coverage, 339 passed).
+
+## E07 - species.py: find_species
+Implemented `find_species()` in `backend/app/species.py:240`: builds a select with conditional where clauses — `tab="catalogue"` filters `Species.common.is_(True)`, other tabs filter `Species.id.in_(select(Sighting.species_id))`. Adds optional case-insensitive substring search on name or latin via `or_(func.lower(Species.name).like(), func.lower(Species.latin).like())` and optional `verdict` filter. Orders by `func.lower(Species.name)`. Added `or_` to imports. All E07 judge tests pass. `make check` passes (93% coverage, 340 passed).

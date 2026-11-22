@@ -15,7 +15,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.auth import RequireUser
@@ -247,7 +247,23 @@ def find_species(db: Session, tab: str, q: str | None, verdict: str | None) -> l
     TODO (task E07): build the select with those ``where`` clauses (``from sqlalchemy import or_``),
     ``.order_by(func.lower(Species.name))``, return ``list(db.execute(stmt).scalars())``.
     """
-    return []
+    stmt = select(Species)
+    if tab == "catalogue":
+        stmt = stmt.where(Species.common.is_(True))
+    else:
+        stmt = stmt.where(Species.id.in_(select(Sighting.species_id)))
+    if q:
+        ilike = f"%{q.lower()}%"
+        stmt = stmt.where(
+            or_(
+                func.lower(Species.name).like(ilike),
+                func.lower(Species.latin).like(ilike),
+            )
+        )
+    if verdict:
+        stmt = stmt.where(Species.verdict == verdict)
+    stmt = stmt.order_by(func.lower(Species.name))
+    return list(db.execute(stmt).scalars().all())
 
 
 def seed_catalogue(db: Session, path: Path = CATALOGUE) -> int:

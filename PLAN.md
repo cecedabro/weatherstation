@@ -29,7 +29,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e05
 - [x] E06: In backend/app/species.py fill in `sighting_stats`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e06
-- [ ] E07: In backend/app/species.py fill in `find_species`
+- [x] E07: In backend/app/species.py fill in `find_species`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e07
 - [ ] E08: In backend/app/species.py fill in `seed_catalogue`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e08
