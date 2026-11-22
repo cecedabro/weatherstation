@@ -1,0 +1,72 @@
+{#- Sensors page (SPEC §11). Human-owned; context from app.sensors.page_context. -#}
+{% extends "base.html" %}
+{% block title %}Sensors{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/vendor/uPlot.min.css"><script src="/static/vendor/uPlot.iife.min.js" defer></script><script src="/static/js/charts.js" defer></script>{% endblock %}
+{% block content %}
+{{ ui.page_head("Sensors", "Every reading from the garden, per category, over the day, week, month, season or year.") }}
+{{ ui.tabs(tabs, current_tab) }}
+
+<div class="toolbar">
+  {{ ui.seg(ranges, view.range, range_href, label="Range") }}
+  {% if nodes|length > 1 %}<nav class="seg" aria-label="Node">{% for n in nodes %}<a href="{{ node_href(n) }}"{% if n == view.node %} aria-current="page"{% endif %}>{{ n }}</a>{% endfor %}</nav>{% endif %}
+</div>
+
+{% if not view.node %}
+{% call ui.card(tint="leaf") %}{{ ui.empty("No " ~ cat_label|lower ~ " sensors yet", "When a " ~ ("soil" if view.cat == "soil" else "weather") ~ " node sends its first reading, its graphs show up here.", "📡") }}{% endcall %}
+{% else %}
+<div class="grid-2" data-chart-group>
+  {% for c in cards %}
+  {% call ui.card(tint="sky" if view.cat != "soil" else "soil", cls="span-all" if view.cat == "soil" else "") %}
+    {{ ui.chart(c.title, c.series, unit=c.unit, kind=c.kind, range=view.range) }}
+    {% if c.tiles %}<div class="stats">{% for label, value, unit in c.tiles %}{{ ui.stat(label, value, unit) }}{% endfor %}</div>{% endif %}
+    <div class="card-foot small"><a href="{{ c.csv }}">Download CSV</a><span class="muted">{{ view.node }} · {{ c.metric }}</span></div>
+  {% endcall %}
+  {% endfor %}
+</div>
+
+{% if soil is defined %}
+<div class="section">
+{% call ui.card("Latest per bed", icon="🌱", tint="soil", flush=True) %}
+  {% call ui.table(["Node", "Moisture#", "Soil temperature#"], caption="Latest soil values") %}
+  {% for r in soil %}<tr><td>{{ r.node }}</td><td class="num">{{ "%.0f %%"|format(r.soil_moisture_pct) if r.soil_moisture_pct is not none else "—" }}</td><td class="num">{{ "%.1f °C"|format(r.soil_temp_c) if r.soil_temp_c is not none else "—" }}</td></tr>{% endfor %}
+  {% endcall %}
+{% endcall %}
+</div>
+{% endif %}
+
+<div class="section">
+{% call ui.card("Per day", icon="📅", flush=True) %}
+  {% if daily %}
+  {%- set heads = ["Day"] -%}
+  {%- for m, title, unit in metrics -%}{%- if m == "rain_mm" -%}{%- set _ = heads.append(title ~ " total#") -%}{%- elif m == "wind_dir_deg" -%}{%- else -%}{%- set _ = heads.extend([title ~ " min#", title ~ " max#", title ~ " avg#"]) -%}{%- endif -%}{%- endfor -%}
+  {% call ui.table(heads, compact=True, caption="Daily minimum, maximum and average") %}
+  {% for row in daily %}<tr><td>{{ row.date }}</td>
+    {%- for m, title, unit in metrics -%}{%- set s = row[m] -%}
+    {%- if m == "rain_mm" -%}<td class="num">{{ "%.1f"|format(s.sum) if s else "—" }}</td>
+    {%- elif m == "wind_dir_deg" -%}
+    {%- else -%}{% for k in ("min", "max", "avg") %}<td class="num">{{ "%.1f"|format(s[k]) if s and s[k] is not none else "—" }}</td>{% endfor %}{%- endif -%}
+    {%- endfor %}</tr>{% endfor %}
+  {% endcall %}
+  {% else %}{{ ui.empty("No readings in this period", icon="📅") }}{% endif %}
+{% endcall %}
+</div>
+
+<div class="section">
+{% call ui.card("Compare days", icon="🔍", tint="water") %}
+  <form class="form" method="get" action="/sensors">
+    <input type="hidden" name="cat" value="{{ view.cat }}"><input type="hidden" name="range" value="{{ view.range }}"><input type="hidden" name="node" value="{{ view.node }}">
+    <div class="form-row">
+      {% for i in (1, 2, 3) %}{{ ui.field("d" ~ i, "Day " ~ i, type="date", value=(view.compare[i - 1].isoformat() if view.compare|length >= i else None)) }}{% endfor %}
+    </div>
+    <div class="form-actions">{{ ui.button("Compare", type="submit", variant="aqua") }}</div>
+  </form>
+  {% if compare_series is defined %}
+  {{ ui.chart(compare_metric[1] ~ " by hour (UTC)", compare_series, unit=compare_metric[2], x="hour") }}
+  {% call ui.table(["Day", "Min#", "Max#", "Avg#"], compact=True, caption="Compared days") %}
+  {% for r in compare_rows %}<tr><td>{{ r.date }}</td>{% for k in ("min", "max", "avg") %}<td class="num">{{ "%.1f"|format(r[k]) if r[k] is not none else "—" }}</td>{% endfor %}</tr>{% endfor %}
+  {% endcall %}
+  {% endif %}
+{% endcall %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{#- New / edit species (SPEC 15.4). Human-owned; context from app.species._form_page. -#}
+{% extends "base.html" %}
+{% block title %}{{ "Edit " ~ sp.name if sp else "New species" }}{% endblock %}
+{% block content %}
+{{ ui.page_head("Edit " ~ sp.name if sp else "New species") }}
+{% call ui.card(tint="leaf") %}
+<form class="form" method="post" action="{{ '/species/' ~ sp.id if sp else '/species' }}">
+  <div class="form-row">
+    {{ ui.field("name", "Name", value=values.name, required=True, error=errors.name, attrs={"maxlength": 120}) }}
+    {{ ui.field("latin", "Latin name", value=values.latin, error=errors.latin, attrs={"maxlength": 120}) }}
+  </div>
+  <div class="form-row">
+    {{ ui.field("kind", "Kind", type="select", value=values.kind, options=kinds, error=errors.kind) }}
+    {{ ui.field("verdict", "Verdict", type="select", value=values.verdict, options=verdicts, error=errors.verdict, hint="Harmful and invasive finds get a reminder to remove them.") }}
+  </div>
+  {{ ui.field("description", "Notes", type="textarea", value=values.description, error=errors.description) }}
+  <div class="form-actions">
+    {{ ui.button("Save", type="submit", variant="primary") }}
+    {{ ui.button("Cancel", href="/species/" ~ sp.id if sp else "/species", variant="quiet") }}
+  </div>
+</form>
+{% if sp %}
+<form method="post" action="/species/{{ sp.id }}/delete" data-confirm="Delete this species and all its sightings?">{{ ui.button("Delete species", type="submit", variant="danger", size="sm") }}</form>
+{% endif %}
+{% endcall %}
+{% endblock %}

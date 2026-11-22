@@ -1,0 +1,25 @@
+{#- New / edit task form (SPEC 14.3). Human-owned; context from app.tasks._form_page. -#}
+{% extends "base.html" %}
+{% block title %}{{ "Edit task" if task else "New task" }}{% endblock %}
+{% block content %}
+{{ ui.page_head("Edit task" if task else "New task") }}
+{% call ui.card(tint="leaf") %}
+<form class="form" method="post" action="{{ '/tasks/' ~ task.id if task else '/tasks' }}">
+  {{ ui.field("title", "Title", value=values.title, required=True, error=errors.title, attrs={"maxlength": 120}) }}
+  <div class="form-row">
+    {{ ui.field("category", "Category", type="select", value=values.category, options=categories, error=errors.category) }}
+    {{ ui.field("urgency", "Urgency", type="select", value=values.urgency, options=urgencies, error=errors.urgency) }}
+    {{ ui.field("deadline", "Deadline", type="date", value=values.deadline, error=errors.deadline) }}
+    {{ ui.field("object_id", "Pinned to", type="select", value=values.object_id if values.object_id is not none else "", options=objects, error=errors.object_id) }}
+  </div>
+  {{ ui.field("notes", "Notes", type="textarea", value=values.notes, error=errors.notes) }}
+  <div class="form-actions">
+    {{ ui.button("Save", type="submit", variant="primary") }}
+    {{ ui.button("Cancel", href="/tasks", variant="quiet") }}
+  </div>
+</form>
+{% if task %}
+<form method="post" action="/tasks/{{ task.id }}/delete" data-confirm="Delete this task?">{{ ui.button("Delete task", type="submit", variant="danger", size="sm") }}</form>
+{% endif %}
+{% endcall %}
+{% endblock %}

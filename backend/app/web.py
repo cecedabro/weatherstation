@@ -94,16 +94,6 @@ COMING: dict[str, tuple[str, str, str]] = {
         "🌱",
         "What you sowed and planted, where and when, and when it should be ready.",
     ),
-    "tasks": (
-        "Tasks",
-        "✅",
-        "Jobs and reminders with urgency, category and deadline, pinned on the map.",
-    ),
-    "species": (
-        "Species",
-        "🐞",
-        "Plants and animals you found in the garden, and a catalogue of common ones.",
-    ),
 }
 
 
@@ -118,16 +108,3 @@ def _placeholder(key: str) -> Any:
 
 for _key in COMING:
     router.add_api_route(f"/{_key}", _placeholder(_key), methods=["GET"])
-
-
-@router.get("/sensors")
-async def sensors_placeholder(request: Request) -> HTMLResponse:
-    """Replaced by loop A (SPEC §11)."""
-    return render(
-        request,
-        "coming_soon.html",
-        active="sensors",
-        title="Sensors",
-        icon="📈",
-        text="Every sensor in graphs and tables, per category and across days.",
-    )
