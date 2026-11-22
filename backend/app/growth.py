@@ -103,7 +103,17 @@ def harvest_eta(
     2. No *recent* values → None. ``rate = sum(recent) / len(recent)``; ``rate < 0.1`` → None (too cold to say).
     3. ``days = math.ceil((gdd_needed - gdd_done) / rate)``; return ``today + timedelta(days=days)``.
     """
-    return None
+    if gdd_needed is None or gdd_needed <= 0:
+        return None
+    if gdd_done >= gdd_needed:
+        return today
+    if not recent:
+        return None
+    rate = sum(recent) / len(recent)
+    if rate < 0.1:
+        return None
+    days = math.ceil((gdd_needed - gdd_done) / rate)
+    return today + timedelta(days=days)
 
 
 def sun_fit(crop_sun: str | None, sun_hours: float | None) -> tuple[float, str]:

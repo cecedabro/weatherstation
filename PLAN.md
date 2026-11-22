@@ -24,7 +24,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a03
 - [x] A04: In backend/app/growth.py fill in `progress`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a04
-- [ ] A05: In backend/app/growth.py fill in `harvest_eta` (follow the 3 steps in its docstring)
+- [x] A05: In backend/app/growth.py fill in `harvest_eta` (follow the 3 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a05
 - [ ] A06: In backend/app/growth.py fill in `sun_fit` (follow the 4 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a06

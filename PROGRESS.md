@@ -9,3 +9,6 @@ Implemented `gdd_series()` in `backend/app/growth.py:64`. The function walks day
 
 ## A04 - progress
 Implemented `progress()` in `backend/app/growth.py:86`. Returns `None` when `gdd_needed` is `None` or `<= 0`; otherwise returns `min(1.0, gdd_done / gdd_needed)` rounded to 3 decimals. All A04 tests pass. `make check` passes (512 passed).
+
+## A05 - harvest_eta
+Implemented `harvest_eta()` in `backend/app/growth.py:96`. Returns `None` when `gdd_needed` is None/`<= 0`; `today` when already done; `None` when no recent data or rate < 0.1 (too cold); otherwise computes average rate from `recent`, divides remaining GDD by rate, and returns `today + timedelta(days=ceil(remaining/rate))`. All A05 tests pass. `make check` passes (513 passed).
