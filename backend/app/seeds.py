@@ -86,7 +86,9 @@ def expected_harvest(sown_on: date, days_to_harvest: int | None) -> date | None:
 
     TODO (task P02): None → None; else ``sown_on + timedelta(days=days_to_harvest)``.
     """
-    return None
+    if days_to_harvest is None:
+        return None
+    return sown_on + timedelta(days=days_to_harvest)
 
 
 def harvest_text(expected: date | None, today: date, status: str) -> str:
@@ -97,7 +99,22 @@ def harvest_text(expected: date | None, today: date, status: str) -> str:
     2. ``n = (expected - today).days``: n > 1 → f"ready in {n} days"; n == 1 → "ready tomorrow"; n == 0 →
        "ready today"; n == -1 → "ready since yesterday"; n < -1 → f"ready since {-n} days".
     """
-    return ""
+    if status == "done":
+        return "harvested"
+    if status == "failed":
+        return "failed"
+    if expected is None:
+        return ""
+    n = (expected - today).days
+    if n > 1:
+        return f"ready in {n} days"
+    if n == 1:
+        return "ready tomorrow"
+    if n == 0:
+        return "ready today"
+    if n == -1:
+        return "ready since yesterday"
+    return f"ready since {-n} days"
 
 
 def validate_planting(
