@@ -66,7 +66,7 @@ or by point:
 - `rotation_warning(bed, crop, history)` (same family in the same bed within 3 years);
 - the list grouped by bed, and plantings drawn on the map.
 
-### 4. Loop A: growth model and advisor (agent + human, SPEC §16)
+### 4. Loop A: growth model and advisor (agent + human, SPEC §16; built, branch `agent/growth-steps`, 14 tasks)
 - **Growth model** (pure functions, ideal loop tasks): `growing_degree_days(temps, base)` from the station's
   temperature, `progress(planting, gdd)` against the crop's GDD-to-harvest, and an extrapolated harvest date
   from the last 14 days' GDD rate.
@@ -77,6 +77,8 @@ or by point:
   own notes) and must cite them. An answer without a valid citation is rejected and shown as "not in the
   sources". The human builds the prompt and the citation check; the loop fills in the source search and
   ranking.
+- Built as: `/growth` (GDD progress and ETA per planting, best spot per crop), `/advisor`, `/sources`. The model
+  call is stdlib `urllib` to `LLM_BASE_URL/chat/completions`; tests replace `advisor.ask_llm`.
 
 ### 5. Later
 Photos on plantings, harvest weights and yearly totals, frost alerts from the station temperature (push via

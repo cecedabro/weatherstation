@@ -131,6 +131,12 @@ def create_app() -> FastAPI:
 
     application.include_router(objects_router)
 
+    from app.advisor import router as advisor_router
+    from app.growth import router as growth_router
+
+    application.include_router(growth_router)
+    application.include_router(advisor_router)
+
     from app.readapi import router as readapi_router
 
     application.include_router(readapi_router)

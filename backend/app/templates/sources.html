@@ -1,0 +1,18 @@
+{#- Sources for the advisor. Human-owned; context from app.advisor.sources_page. -#}
+{% extends "base.html" %}
+{% block title %}Sources{% endblock %}
+{% block content %}
+{% call ui.page_head("Sources", "What the advisor may quote: guides, seed packets, papers and your own notes.") %}{{ ui.button("Advisor", href="/advisor", variant="quiet", icon="💬") }}{{ ui.button("New source", href="/sources/new", variant="primary", icon="＋") }}{% endcall %}
+{% call ui.card(flush=True, cls="section") %}
+{% if sources %}
+<ul class="list">
+  {% for s in sources %}
+  {% set meta = [ui.chip(s.kind.replace("_", " ").title(), "info")] + ([s.publisher] if s.publisher else []) + ([s.tags] if s.tags else []) %}
+  {% call ui.list_item(s.title, meta=meta, href=s.url) %}{{ ui.button("Edit", href="/sources/" ~ s.id ~ "/edit", size="sm", variant="quiet") }}{% endcall %}
+  {% endfor %}
+</ul>
+{% else %}
+{{ ui.empty("No sources yet", "Paste the text of a growing guide or seed packet; the advisor answers only from these.", "📚", "/sources/new", "New source") }}
+{% endif %}
+{% endcall %}
+{% endblock %}

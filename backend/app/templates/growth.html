@@ -1,0 +1,44 @@
+{#- Growth and best spot (SPEC §16). Human-owned; context from app.growth.growth_page. -#}
+{% extends "base.html" %}
+{% block title %}Growth{% endblock %}
+{% block content %}
+{% call ui.page_head("Growth", "How far each planting is, from the warmth your own station measured.") %}{{ ui.button("Sources", href="/sources", variant="quiet", icon="📚") }}{{ ui.button("Ask the advisor", href="/advisor", variant="primary", icon="💬") }}{% endcall %}
+
+{% call ui.card("Growing now", icon="🌤️", cls="section") %}
+{% if rows %}
+<ul class="list">
+  {% for r in rows %}{% set p = r.planting %}
+  {% set meta = [p.method.title() ~ " " ~ p.sown_on.strftime("%-d %b"), r.gdd ~ " GDD in " ~ r.days ~ " days"] %}
+  {% if r.bed %}{% set _ = meta.append("📍 " ~ r.bed) %}{% endif %}
+  {% if r.eta %}{% set _ = meta.append(ui.chip("ready " ~ ("now" if r.eta <= today else r.eta.strftime("%-d %b")), "ok" if r.eta <= today else "info")) %}{% elif r.pct is not none %}{% set _ = meta.append(ui.chip("too cold to estimate", "off")) %}{% endif %}
+  {% call ui.list_item(p.crop ~ (" · " ~ p.variety if p.variety else ""), meta=meta) %}
+    {% if r.pct is not none %}<div class="list-progress">{{ ui.progress(r.pct, p.crop ~ " progress") }}<span class="num small">{{ r.pct }}%</span></div>{% else %}<span class="muted small">no GDD target</span>{% endif %}
+  {% endcall %}
+  {% endfor %}
+</ul>
+<p class="muted tiny">Growing degree days: each day adds how much its average temperature was above the crop's base temperature (capped at 30 °C). The date assumes the last two weeks' pace continues.</p>
+{% else %}
+{{ ui.empty("Nothing growing yet", "Plantings with a crop from the catalogue show up here once they're sown.", "🌱", "/seeds/new", "New planting") }}
+{% endif %}
+{% endcall %}
+
+{% call ui.card("Best spot", icon="📍", tint="leaf", cls="section") %}
+<form class="toolbar" method="get" action="/growth">
+  <select class="select" name="crop" aria-label="Crop">{% for v, t in crops %}<option value="{{ v }}"{% if chosen and v == chosen.id|string %} selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+  {{ ui.button("Find beds", type="submit", size="sm", variant="primary") }}
+</form>
+{% if chosen %}
+{% if spots %}
+<ul class="list">
+  {% for s in spots %}
+  {% call ui.list_item(loop.index ~ ". " ~ s.name, meta=s.reasons) %}<span class="num">{{ s.score }}</span><span class="muted small">/100</span>{% endcall %}
+  {% endfor %}
+</ul>
+{% else %}
+{{ ui.empty("No beds yet", "Add beds on the garden map with their sun hours.", "🪴") }}
+{% endif %}
+{% else %}
+<p class="muted small">Ranks your beds for a crop by sun hours, soil moisture from the sensors, and crop rotation.</p>
+{% endif %}
+{% endcall %}
+{% endblock %}
