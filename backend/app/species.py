@@ -296,7 +296,17 @@ def sighting_json(x: Sighting, species: Species) -> dict[str, Any]:
 
     TODO (task E09): build the dict.
     """
-    return {"id": x.id}
+    return {
+        "id": x.id,
+        "species_id": x.species_id,
+        "species": species.name,
+        "verdict": species.verdict,
+        "seen_on": x.seen_on.isoformat(),
+        "x": x.x,
+        "y": x.y,
+        "object_id": x.object_id,
+        "removed": x.removed,
+    }
 
 
 # -- glue (done)

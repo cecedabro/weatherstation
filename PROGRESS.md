@@ -21,3 +21,6 @@ Implemented `find_species()` in `backend/app/species.py:240`: builds a select wi
 
 ## E08 - species.py: seed_catalogue
 Implemented `seed_catalogue()` in `backend/app/species.py:269`: reads `common_species.json`, gets existing species names case-insensitively, adds entries whose lowercase name is not already present as `Species` rows with `common=True`, deduplicates within the batch, and returns the count added. Idempotent — running twice adds nothing the second time. All E08 judge tests pass. `make check` passes (93% coverage, 341 passed).
+
+## E09 - species.py: sighting_json
+Implemented `sighting_json()` in `backend/app/species.py:293`: builds a dict with id, species_id, species (name), verdict, seen_on (isoformat), x, y, object_id, removed from the Sighting and Species objects. All E09 judge tests pass. `make check` passes (93% coverage, 342 passed).
