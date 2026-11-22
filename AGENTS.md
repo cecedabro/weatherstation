@@ -78,7 +78,11 @@ So: **run `make check` yourself before you stop, and fix what fails.**
 - `make setup` — install backend deps (`uv sync`). Tests start their own throwaway Postgres (see `docs/testing.md`); there is no Docker here.
 - `make check` — lint + type-check + all tests of every part that exists (also the contract tests), backend coverage of at least 90%, and a `bandit` security scan (medium or higher). Must pass after every task, so write tests for the code you add.
 - `make migcheck` — the migration check (also part of `make check`). If you change `app/models.py`, add a new Alembic migration in the same task; never edit an old one.
-- `make fmt` — autoformat (ruff). Run before `make check`.
+- `make fmt` — autoformat (ruff) for humans only. **Agents: never run `make fmt`, `ruff format .` or
+  `ruff check --fix .`** (they rewrite protected files and the attempt is rejected). Format only the file you
+  changed: `cd backend && uv run ruff format app/<file>.py`.
+- Runs are non-interactive: never end with a question or a plan. Make the edit, run the accept command, stop.
+- Never read a large file whole: `grep -n`, then `sed -n 'a,bp' <file>`.
 - `make dev` — run the site on :8000 with a throwaway Postgres and fake readings (for humans previewing; don't use it in tests).
 - `make run` — run the backend locally (needs a Postgres at `DATABASE_URL`; usually you only need the tests).
 - Offline docs are in `~/docs/` (fastapi, sqlalchemy, alembic, jinja, htmx, uplot, python). Search them with `rg -i <term> ~/docs/<name>`; never read a whole file.
