@@ -25,3 +25,8 @@ backend/app/templates/species_detail.html
 backend/app/templates/species_form.html
 backend/app/config.py                # settings (human)
 backend/app/main.py                  # app wiring (human)
+backend/app/templates/growth.html    # Growth, advisor and sources pages (human)
+backend/app/templates/advisor.html
+backend/app/templates/sources.html
+backend/app/templates/source_form.html
+backend/app/templating.py            # navigation (human)

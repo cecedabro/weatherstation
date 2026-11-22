@@ -1,0 +1,37 @@
+{#- Advisor (SPEC §16). Human-owned; context from app.advisor.advisor_page / advisor_ask. -#}
+{% extends "base.html" %}
+{% block title %}Advisor{% endblock %}
+{% block content %}
+{% call ui.page_head("Advisor", "Answers from your own sources only, with the source for every claim.") %}{{ ui.button("Sources (" ~ n_sources ~ ")", href="/sources", variant="quiet", icon="📚") }}{{ ui.button("Growth", href="/growth", variant="quiet", icon="🌤️") }}{% endcall %}
+
+{% if not enabled %}{{ ui.alert("Advisor is off", "The local model isn't connected (LLM_BASE_URL is empty). You can still add sources.", "info", "💤") }}{% endif %}
+{% if n_sources == 0 %}{{ ui.alert("No sources yet", "Add growing guides, seed packets or your own notes first: the advisor only answers from those.", "warn", "📚") }}{% endif %}
+
+{% call ui.card(tint="leaf", cls="section") %}
+<form class="form" method="post" action="/advisor">
+  {{ ui.field("question", "Your question", type="textarea", value=question, required=True, attrs={"maxlength": 500, "rows": 3, "placeholder": "When should I sow leeks, and how far apart?"}) }}
+  <div class="form-actions">{{ ui.button("Ask", type="submit", variant="primary", icon="💬") }}</div>
+</form>
+{% endcall %}
+
+{% if result %}
+{% call ui.card("Answer", icon="💬", cls="section") %}
+{% if result.state == "ok" %}
+<p>{{ result.answer }}</p>
+<ol class="list">
+  {% for i, s in result.cited %}
+  {% call ui.list_item("[" ~ i ~ "] " ~ s.title, meta=[s.kind.replace("_", " ").title()] + ([s.publisher] if s.publisher else []), href=s.url) %}{% endcall %}
+  {% endfor %}
+</ol>
+{% elif result.state == "off" %}
+{{ ui.alert("Advisor is off", "The local model isn't connected.", "info", "💤") }}
+{% elif result.state == "error" %}
+{{ ui.alert("No answer right now", "The local model didn't respond (the PC may be asleep). Try again in a minute.", "warn", "⏳") }}
+{% elif result.state == "empty" %}
+{{ ui.alert("Ask something", "Type a question first.", "info") }}
+{% else %}
+{{ ui.alert("Not in the sources", "None of your sources answers this, so the advisor won't guess. Add a source that covers it.", "info", "📚") }}
+{% endif %}
+{% endcall %}
+{% endif %}
+{% endblock %}

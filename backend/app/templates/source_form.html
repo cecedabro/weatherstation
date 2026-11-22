@@ -1,0 +1,25 @@
+{#- New / edit source. Human-owned; context from app.advisor._form_page. -#}
+{% extends "base.html" %}
+{% block title %}{{ "Edit source" if source else "New source" }}{% endblock %}
+{% block content %}
+{{ ui.page_head("Edit source" if source else "New source") }}
+{% call ui.card(tint="leaf") %}
+<form class="form" method="post" action="{{ '/sources/' ~ source.id if source else '/sources' }}">
+  {{ ui.field("title", "Title", value=values.title, required=True, error=errors.title, attrs={"maxlength": 200}) }}
+  <div class="form-row">
+    {{ ui.field("kind", "Kind", type="select", value=values.kind, options=kinds, error=errors.kind) }}
+    {{ ui.field("publisher", "Publisher", value=values.publisher, error=errors.publisher, attrs={"maxlength": 120}) }}
+  </div>
+  {{ ui.field("url", "Link", type="url", value=values.url, error=errors.url, attrs={"placeholder": "https://…"}) }}
+  {{ ui.field("body", "Text", type="textarea", value=values.body, required=True, error=errors.body, hint="The advisor only sees this text, so paste the parts that matter.", attrs={"rows": 10, "maxlength": 20000}) }}
+  {{ ui.field("tags", "Tags", value=values.tags, error=errors.tags, hint="Comma separated, e.g. leek, sowing, spacing", attrs={"maxlength": 200}) }}
+  <div class="form-actions">
+    {{ ui.button("Save", type="submit", variant="primary") }}
+    {{ ui.button("Cancel", href="/sources", variant="quiet") }}
+  </div>
+</form>
+{% if source %}
+<form method="post" action="/sources/{{ source.id }}/delete" data-confirm="Delete this source?">{{ ui.button("Delete source", type="submit", variant="danger", size="sm") }}</form>
+{% endif %}
+{% endcall %}
+{% endblock %}

@@ -22,6 +22,7 @@ NAV: list[tuple[str, str, str, str, bool]] = [
     ("sensors", "/sensors", "Sensors", "📈", False),
     ("garden", "/garden", "Garden", "🗺️", True),
     ("seeds", "/seeds", "Seeds", "🌱", True),
+    ("growth", "/growth", "Growth", "🌤️", True),
     ("tasks", "/tasks", "Tasks", "✅", True),
     ("species", "/species", "Species", "🐞", True),
 ]
