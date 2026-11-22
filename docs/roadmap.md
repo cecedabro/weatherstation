@@ -52,7 +52,7 @@ A 3D view of the plot with three.js (vendored), built by the human because it is
 
 Needs from you: a sketch of the plot with its sizes, and where the shed, beds and sensors are.
 
-### 2. Loop G: objects API and map data (agent, ~9 tasks)
+### 2. Loop G: objects API and map data (agent, 11 tasks; built, branch `agent/objects-steps`)
 `validate_object(form, kind)` per `KIND_PROPS`, `object_json`, the `/api/v1/objects` routes (GET, POST, PATCH,
 DELETE) as fill-ins. Also `soil_grid(points, width, depth, cell)` (inverse-distance weighting of the latest
 soil moisture between sensors, for the ground colour) and `pins(db)` (open tasks and unremoved harmful

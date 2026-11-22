@@ -27,8 +27,9 @@ exact SQLAlchemy calls and the imports needed. If the agent has to design someth
 - The last task of a loop makes the **whole-feature test** (`test_<area>.py`, tagged with that task's id) pass.
 - A `test_<area>_smoke.py` (not tagged) covers the glue, so `make check` coverage stays above 90 % on the stubs.
 
-**Task gating** (`backend/tests/conftest.py`): `make check` skips a tagged test until PLAN.md ticks its task
-(`- [x] S01:`). Later tasks of a running loop therefore don't fail the check, and finished tasks stay tested.
+**Task gating** (`backend/tests/conftest.py`): `make check` skips a tagged test while PLAN.md lists its task as
+open (`- [ ] S01:`). Later tasks of a running loop therefore don't fail the check; finished tasks, and the tests
+of earlier loops whose ids aren't in this PLAN.md, always run.
 `TASKS=all`, or having no PLAN.md (after merging to main), runs them all.
 
 ## Before queueing a loop

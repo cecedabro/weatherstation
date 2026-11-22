@@ -127,6 +127,10 @@ def create_app() -> FastAPI:
 
     application.include_router(species_router)
 
+    from app.objects import router as objects_router
+
+    application.include_router(objects_router)
+
     from app.readapi import router as readapi_router
 
     application.include_router(readapi_router)

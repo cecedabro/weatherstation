@@ -62,19 +62,18 @@ _TABLES = (
 _PLAN = Path(__file__).resolve().parents[2] / "PLAN.md"
 
 
-def _ticked() -> set[str] | None:
+def _open_tasks() -> set[str]:
+    """Task ids PLAN.md lists as not done yet (``- [ ] ID:``). Tests of earlier loops always run."""
     if os.environ.get("TASKS") == "all" or not _PLAN.exists():
-        return None
-    return set(re.findall(r"^- \[x\] (\w+):", _PLAN.read_text(), re.M))
+        return set()
+    return set(re.findall(r"^- \[ \] (\w+):", _PLAN.read_text(), re.M))
 
 
 def pytest_collection_modifyitems(config, items):
-    done = _ticked()
-    if done is None:
-        return
+    todo = _open_tasks()
     for item in items:
         mark = item.get_closest_marker("task")
-        if mark and mark.args[0] not in done:
+        if mark and mark.args[0] in todo:
             item.add_marker(pytest.mark.skip(reason=f"task {mark.args[0]} not done yet (PLAN.md)"))
 
 
