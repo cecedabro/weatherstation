@@ -143,7 +143,15 @@ def moisture_fit(avg: float | None, lo: float | None, hi: float | None) -> tuple
        ``gap = avg - hi``, reason ``f"too wet: {avg:.0f}% (needs {lo:.0f}–{hi:.0f}%)"``.
        Score ``round(max(0.0, 1 - gap / 20), 2)``.
     """
-    return 0.5, ""
+    if avg is None or lo is None or hi is None:
+        return 0.5, "no soil data"
+    if lo <= avg <= hi:
+        return 1.0, f"soil {avg:.0f}% suits it ({lo:.0f}–{hi:.0f}%)"
+    if avg < lo:
+        gap = lo - avg
+        return round(max(0.0, 1 - gap / 20), 2), f"too dry: {avg:.0f}% (needs {lo:.0f}–{hi:.0f}%)"
+    gap = avg - hi
+    return round(max(0.0, 1 - gap / 20), 2), f"too wet: {avg:.0f}% (needs {lo:.0f}–{hi:.0f}%)"
 
 
 def score_spot(

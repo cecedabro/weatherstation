@@ -15,3 +15,6 @@ Implemented `harvest_eta()` in `backend/app/growth.py:96`. Returns `None` when `
 
 ## A06 - sun_fit
 Implemented `sun_fit()` in `backend/app/growth.py:119`. The function looks up sun needs from `SUN_NEED` dict (defaulting to "full"=6h), returns `(0.5, "sun hours unknown")` when sun_hours is None, `(1.0, "...")` when sun_hours meets/exceeds need, and `(round(sun_hours/need, 2), "only ...")` otherwise. All 8 A06 tests pass. `make check` passes (514 passed).
+
+## A07 - moisture_fit
+Implemented `moisture_fit()` in `backend/app/growth.py:136`. Returns `(0.5, "no soil data")` when any param is None; `(1.0, "...")` when `lo <= avg <= hi`; below lo: `gap = lo - avg`, score `max(0, 1 - gap/20)`; above hi: `gap = avg - hi`, same score formula. All 7 A07 tests pass. `make check` passes (522 passed).
