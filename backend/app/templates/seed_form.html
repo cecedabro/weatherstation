@@ -1,0 +1,35 @@
+{#- New / edit planting form. Human-owned; context from app.seeds._form_page. -#}
+{% extends "base.html" %}
+{% block title %}{{ "Edit planting" if planting else "New planting" }}{% endblock %}
+{% block content %}
+{{ ui.page_head("Edit planting" if planting else "New planting") }}
+{% call ui.card(tint="leaf") %}
+<form class="form" method="post" action="{{ '/seeds/' ~ planting.id if planting else '/seeds' }}">
+  <div class="form-row">
+    {{ ui.field("crop", "Crop", value=values.crop, required=True, error=errors.crop, hint="Pick from the list for harvest dates and rotation checks", attrs={"maxlength": 80, "list": "crop-list", "autocomplete": "off"}) }}
+    {{ ui.field("variety", "Variety", value=values.variety, error=errors.variety, attrs={"maxlength": 80}) }}
+  </div>
+  <datalist id="crop-list">{% for c in crops %}<option value="{{ c }}"></option>{% endfor %}</datalist>
+  <div class="form-row">
+    {{ ui.field("object_id", "Bed", type="select", value=values.object_id if values.object_id is not none else "", options=objects, error=errors.object_id) }}
+    {{ ui.field("method", "Method", type="select", value=values.method, options=methods, error=errors.method) }}
+    {{ ui.field("status", "Status", type="select", value=values.status, options=statuses, error=errors.status) }}
+  </div>
+  <div class="form-row">
+    {{ ui.field("sown_on", "Sown / planted on", type="date", value=values.sown_on, required=True, error=errors.sown_on) }}
+    {{ ui.field("count", "How many", type="number", value=values.count, error=errors.count, attrs={"min": 1, "step": 1}) }}
+  </div>
+  {{ ui.field("notes", "Notes", type="textarea", value=values.notes, error=errors.notes) }}
+  <div class="form-actions">
+    {{ ui.button("Save", type="submit", variant="primary") }}
+    {{ ui.button("Cancel", href="/seeds", variant="quiet") }}
+  </div>
+</form>
+{% if planting %}
+<div class="form-actions">
+  {% if planting.status != "failed" %}<form method="post" action="/seeds/{{ planting.id }}/failed" data-confirm="Mark this planting as failed?">{{ ui.button("Mark failed", type="submit", size="sm") }}</form>{% endif %}
+  <form method="post" action="/seeds/{{ planting.id }}/delete" data-confirm="Delete this planting?">{{ ui.button("Delete planting", type="submit", variant="danger", size="sm") }}</form>
+</div>
+{% endif %}
+{% endcall %}
+{% endblock %}

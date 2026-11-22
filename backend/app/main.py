@@ -22,9 +22,11 @@ def create_app() -> FastAPI:
 
     @contextlib.asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        from app.seeds import startup_seed as seed_crops
         from app.species import startup_seed
 
         startup_seed()
+        seed_crops()
         yield
 
     application = FastAPI(title="Weather Station", lifespan=lifespan)
@@ -130,6 +132,10 @@ def create_app() -> FastAPI:
     from app.objects import router as objects_router
 
     application.include_router(objects_router)
+
+    from app.seeds import router as seeds_router
+
+    application.include_router(seeds_router)
 
     from app.readapi import router as readapi_router
 

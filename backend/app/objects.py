@@ -27,7 +27,20 @@ from app.models import GardenObject, Node, Reading, Sighting, Species, Task
 
 router = APIRouter()
 
-OBJECT_KINDS = ("bed", "house", "patch", "compost", "path", "tree", "water", "fence", "sensor")
+OBJECT_KINDS = (
+    "bed",
+    "house",
+    "greenhouse",
+    "patch",
+    "compost",
+    "path",
+    "tree",
+    "shrub",
+    "water",
+    "fence",
+    "sensor",
+    "other",
+)
 
 # kind -> property -> spec. Spec forms: ("choice", options), ("bool",), ("number", low, high), ("date",),
 # ("text", max_length), ("color",).
@@ -44,7 +57,10 @@ KIND_PROPS: dict[str, dict[str, tuple[Any, ...]]] = {
     "patch": {"dug": ("bool",), "last_compost": ("date",)},
     "water": {"litres": ("number", 0, 5000)},
     "tree": {"species": ("text", 80), "crown": ("number", 0, 30)},
+    "greenhouse": {"heated": ("bool",)},
+    "shrub": {"species": ("text", 80)},
     "compost": {},
+    "other": {},
     "path": {},
     "fence": {},
     "sensor": {},
