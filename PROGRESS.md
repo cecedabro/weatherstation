@@ -14,3 +14,6 @@ Implemented `validate_object` in `backend/app/objects.py:229`: checks data is a 
 
 ## G05 — object_json (objects.py)
 Implemented `object_json` in `backend/app/objects.py:315`: builds a dict with keys `id`, `kind`, `name`, `x`, `y`, `w`, `d`, `h`, `rotation`, `color`, `props`, `node_id`, `updated_at` from the GardenObject attributes; `updated_at` is serialized via `.isoformat()`. All G05 judge tests pass. `make check` exits 0 (491 passed, 10 skipped, 95.90% coverage).
+
+## G06 — apply_fields, find_objects (objects.py)
+Implemented `apply_fields` in `backend/app/objects.py:338`: iterates `fields.items()` and calls `setattr(obj, key, value)` for each. Implemented `find_objects` in `backend/app/objects.py:346`: builds a `select(GardenObject)` query, optionally filters by `kind` via `.where(GardenObject.kind == kind)`, orders by `GardenObject.id`, returns all results. Both G06 judge tests pass. `make check` exits 0 (492 passed, 9 skipped, 95.86% coverage).

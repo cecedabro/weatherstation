@@ -26,7 +26,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g04
 - [x] G05: In backend/app/objects.py fill in `object_json`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g05
-- [ ] G06: In backend/app/objects.py fill in `apply_fields` and `find_objects`
+- [x] G06: In backend/app/objects.py fill in `apply_fields` and `find_objects`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g06
 - [ ] G07: In backend/app/objects.py fill in `idw`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g07

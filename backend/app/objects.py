@@ -340,7 +340,8 @@ def apply_fields(obj: GardenObject, fields: dict[str, Any]) -> None:
 
     TODO (task G06): ``for key, value in fields.items(): setattr(obj, key, value)``.
     """
-    return None
+    for key, value in fields.items():
+        setattr(obj, key, value)
 
 
 def find_objects(db: Session, kind: str | None) -> list[GardenObject]:
@@ -349,7 +350,11 @@ def find_objects(db: Session, kind: str | None) -> list[GardenObject]:
     TODO (task G06): ``select(GardenObject)``, ``.where(GardenObject.kind == kind)`` when *kind*,
     ``.order_by(GardenObject.id)``, return ``list(db.execute(stmt).scalars())``.
     """
-    return []
+    stmt = select(GardenObject)
+    if kind is not None:
+        stmt = stmt.where(GardenObject.kind == kind)
+    stmt = stmt.order_by(GardenObject.id)
+    return list(db.execute(stmt).scalars().all())
 
 
 def idw(
