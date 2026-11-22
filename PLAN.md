@@ -42,5 +42,5 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a12
 - [x] A13: In backend/app/advisor.py fill in `validate_source` (follow the 6 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a13
-- [ ] A14: Make the whole-feature tests pass: run them, read the first failing assert, fix only the function bodies from A01–A13
+- [x] A14: Make the whole-feature tests pass: run them, read the first failing assert, fix only the function bodies from A01–A13
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_growth.py tests/judge/test_step_growth.py -q

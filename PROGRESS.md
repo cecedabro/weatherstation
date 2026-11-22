@@ -36,3 +36,6 @@ Implemented `snippet()` in `backend/app/advisor.py:125`. Given a body of text, a
 
 ## A13 - validate_source
 Implemented `validate_source()` in `backend/app/advisor.py:149`. Validates the source form fields: title (1-200 chars), kind (must be in SOURCE_KINDS), url (empty→None, must start with http/https, ≤500 chars), publisher (empty→None, ≤120 chars), body (1-20000 chars), tags (split/comma, strip, lower, join with ", ", ≤200 chars). Returns (values, errors) tuple with all FORM_FIELDS keys present. All A13 tests pass. `make check` passes (534 passed).
+
+## A14 - whole-feature tests
+Ran `pytest backend/tests/judge/test_growth.py backend/tests/judge/test_step_growth.py` (50 passed) and `make check` (all pass). No code changes needed — all A01–A13 implementations already satisfy the acceptance criteria.
