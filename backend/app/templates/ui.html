@@ -1,0 +1,186 @@
+{#- Garden UI components. Human-owned (docs/design.md).
+    Import in a page with:  {% import "ui.html" as ui %}
+    Every macro here is shown with its call on /styleguide. Pages build their markup from these macros;
+    when a page needs something that is not here, ask for a component instead of writing new CSS. -#}
+
+{#- Page title block. caller() (optional) renders buttons on the right. -#}
+{% macro page_head(title, lede=None) -%}
+<div class="page-head">
+  <div class="page-head-text">
+    <h1>{{ title }}</h1>
+    {% if lede %}<p class="lede">{{ lede }}</p>{% endif %}
+  </div>
+  {% if caller %}<div class="page-actions">{{ caller() }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{#- Glass card. tint: sky|leaf|sun|soil|berry|water|stone. actions: optional HTML-safe string for the head. -#}
+{% macro card(title=None, icon=None, tint=None, id=None, cls="", flush=False, actions=None) -%}
+<section class="card{% if tint %} tint-{{ tint }}{% endif %}{% if flush %} card-flush{% endif %}{% if cls %} {{ cls }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+  {% if title %}<div class="card-head">
+    <h2>{% if icon %}<span class="card-icon" aria-hidden="true">{{ icon }}</span>{% endif %}{{ title }}</h2>
+    {% if actions %}<div class="card-actions">{{ actions }}</div>{% endif %}
+  </div>{% endif %}
+  {{ caller() if caller }}
+</section>
+{%- endmacro %}
+
+{#- Card that is a link (for navigation tiles). -#}
+{% macro link_card(href, title, text=None, icon=None, tint=None, meta=None) -%}
+<a class="card{% if tint %} tint-{{ tint }}{% endif %}" href="{{ href }}">
+  <div class="row"><span class="empty-icon" aria-hidden="true">{{ icon or "🌿" }}</span>
+    <div class="list-main"><h3>{{ title }}</h3>{% if text %}<p class="muted small">{{ text }}</p>{% endif %}</div></div>
+  {% if meta %}<div class="card-foot small muted">{{ meta }}</div>{% endif %}
+</a>
+{%- endmacro %}
+
+{#- Number tile. value=None shows an em dash. -#}
+{% macro stat(label, value, unit=None, icon=None, meta=None, tint=None, big=False, fmt="%.1f") -%}
+<div class="stat{% if tint %} tint-{{ tint }}{% endif %}{% if big %} stat-big{% endif %}">
+  <div class="stat-label">{% if icon %}<span aria-hidden="true">{{ icon }}</span>{% endif %}{{ label }}</div>
+  <div class="stat-value">{% if value is none %}—{% elif value is number %}{{ fmt|format(value) }}{% else %}{{ value }}{% endif %}{% if unit and value is not none %}<span class="stat-unit">{{ unit }}</span>{% endif %}</div>
+  {% if meta %}<div class="stat-meta">{{ meta }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{#- Button or link styled as a button. variant: primary|aqua|danger|quiet|None. -#}
+{% macro button(label, href=None, variant=None, size=None, type="button", icon=None, attrs={}) -%}
+{%- set cls = "btn" ~ (" btn-" ~ variant if variant else "") ~ (" btn-" ~ size if size else "") -%}
+{%- if href -%}
+<a class="{{ cls }}" href="{{ href }}"{% for k, v in attrs.items() %} {{ k }}="{{ v }}"{% endfor %}>{% if icon %}<span aria-hidden="true">{{ icon }}</span>{% endif %}{{ label }}</a>
+{%- else -%}
+<button class="{{ cls }}" type="{{ type }}"{% for k, v in attrs.items() %} {{ k }}="{{ v }}"{% endfor %}>{% if icon %}<span aria-hidden="true">{{ icon }}</span>{% endif %}{{ label }}</button>
+{%- endif -%}
+{%- endmacro %}
+
+{#- Segmented control of links. items: list of (value, label). Marks the current one. -#}
+{% macro seg(items, current, href_for, label="Options") -%}
+<nav class="seg" aria-label="{{ label }}">
+  {% for value, text in items %}<a href="{{ href_for(value) }}"{% if value == current %} aria-current="page"{% endif %}>{{ text }}</a>{% endfor %}
+</nav>
+{%- endmacro %}
+
+{#- Segmented control of buttons for JS (charts.js range switch). -#}
+{% macro seg_buttons(items, current, data_attr="range", label="Range") -%}
+<div class="seg" role="group" aria-label="{{ label }}">
+  {% for value, text in items %}<button type="button" data-{{ data_attr }}="{{ value }}" aria-pressed="{{ 'true' if value == current else 'false' }}">{{ text }}</button>{% endfor %}
+</div>
+{%- endmacro %}
+
+{#- Big tabs (page-level categories). items: list of (href, label, icon, count). -#}
+{% macro tabs(items, current_href) -%}
+<nav class="tabs" aria-label="Sections">
+  {% for href, text, icon, count in items %}<a class="tab" href="{{ href }}"{% if href == current_href %} aria-current="page"{% endif %}>{% if icon %}<span aria-hidden="true">{{ icon }}</span>{% endif %}{{ text }}{% if count is not none %} <span class="tab-count">{{ count }}</span>{% endif %}</a>{% endfor %}
+</nav>
+{%- endmacro %}
+
+{#- Chip. kind: ok|info|warn|bad|off, or urgency low|normal|high|critical (use urgency=). dot adds a status dot. -#}
+{% macro chip(text, kind=None, urgency=None, dot=False, title=None) -%}
+<span class="chip{% if kind %} chip-{{ kind }}{% endif %}{% if urgency %} u-{{ urgency }}{% endif %}{% if dot %} chip-dot{% endif %}"{% if title %} title="{{ title }}"{% endif %}>{{ text }}</span>
+{%- endmacro %}
+
+{% macro online(is_online) -%}{{ chip("Online", "ok", dot=True) if is_online else chip("Offline", "off", dot=True) }}{%- endmacro %}
+
+{#- Categorical colour swatch, n = 1..8 (same order as chart series and map markers). -#}
+{% macro swatch(n) -%}<span class="swatch k{{ ((n - 1) % 8) + 1 }}" aria-hidden="true"></span>{%- endmacro %}
+
+{#- Alert banner. kind: info|ok|warn|bad. caller() (optional) adds extra body content. -#}
+{% macro alert(title, text=None, kind="info", icon=None) -%}
+<div class="alert alert-{{ kind }}" role="{{ 'alert' if kind == 'bad' else 'status' }}">
+  {% if icon %}<span class="alert-icon" aria-hidden="true">{{ icon }}</span>{% endif %}
+  <div class="alert-body"><div class="alert-title">{{ title }}</div>{% if text %}<div>{{ text }}</div>{% endif %}{{ caller() if caller }}</div>
+</div>
+{%- endmacro %}
+
+{#- Table. headers: list of labels; a label ending in "#" is a numeric (right-aligned) column, e.g. "Min °C#".
+    caller() renders the <tr> rows. Wrapped so wide tables scroll inside their card. -#}
+{% macro table(headers, compact=False, caption=None) -%}
+<div class="table-wrap"><table class="table{% if compact %} table-compact{% endif %}">
+  {% if caption %}<caption class="sr-only">{{ caption }}</caption>{% endif %}
+  <thead><tr>{% for h in headers %}{% if h.endswith("#") %}<th class="num" scope="col">{{ h[:-1] }}</th>{% else %}<th scope="col">{{ h }}</th>{% endif %}{% endfor %}</tr></thead>
+  <tbody>{{ caller() }}</tbody>
+</table></div>
+{%- endmacro %}
+
+{#- Form field. type: text|number|date|datetime-local|email|password|textarea|select|checkbox|color|file.
+    options for select: list of (value, label). attrs: extra attributes (min, max, step, placeholder…). -#}
+{% macro field(name, label, type="text", value=None, required=False, hint=None, error=None, options=[], attrs={}, id=None) -%}
+{%- set fid = id or ("f-" ~ name) -%}
+{%- if type == "checkbox" -%}
+<label class="check"><input type="checkbox" id="{{ fid }}" name="{{ name }}" value="1"{% if value %} checked{% endif %}{% for k, v in attrs.items() %} {{ k }}="{{ v }}"{% endfor %}> {{ label }}</label>
+{%- else -%}
+<div class="field{% if error %} field-invalid{% endif %}">
+  <label class="field-label" for="{{ fid }}">{{ label }}{% if required %} <span class="muted" aria-hidden="true">*</span>{% endif %}</label>
+  {%- if type == "textarea" %}
+  <textarea class="textarea" id="{{ fid }}" name="{{ name }}"{% if required %} required{% endif %}{% for k, v in attrs.items() %} {{ k }}="{{ v }}"{% endfor %}>{{ value if value is not none }}</textarea>
+  {%- elif type == "select" %}
+  <select class="select" id="{{ fid }}" name="{{ name }}"{% if required %} required{% endif %}{% for k, v in attrs.items() %} {{ k }}="{{ v }}"{% endfor %}>
+    {% for v, t in options %}<option value="{{ v }}"{% if v|string == value|string %} selected{% endif %}>{{ t }}</option>{% endfor %}
+  </select>
+  {%- else %}
+  <input class="input" type="{{ type }}" id="{{ fid }}" name="{{ name }}"{% if value is not none %} value="{{ value }}"{% endif %}{% if required %} required{% endif %}{% for k, v in attrs.items() %} {{ k }}="{{ v }}"{% endfor %}>
+  {%- endif %}
+  {% if hint %}<span class="field-hint">{{ hint }}</span>{% endif %}
+  {% if error %}<span class="field-error">{{ error }}</span>{% endif %}
+</div>
+{%- endif -%}
+{%- endmacro %}
+
+{#- List row. caller() (optional) renders action buttons on the right. -#}
+{% macro list_item(title, meta=[], icon=None, done=False, href=None) -%}
+<li class="list-item{% if done %} list-done{% endif %}">
+  {% if icon %}<span class="thumb" aria-hidden="true">{{ icon }}</span>{% endif %}
+  <div class="list-main">
+    <div class="list-title">{% if href %}<a href="{{ href }}">{{ title }}</a>{% else %}{{ title }}{% endif %}</div>
+    {% if meta %}<div class="list-meta">{% for m in meta %}<span>{{ m }}</span>{% endfor %}</div>{% endif %}
+  </div>
+  {% if caller %}<div class="list-actions">{{ caller() }}</div>{% endif %}
+</li>
+{%- endmacro %}
+
+{#- Definition list. items: list of (label, value). -#}
+{% macro kv(items) -%}
+<dl class="kv">{% for k, v in items %}<dt>{{ k }}</dt><dd>{{ v if v is not none and v != "" else "—" }}</dd>{% endfor %}</dl>
+{%- endmacro %}
+
+{#- Friendly empty state. -#}
+{% macro empty(title, text=None, icon="🌱", action_href=None, action_label=None) -%}
+<div class="empty">
+  <div class="empty-icon" aria-hidden="true">{{ icon }}</div>
+  <div class="empty-title">{{ title }}</div>
+  {% if text %}<p class="empty-text">{{ text }}</p>{% endif %}
+  {% if action_href %}{{ button(action_label or "Add", href=action_href, variant="primary") }}{% endif %}
+</div>
+{%- endmacro %}
+
+{#- Progress bar, pct 0..100. -#}
+{% macro progress(pct, label) -%}
+<div class="progress" role="progressbar" aria-label="{{ label }}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct|round|int }}"><span class="progress-fill" style="width:{{ [[pct, 0]|max, 100]|min }}%"></span></div>
+{%- endmacro %}
+
+{#- Time element: relative text, exact local time on hover. -#}
+{% macro when(dt) -%}
+{%- if dt -%}<time datetime="{{ dt.isoformat() }}" title="{{ dt|local_time }}">{{ ago(dt) }}</time>{%- else -%}—{%- endif -%}
+{%- endmacro %}
+
+{#- Time-series chart drawn by js/charts.js from /api/v1/series.
+    series: list of (node, metric, label). kind: line|bar|area. range: 24h|7d|30d|90d|365d (charts.js picks the step).
+    x="hour" compares days: series are (node, metric, label, "YYYY-MM-DD") and the x axis is the hour of day.
+    Charts inside one element with data-chart-group share the range buttons in that group. -#}
+{% macro chart(title, series, unit="", kind="line", range="7d", height=240, small=False, x="time") -%}
+<figure class="chart{% if small %} chart-sm{% endif %}">
+  <figcaption class="chart-head"><span class="chart-title">{{ title }}</span>
+    <span class="legend">{% for s in series %}<span class="legend-item">{{ swatch(loop.index) }}{{ s[2] }}{% if x == "hour" %} · {{ s[3] }}{% endif %}</span>{% endfor %}</span>
+  </figcaption>
+  <div class="chart-plot" data-chart data-kind="{{ kind }}" data-unit="{{ unit }}" data-range="{{ range }}" data-height="{{ height }}"{% if x == "hour" %} data-x="hour"{% endif %}
+       data-series='{{ series|map("list")|list|tojson }}' role="img" aria-label="{{ title }} chart, {{ series|length }} series"></div>
+</figure>
+{%- endmacro %}
+
+{#- Dialog shell: open with a button that has data-open="<id>", close with data-close. -#}
+{% macro dialog(id, title) -%}
+<dialog class="dialog" id="{{ id }}" aria-labelledby="{{ id }}-title">
+  <div class="dialog-head"><h3 id="{{ id }}-title">{{ title }}</h3>{{ button("✕", size="sm", attrs={"data-close": "", "aria-label": "Close"}) }}</div>
+  {{ caller() }}
+</dialog>
+{%- endmacro %}

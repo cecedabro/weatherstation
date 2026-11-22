@@ -1,46 +1,45 @@
+{#- Page layout. Human-owned (docs/design.md). Pages set `active` (a NAV key) and fill the blocks. -#}
+{% import "ui.html" as ui %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Garden{% endblock %} · Volkstuin Landsmeer</title>
+  <meta name="description" content="{% block description %}Garden sensors, planting log and plans for the volkstuin near Landsmeer.{% endblock %}">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-  <title>{% block title %}Weather Station{% endblock %}</title>
-  <meta name="description" content="{% block description %}Garden weather station near Landsmeer{% endblock %}">
-  <link rel="stylesheet" href="/static/style.css">
-  <script src="/static/vendor/htmx.min.js"></script>
+  <link rel="stylesheet" href="/static/css/tokens.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+  <script src="/static/js/ui.js" defer></script>
+  <script src="/static/vendor/htmx.min.js" defer></script>
   {% block head %}{% endblock %}
 </head>
 <body>
-
-  <!-- Water bubble decorations -->
-  <div class="bubble"></div>
-  <div class="bubble"></div>
-  <div class="bubble"></div>
-  <div class="bubble"></div>
-
-  <header class="header">
-    <div>
-      <h1>{% block header_title %}<span aria-hidden="true">&#x1F33F;</span> Weather<span>Station</span>{% endblock %}</h1>
+  <div class="bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/"><span class="brand-orb" aria-hidden="true"></span>Garden</a>
+      <nav class="nav" aria-label="Main">
+        {% for key, href, label, icon, private in nav %}
+        {% if not private or user %}<a href="{{ href }}"{% if active == key %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true">{{ icon }}</span>{{ label }}</a>{% endif %}
+        {% endfor %}
+      </nav>
+      <div class="topbar-actions">
+        {{ ui.button("◐", size="sm", attrs={"data-theme-toggle": "", "aria-label": "Switch light or dark", "title": "Light / dark"}) }}
+        {% if user %}
+        <form method="post" action="/logout">{{ ui.button("Sign out", size="sm", type="submit", variant="quiet") }}</form>
+        {% else %}
+        {{ ui.button("Sign in", href="/login?next=" ~ (path|urlencode), size="sm") }}
+        {% endif %}
+      </div>
     </div>
-    <div class="header-logo">{% block header_logo %}<span aria-hidden="true">&#x1F33B;</span>{% endblock %}</div>
   </header>
-
-  <nav aria-label="Main" class="nav">
-    <a href="/" {% if active == 'home' %}aria-current="page"{% endif %} class="nav-link {% if active == 'home' %}active{% endif %}">Home</a>
-    <a href="/weather" {% if active == 'weather' %}aria-current="page"{% endif %} class="nav-link {% if active == 'weather' %}active{% endif %}">Weather</a>
-    <a href="/soil" {% if active == 'soil' %}aria-current="page"{% endif %} class="nav-link {% if active == 'soil' %}active{% endif %}">Soil</a>
-    <a href="/history" {% if active == 'history' %}aria-current="page"{% endif %} class="nav-link {% if active == 'history' %}active{% endif %}">History</a>
-    <a href="/about" {% if active == 'about' %}aria-current="page"{% endif %} class="nav-link {% if active == 'about' %}active{% endif %}">About</a>
-  </nav>
-
-  <main class="container">
+  <main class="page" id="main">
     {% block content %}{% endblock %}
   </main>
-
-  <footer class="footer">
-    {% block footer %}Weather Station <span aria-hidden="true">&#x2764;&#xFE0F;</span>{% endblock %}
-  </footer>
-
+  <footer class="footer">{% block footer %}Volkstuin Landsmeer · sensors, seeds and plans{% endblock %}</footer>
   {% block scripts %}{% endblock %}
 </body>
 </html>

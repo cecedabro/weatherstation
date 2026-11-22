@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Styleguide{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/vendor/uPlot.min.css">
+<script src="/static/vendor/uPlot.iife.min.js" defer></script>
+<script src="/static/js/charts.js" defer></script>{% endblock %}
+{% block content %}
+{{ ui.page_head("Styleguide", "Every component, live, with the template code that makes it. Pages use only these.") }}
+{% for group, items in examples|groupby("group") %}
+<h2 class="section">{{ group }}</h2>
+<div class="stack section">
+  {% for ex in items %}
+  {% call ui.card(ex.name) %}
+    <div class="stack">
+      <div>{{ ex.html }}</div>
+      <pre><code>{{ ex.code }}</code></pre>
+    </div>
+  {% endcall %}
+  {% endfor %}
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,7 +1,7 @@
 """Tests for /admin with Basic auth and node health table (T15, SPEC 6).
 
-SPEC 6.1: GET /admin requires HTTP Basic auth (ADMIN_USER / ADMIN_PASSWORD);
-          wrong or missing credentials → 401.
+SPEC 6.1: GET /admin requires a signed-in user (cookie, or HTTP Basic for scripts);
+          wrong Basic credentials → 401, none → redirect to /login.
 SPEC 6.2: Lists every node with last_seen, online state, last battery voltage
           and RSSI, flags nodes offline > 15 min and batteries < 3.4 V.
 SPEC 6.3: Shows, per node, the count of readings in the last 24 h.
@@ -136,9 +136,10 @@ def all_nodes(db: Session) -> Session:
 
 
 def test_admin_requires_basic_auth(client):
-    """SPEC 6.1: GET /admin without credentials returns 401."""
-    resp = client.get("/admin")
-    assert resp.status_code == 401
+    """SPEC 6.1: GET /admin without credentials goes to the sign-in page."""
+    resp = client.get("/admin", follow_redirects=False)
+    assert resp.status_code == 303
+    assert resp.headers["location"].startswith("/login?next=/admin")
 
 
 def test_admin_wrong_credentials(client):

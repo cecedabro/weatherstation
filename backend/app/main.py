@@ -3,15 +3,15 @@
 import logging
 from collections.abc import Awaitable, Callable
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import text
 from starlette.responses import Response
 
-from app.config import _DEV_ADMIN_PASSWORD, _DEV_INGEST_TOKEN, Settings
+from app.config import _DEV_ADMIN_PASSWORD, _DEV_INGEST_TOKEN, _DEV_SESSION_SECRET, Settings
 
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
 
@@ -60,6 +60,11 @@ def create_app() -> FastAPI:
                 "APP_ENV=production but ADMIN_PASSWORD has its development default. "
                 "Set a strong ADMIN_PASSWORD before starting in production."
             )
+        if settings.SESSION_SECRET == _DEV_SESSION_SECRET:
+            raise RuntimeError(
+                "APP_ENV=production but SESSION_SECRET has its development default. "
+                "Set a long random SESSION_SECRET before starting in production."
+            )
 
     # Serve static files (CSS, JS, vendor libs)
     application.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
@@ -79,6 +84,18 @@ def create_app() -> FastAPI:
         except Exception:
             return JSONResponse(status_code=503, content={"status": "unavailable"})
 
+    from app.auth import LoginRequired
+    from app.auth import router as auth_router
+
+    @application.exception_handler(LoginRequired)
+    async def login_required(request: Request, exc: LoginRequired) -> Response:
+        """Private pages: HTML goes to the sign-in page, API calls get 401."""
+        if request.url.path.startswith("/api/") or "authorization" in request.headers:
+            return JSONResponse(status_code=401, content={"detail": "Sign in required"})
+        return RedirectResponse(f"/login?next={quote(exc.next_path)}", status_code=303)
+
+    application.include_router(auth_router)
+
     from app.web import router as web_router
 
     application.include_router(web_router)
@@ -95,13 +112,6 @@ def create_app() -> FastAPI:
 
     application.include_router(ingest_router)
 
-    _BASE_DIR = Path(__file__).resolve().parent
-    _TEMPLATE_DIR = _BASE_DIR / "templates"
-    _jinja_env = Environment(
-        loader=FileSystemLoader(str(_TEMPLATE_DIR)),
-        autoescape=True,
-    )
-
     @application.exception_handler(404)
     async def not_found_handler(
         request: Request, exc: HTTPException
@@ -109,9 +119,9 @@ def create_app() -> FastAPI:
         """SPEC 10.9: HTML 404 for non-API paths, JSON 404 for /api/ paths."""
         if request.url.path.startswith("/api/"):
             return JSONResponse(status_code=404, content={"detail": "Not found"})
-        template = _jinja_env.get_template("404.html")
-        html = template.render()
-        return HTMLResponse(content=html, status_code=404)
+        from app.templating import render
+
+        return render(request, "404.html", 404)
 
     return application
 

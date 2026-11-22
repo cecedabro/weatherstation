@@ -1,47 +1,36 @@
 {% extends "base.html" %}
-
-{% block title %}Weather Station — Live Conditions{% endblock %}
-{% block description %}Current weather and soil conditions for the garden near Landsmeer — temperature, humidity, rainfall, and soil moisture at a glance.{% endblock %}
-
+{% block title %}Overview{% endblock %}
+{% block description %}Live weather and soil conditions in the volkstuin near Landsmeer.{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/vendor/uPlot.min.css">
+<script src="/static/vendor/uPlot.iife.min.js" defer></script>
+<script src="/static/js/charts.js" defer></script>{% endblock %}
 {% block content %}
+{{ ui.page_head("Overview", "What is happening in the garden right now.") }}
 
-{% include "_current.html" %}
+{% include "_now.html" %}
 
-<section class="card" id="chart-section">
-  <h2><span class="icon" aria-hidden="true">&#x1F4C8;</span> History</h2>
-  <div class="chart-selector">
-    {% for sel in chart_selectors %}
-    <a href="/api/v1/series?from={{ sel.from }}&to={{ sel.to }}&step={{ sel.step }}&metric=temp_c"
-       class="btn-glossy chart-btn"
-       data-step="{{ sel.step }}"
-       data-from="{{ sel.from }}"
-       data-to="{{ sel.to }}">
-      {{ sel.label }}
-    </a>
-    {% endfor %}
+{% if weather_nodes or soil_nodes %}
+<div class="grid-2 section" data-chart-group>
+  <div class="span-all row-between">
+    <h2>Last days</h2>
+    {{ ui.seg_buttons([("24h", "Day"), ("7d", "Week"), ("30d", "Month")], "7d") }}
   </div>
-  <div id="chart-container"
-        class="chart-container"
-        data-chart
-        data-node="{{ first_weather_node or '' }}"
-        data-metric="temp_c"
-        role="img"
-        aria-label="Temperature chart for {{ first_weather_node or 'no node' }}"></div>
-</section>
+  {% if weather_nodes %}
+  {% call ui.card(tint="sun") %}{{ ui.chart("Air temperature", [(weather_nodes[0].node_id, "temp_c", "Air")], unit="°C") }}{% endcall %}
+  {% call ui.card(tint="water") %}{{ ui.chart("Rain", [(weather_nodes[0].node_id, "rain_mm", "Rain")], unit="mm", kind="bar") }}{% endcall %}
+  {% endif %}
+  {% if soil_nodes %}
+  {% call ui.card(tint="soil", cls="span-all") %}{{ ui.chart("Soil moisture", soil_nodes|map(attribute="node_id")|map("moisture_series")|list, unit="%") }}{% endcall %}
+  {% endif %}
+</div>
+{% endif %}
 
-{% endblock %}
-
-{% block scripts %}
-<noscript>
-  <style>.chart-container{min-height:60px;}</style>
-  <div class="card" style="margin-bottom:var(--space-4xl)">
-    <p>Charts require JavaScript to display. Without JavaScript, historical data cannot be visualized.</p>
-  </div>
-</noscript>
-<link rel="stylesheet" href="/static/vendor/uPlot.min.css">
-<script src="/static/vendor/uPlot.iife.min.js"></script>
-<script src="/static/chart-helpers.js"></script>
-<script src="/static/chart.js"
-        data-node="{{ first_weather_node or '' }}"
-        data-metric="temp_c"></script>
+{% if user %}
+<div class="grid section">
+  {{ ui.link_card("/garden", "Garden map", "Beds, sensors and what grows where.", "🗺️", "leaf") }}
+  {{ ui.link_card("/seeds", "Seed log", "What you sowed, where and when.", "🌱", "sun") }}
+  {{ ui.link_card("/tasks", "Tasks", "Jobs and reminders.", "✅", "sky") }}
+  {{ ui.link_card("/species", "Species", "Finds and the common-species catalogue.", "🐞", "berry") }}
+</div>
+{% endif %}
 {% endblock %}

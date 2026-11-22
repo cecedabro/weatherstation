@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{{ ui.page_head(title) }}
+{% call ui.card(tint="leaf") %}{{ ui.empty(title ~ " is being built", text, icon) }}{% endcall %}
+{% endblock %}

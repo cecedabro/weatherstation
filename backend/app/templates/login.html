@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<div class="login">
+  {% call ui.card(tint="leaf") %}
+    <span class="brand-orb" aria-hidden="true"></span>
+    <h1 class="center">Sign in</h1>
+    <p class="muted center">The garden map, seed log, tasks and species are private.</p>
+    {% if error %}{{ ui.alert(error, kind="bad") }}{% endif %}
+    <form class="form section" method="post" action="/login">
+      <input type="hidden" name="next" value="{{ next }}">
+      {{ ui.field("username", "Name", required=True, attrs={"autocomplete": "username", "autofocus": ""}) }}
+      {{ ui.field("password", "Password", "password", required=True, attrs={"autocomplete": "current-password"}) }}
+      <div class="form-actions">{{ ui.button("Sign in", type="submit", variant="primary") }}</div>
+    </form>
+  {% endcall %}
+</div>
+{% endblock %}

@@ -56,7 +56,7 @@ def _daily_fixture(db: Session):
     Day offset 2 (3 days before now): temp 15.0 & 18.0, humidity 55.0, rain 2.0
     Day offset 1 (yesterday):      temp 20.0 & 24.0, humidity 60.0 & 70.0, rain 5.5
     """
-    now = _now()
+    now = _now().replace(hour=12, minute=0, second=0, microsecond=0)  # midday: no date flake
     node_id = "weather-daily"
 
     # Day offset 2 -- two readings on this UTC day

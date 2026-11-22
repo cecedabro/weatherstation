@@ -10,7 +10,7 @@ fmt:
 	cd backend && uv run ruff format . && uv run ruff check --fix .
 
 check:
-	@if [ -d backend ]; then cd backend && uv run ruff check . && uv run mypy app && uv run pytest -q ../contract/tests tests --cov=app --cov-fail-under=90 && bandit -r app -q -ll; fi
+	@if [ -d backend ]; then cd backend && uv run ruff check . && uv run mypy app && uv run pytest -q -m "not accept" ../contract/tests tests --cov=app --cov-fail-under=90 && bandit -r app -q -ll; fi
 	@for f in $(wildcard backend/app/static/*.js); do node --check $$f || exit 1; done
 	@if [ -d gateway ]; then cd gateway && uv run ruff check . && uv run mypy gateway && uv run pytest -q; fi
 	@if [ -n "$${DATABASE_URL:-}" ] && [ -f tests/ci/check-migrations.sh ]; then $(MAKE) -s migcheck; fi

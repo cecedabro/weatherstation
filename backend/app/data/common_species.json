@@ -1,0 +1,226 @@
+[
+ {
+  "name": "Ground elder",
+  "latin": "Aegopodium podagraria",
+  "kind": "plant",
+  "verdict": "invasive",
+  "description": "Zevenblad. Spreads by white underground runners; dig out every piece of root."
+ },
+ {
+  "name": "Field bindweed",
+  "latin": "Convolvulus arvensis",
+  "kind": "plant",
+  "verdict": "invasive",
+  "description": "Akkerwinde. Deep roots, twines around crops. Remove before it flowers."
+ },
+ {
+  "name": "Hedge bindweed",
+  "latin": "Calystegia sepium",
+  "kind": "plant",
+  "verdict": "invasive",
+  "description": "Haagwinde. Large white trumpets; brittle white roots regrow from fragments."
+ },
+ {
+  "name": "Couch grass",
+  "latin": "Elymus repens",
+  "kind": "plant",
+  "verdict": "invasive",
+  "description": "Kweek. Wiry runners through beds; fork out, do not rotavate."
+ },
+ {
+  "name": "Creeping thistle",
+  "latin": "Cirsium arvense",
+  "kind": "plant",
+  "verdict": "harmful",
+  "description": "Akkerdistel. Spreads by roots and seed; cut before flowering."
+ },
+ {
+  "name": "Japanese knotweed",
+  "latin": "Reynoutria japonica",
+  "kind": "plant",
+  "verdict": "invasive",
+  "description": "Japanse duizendknoop. Report and do not dig yourself; fragments regrow."
+ },
+ {
+  "name": "Common nettle",
+  "latin": "Urtica dioica",
+  "kind": "plant",
+  "verdict": "neutral",
+  "description": "Grote brandnetel. Good for butterflies and nettle tea fertiliser; keep it in a corner."
+ },
+ {
+  "name": "Dandelion",
+  "latin": "Taraxacum officinale",
+  "kind": "plant",
+  "verdict": "neutral",
+  "description": "Paardenbloem. Early food for bees; remove from beds before it seeds."
+ },
+ {
+  "name": "Chickweed",
+  "latin": "Stellaria media",
+  "kind": "plant",
+  "verdict": "neutral",
+  "description": "Vogelmuur. Shallow annual weed, easy to hoe; edible."
+ },
+ {
+  "name": "Hairy bittercress",
+  "latin": "Cardamine hirsuta",
+  "kind": "plant",
+  "verdict": "neutral",
+  "description": "Kleine veldkers. Seeds explosively; pull before the pods ripen."
+ },
+ {
+  "name": "Horsetail",
+  "latin": "Equisetum arvense",
+  "kind": "plant",
+  "verdict": "invasive",
+  "description": "Heermoes. Very deep rhizomes, likes wet soil; keep cutting it down."
+ },
+ {
+  "name": "Common comfrey",
+  "latin": "Symphytum officinale",
+  "kind": "plant",
+  "verdict": "beneficial",
+  "description": "Smeerwortel. Deep roots, leaves make potassium-rich liquid feed."
+ },
+ {
+  "name": "Phacelia",
+  "latin": "Phacelia tanacetifolia",
+  "kind": "plant",
+  "verdict": "beneficial",
+  "description": "Phacelia. Green manure and bee magnet."
+ },
+ {
+  "name": "Seven-spot ladybird",
+  "latin": "Coccinella septempunctata",
+  "kind": "insect",
+  "verdict": "beneficial",
+  "description": "Zevenstippelig lieveheersbeestje. Adults and larvae eat aphids."
+ },
+ {
+  "name": "Harlequin ladybird",
+  "latin": "Harmonia axyridis",
+  "kind": "insect",
+  "verdict": "neutral",
+  "description": "Veelkleurig Aziatisch lieveheersbeestje. Eats aphids but outcompetes native ladybirds."
+ },
+ {
+  "name": "Hoverfly",
+  "latin": "Syrphidae",
+  "kind": "insect",
+  "verdict": "beneficial",
+  "description": "Zweefvlieg. Pollinator; larvae eat aphids."
+ },
+ {
+  "name": "Common earwig",
+  "latin": "Forficula auricularia",
+  "kind": "insect",
+  "verdict": "neutral",
+  "description": "Oorworm. Eats aphids, but also nibbles dahlias and fruit."
+ },
+ {
+  "name": "Black bean aphid",
+  "latin": "Aphis fabae",
+  "kind": "insect",
+  "verdict": "harmful",
+  "description": "Zwarte bonenluis. Colonies on broad bean tips; pinch tips out."
+ },
+ {
+  "name": "Cabbage white",
+  "latin": "Pieris brassicae",
+  "kind": "insect",
+  "verdict": "harmful",
+  "description": "Groot koolwitje. Caterpillars strip brassicas; use netting."
+ },
+ {
+  "name": "Carrot fly",
+  "latin": "Psila rosae",
+  "kind": "insect",
+  "verdict": "harmful",
+  "description": "Wortelvlieg. Larvae tunnel carrots; use fleece or sow late."
+ },
+ {
+  "name": "Lily beetle",
+  "latin": "Lilioceris lilii",
+  "kind": "insect",
+  "verdict": "harmful",
+  "description": "Leliehaantje. Bright red beetle that eats lilies and fritillaries."
+ },
+ {
+  "name": "Box tree moth",
+  "latin": "Cydalima perspectalis",
+  "kind": "insect",
+  "verdict": "invasive",
+  "description": "Buxusmot. Caterpillars defoliate box hedges."
+ },
+ {
+  "name": "Spanish slug",
+  "latin": "Arion vulgaris",
+  "kind": "other",
+  "verdict": "harmful",
+  "description": "Spaanse wegslak. Eats seedlings; collect in the evening."
+ },
+ {
+  "name": "Leopard slug",
+  "latin": "Limax maximus",
+  "kind": "other",
+  "verdict": "beneficial",
+  "description": "Grote aardslak. Eats other slugs and dead plant matter; leave it."
+ },
+ {
+  "name": "Common earthworm",
+  "latin": "Lumbricus terrestris",
+  "kind": "other",
+  "verdict": "beneficial",
+  "description": "Regenworm. Aerates the soil and mixes in organic matter."
+ },
+ {
+  "name": "Common toad",
+  "latin": "Bufo bufo",
+  "kind": "other",
+  "verdict": "beneficial",
+  "description": "Gewone pad. Eats slugs and insects; keep a damp shady corner."
+ },
+ {
+  "name": "Hedgehog",
+  "latin": "Erinaceus europaeus",
+  "kind": "mammal",
+  "verdict": "beneficial",
+  "description": "Egel. Eats slugs and beetles; leave a gap under fences."
+ },
+ {
+  "name": "Brown rat",
+  "latin": "Rattus norvegicus",
+  "kind": "mammal",
+  "verdict": "harmful",
+  "description": "Bruine rat. Attracted to compost and fallen fruit; keep the compost closed."
+ },
+ {
+  "name": "Common blackbird",
+  "latin": "Turdus merula",
+  "kind": "bird",
+  "verdict": "neutral",
+  "description": "Merel. Eats worms and slugs, but also berries; net soft fruit."
+ },
+ {
+  "name": "Grey mould",
+  "latin": "Botrytis cinerea",
+  "kind": "fungus",
+  "verdict": "harmful",
+  "description": "Grauwe schimmel. Grey fuzz on soft fruit and seedlings; improve airflow."
+ },
+ {
+  "name": "Potato blight",
+  "latin": "Phytophthora infestans",
+  "kind": "fungus",
+  "verdict": "harmful",
+  "description": "Aardappelziekte. Brown patches on potato and tomato leaves in wet summers."
+ },
+ {
+  "name": "Powdery mildew",
+  "latin": "Erysiphales",
+  "kind": "fungus",
+  "verdict": "harmful",
+  "description": "Echte meeldauw. White powder on courgettes and peas; water the soil, not the leaves."
+ }
+]

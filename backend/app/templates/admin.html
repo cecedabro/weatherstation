@@ -1,82 +1,21 @@
 {% extends "base.html" %}
-
-{% block title %}Weather Station — Admin{% endblock %}
-
-{% block header_title %}<span aria-hidden="true">&#x1F527;</span> Weather<span>Station Admin</span>{% endblock %}
-{% block header_logo %}<span aria-hidden="true">&#x1F512;</span>{% endblock %}
-
+{% block title %}Node health{% endblock %}
 {% block content %}
-
-<nav class="back-to-site" aria-label="Admin navigation">
-  <a href="/">← Back to Website</a>
-</nav>
-
-<section class="card">
-  <h2><span class="icon" aria-hidden="true">&#x1F4CA;</span> Node Health</h2>
-
+{{ ui.page_head("Node health", "Which sensors are online, their batteries and how much they sent today.") }}
+{% call ui.card("Nodes", "📡") %}
   {% if nodes %}
-  <div class="admin-table-wrapper">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Node</th>
-          <th>Type</th>
-          <th>Last Seen</th>
-          <th>Online</th>
-          <th>Battery</th>
-          <th>RSSI</th>
-          <th>24 h Readings</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for node in nodes %}
-        <tr class="{% if not node.online %}row-offline{% endif %}{% if node.low_battery %} row-low-battery{% endif %}">
-          <td class="node-id">{{ node.node_id }}</td>
-          <td>{{ node.node_type }}</td>
-          <td>
-            <time datetime="{{ node.last_seen }}" title="{{ node.last_seen|local_time }}">
-              {{ node.last_seen|ago(now)|escape }}
-            </time>
-            <span class="last-seen-local">{{ node.last_seen|local_time|escape }}</span>
-          </td>
-          <td>
-            {% if node.online %}
-              <span class="badge badge-online">Online</span>
-            {% else %}
-              <span class="badge badge-offline">Offline</span>
-            {% endif %}
-          </td>
-          <td>
-            {% if node.low_battery %}
-              <span class="badge badge-low-battery">{{ "%.2f"|format(node.battery_v) }} V</span>
-            {% elif node.battery_v is not none %}
-              {{ "%.2f"|format(node.battery_v) }} V
-            {% else %}
-              &mdash;
-            {% endif %}
-          </td>
-          <td>
-            {% if node.rssi_dbm is not none %}
-              {{ node.rssi_dbm }} dBm
-            {% else %}
-              &mdash;
-            {% endif %}
-          </td>
-          <td>{{ node.readings_24h }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% else %}
-  <div class="empty-state">
-    <div class="empty-icon" aria-hidden="true">&#x1F50D;</div>
-    <h2>No Nodes Registered</h2>
-    <p style="color: var(--color-text-muted); font-size: 15px;">
-      No sensor nodes have reported yet. The table will appear once nodes send their first reading.
-    </p>
-  </div>
-  {% endif %}
-</section>
-
+  {% call ui.table(["Node", "Type", "Last Seen", "Online", "Battery#", "RSSI#", "24 h Readings#"]) %}
+    {% for n in nodes %}
+    <tr{% if not n.online or n.low_battery %} class="row-alert"{% endif %}>
+      <td class="strong">{{ n.node_id }}</td><td>{{ n.node_type }}</td>
+      <td class="small"><time datetime="{{ n.last_seen }}" title="{{ n.last_seen|local_time }}">{{ n.last_seen|ago(now) }}</time></td>
+      <td>{{ ui.online(n.online) }}</td>
+      <td class="num">{% if n.battery_v is not none %}{% if n.low_battery %}{{ ui.chip("%.2f V"|format(n.battery_v), "bad") }}{% else %}{{ "%.2f V"|format(n.battery_v) }}{% endif %}{% else %}—{% endif %}</td>
+      <td class="num">{{ (n.rssi_dbm ~ " dBm") if n.rssi_dbm is not none else "—" }}</td>
+      <td class="num">{{ n.readings_24h }}</td>
+    </tr>
+    {% endfor %}
+  {% endcall %}
+  {% else %}{{ ui.empty("No nodes registered", "The table fills once nodes send their first reading.", "🔍") }}{% endif %}
+{% endcall %}
 {% endblock %}

@@ -1,40 +1,42 @@
-# Design brief — Frutiger Aero (your call)
+# Design system (human-owned)
 
-Visual design is yours to own. The brief is the *aesthetic*, not pixel specs.
-Make deliberate choices and keep them consistent across the site.
+The look is **Frutiger Aero, fresh-Apple frosted glass**: sky and leaf colours, glass cards with a soft
+sheen, glossy candy buttons, calm motion. It is finished and lives in a few human-owned files. **You do not
+write CSS.** You build pages from the components that exist.
 
-## Starting point: `index.html`
-The repo root has `index.html`, a landing-page mock that Cédric already approved.
-Reuse its palette, glass cards, fonts and spacing as your design tokens in T11
-(copy the CSS into `static/`, don't link to the file). Don't edit `index.html`.
+## Where it lives
+| File | What |
+|---|---|
+| `backend/app/static/css/tokens.css` | Colours, glass, shadows, radius, spacing (light + dark) |
+| `backend/app/static/css/base.css` | Reset, background scene, type, page frame, layout helpers |
+| `backend/app/static/css/components.css` | Every component class |
+| `backend/app/templates/ui.html` | Jinja macros that output those components |
+| `backend/app/templates/base.html` | The page layout (top bar, nav, main, footer) |
+| `backend/app/styleguide.py` + `/styleguide` | Every component, live, with the exact call |
+| `backend/app/static/js/ui.js` | Theme switch, dialogs, confirm, live "x min ago" |
+| `backend/app/static/js/charts.js` | Draws every `ui.chart()` with uPlot |
 
-## The look: Frutiger Aero
-The optimistic mid-2000s "clean tech + nature" aesthetic. Think: glossy but
-clean, translucent glass surfaces, soft gradients, water and greenery, bright
-skies, rounded shapes, a sense of calm and abundance. It fits a garden weather
-station well.
+All of these are in `.agent-protected`: the harness rejects changes to them.
 
-Pull it off with, for example:
-- Palette: sky blues and fresh greens, white, with glass/translucent panels over
-  a soft gradient or a subtle nature background. Good contrast for text, always.
-- Surfaces: frosted-glass cards (backdrop blur), soft shadows, generous rounding,
-  a subtle gloss/highlight on primary elements — without burying the data.
-- Typography: a clean humanist sans (e.g. the Frutiger-adjacent free fonts); large,
-  confident numbers for current conditions.
-- Motion: gentle, optional, never blocking. Respect `prefers-reduced-motion`.
-- Imagery/icons: simple weather and plant motifs; keep them light so the page
-  stays fast and legible.
+## How to build a page
+1. `{% extends "base.html" %}` (it already imports `ui`). Set `active` in the route (a key of `NAV` in
+   `app/templating.py`) so the nav marks the page.
+2. Open `/styleguide` (or `app/styleguide.py`) and copy the calls you need: `ui.page_head`, `ui.card`,
+   `ui.stat`, `ui.table`, `ui.field`, `ui.chart`, `ui.chip`, `ui.alert`, `ui.empty`, `ui.list_item`, …
+3. Lay cards out with the layout classes from `base.css`: `grid`, `grid-2`, `grid-3`, `split`, `stack`,
+   `row`, `row-between`, `section`, `span-all`. Text helpers: `muted`, `small`, `num`, `strong`.
+4. Render from the route with `app.templating.render(request, "page.html", active="tasks", **ctx)`.
 
-## Non-negotiables (these beat the aesthetic)
-- Readability and contrast (WCAG AA) win over gloss. The numbers are the point.
-- Fast and self-contained: vendor fonts/CSS/JS locally, no third-party CDNs, no
-  heavy image payloads. The site runs on the homelab for a handful of viewers.
-- Responsive to 360px; the glass/gradient must not cause horizontal scroll or
-  unreadable text on a phone in sunlight.
-- Accessible: semantic HTML, focus states, alt text, reduced-motion support.
+## Rules (tests/test_design_system.py enforces them)
+- Only classes defined in `static/css/` may appear in templates and JS.
+- No `<style>` blocks, no `style=""` attributes, no new `.css` files.
+- No inline `<script>`; page JS goes in `static/js/pages/<page>.js` (you may write these) and uses existing
+  classes only. Never restyle anything from JS.
+- Colours for categories always come from the swatch order `ui.swatch(1..8)` (same as chart series), so a
+  bed, a crop or a sensor keeps its colour everywhere.
+- Status colours: ok = good, info = neutral, warn = attention, bad = act now, off = inactive. Urgency
+  uses `ui.chip(text, urgency="low|normal|high|critical")`.
+- Every page needs an empty state (`ui.empty`) and must work at 360 px wide.
 
-## What to keep consistent
-Pick a small set of design tokens (colours, radius, blur, spacing, type scale),
-put them in CSS custom properties in one stylesheet, and reuse them. Record the
-palette and font choice in PROGRESS.md so later tasks stay consistent. The admin
-page can be plainer; the public page carries the aesthetic.
+If a page needs something that does not exist, use the closest component and write in `PROGRESS.md`
+what you were missing. The human adds components; you never add CSS.

@@ -3,7 +3,8 @@
 Private garden weather station: ESP32 sensor nodes → Raspberry Pi → k3s backend
 → public site at garden.cedricschippers.dev, with an admin view of node health.
 
-`index.html` is the approved look-and-feel mock (reference only).
+The look is a finished design system (Frutiger Aero, frosted glass): see `docs/design.md` and `/styleguide`.
+What is done, running and planned: [docs/roadmap.md](docs/roadmap.md). How agent loops are built: [docs/loops.md](docs/loops.md).
 
 Built incrementally by a local coding agent. If you are that agent, start with
 `AGENTS.md`. If you are a human, the plan is `PLAN.md` and the requirements are
@@ -14,14 +15,16 @@ Built incrementally by a local coding agent. If you are that agent, start with
 ### Pages
 | Route | Description |
 |---|---|
-| `/` | Home — current conditions per node, alerts, and chart selectors |
-| `/weather` | Weather readings with chart selector |
-| `/soil` | All soil sensor readings |
-| `/soil/{node_id}` | Single soil node detail page with charts |
-| `/history` | 30-day daily aggregation table with node selector |
-| `/about` | Station info, data path diagram, units, and node registry |
-| `/admin` | Admin page showing node health (online status, battery, RSSI) |
-| `/partials/current` | HTMX partial for live current conditions refresh |
+| `/` | Overview: live conditions, alerts, last days in charts |
+| `/sensors` | Every sensor by category, range, daily table, compare days (loop `agent/sensors-steps`) |
+| `/garden` | 3D garden map (private, planned: map core + loop G) |
+| `/seeds` | Seed log (private, planned: loop P) |
+| `/tasks` | Tasks and reminders (private, loop `agent/tasks-steps`) |
+| `/species` | Found species and the common-species catalogue (private, loop `agent/species-steps`) |
+| `/about` | Station info, data path and node registry |
+| `/admin` | Node health (private) |
+| `/styleguide` | Every UI component with its template code |
+| `/login` | Sign in (ADMIN_USER / ADMIN_PASSWORD) |
 
 ### API endpoints
 | Method | Route | Description |
@@ -32,6 +35,8 @@ Built incrementally by a local coding agent. If you are that agent, start with
 | `GET` | `/api/v1/nodes` | List all known nodes with online/offline status |
 | `GET` | `/api/v1/export.csv` | Export readings as CSV with filters |
 | `GET` | `/admin/nodes.json` | Node health data as JSON (Basic auth) |
+| `GET` | `/api/v1/summary`, `/api/v1/daily_stats` | Reading statistics (Sensors loop) |
+| `GET` | `/api/v1/tasks`, `/api/v1/sightings` | Tasks and sightings (private; Tasks and Species loops) |
 | `GET` | `/healthz` | Health check returning `{"status": "ok"}` |
 
 Preview locally with `make dev` (runs on `:8000` with a throwaway Postgres).
@@ -56,7 +61,8 @@ still running checks.
 
 The app reads secrets from two Kubernetes Secrets (see
 `deploy/secret.example.yaml`): `weatherstation-app` provides
-`DATABASE_URL`, `INGEST_TOKEN`, `ADMIN_USER`, `ADMIN_PASSWORD`; `weatherstation-db`
+`DATABASE_URL`, `INGEST_TOKEN`, `ADMIN_USER`, `ADMIN_PASSWORD`, `SESSION_SECRET` (and optional
+`LLM_BASE_URL`, `LLM_API_KEY`, `MEDIA_DIR`); `weatherstation-db`
 provides `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`.
 
 Draft manifests live in `deploy/` (Kustomize). The live copy is maintained in the

@@ -203,7 +203,7 @@ def main() -> int:
             print("seed rejected:", body["rejected"][:3], file=sys.stderr)
             return 1
     print(f"seeded {len(readings)} readings; admin login: admin / admin")
-    uvicorn.run(app, host="0.0.0.0", port=8000)  # noqa: S104
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))  # noqa: S104
     return 0
 
 

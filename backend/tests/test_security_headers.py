@@ -33,10 +33,10 @@ _SECURE_HEADERS = {
 
 _SECURE_PAGE_URLS = [
     "/",
-    "/weather",
-    "/soil",
-    "/history",
+    "/sensors",
     "/about",
+    "/login",
+    "/styleguide",
 ]
 
 _SECURE_API_URLS = [
@@ -46,7 +46,8 @@ _SECURE_API_URLS = [
 ]
 
 _SECURE_STATIC_URLS = [
-    "/static/style.css",
+    "/static/css/components.css",
+    "/static/js/ui.js",
     "/static/vendor/htmx.min.js",
     "/static/vendor/uPlot.iife.min.js",
     "/static/favicon.svg",

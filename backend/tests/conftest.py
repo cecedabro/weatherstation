@@ -2,7 +2,9 @@
 
 import contextlib
 import os
+import re
 from collections.abc import Iterator
+from pathlib import Path
 
 import pgserver
 import pytest
@@ -37,6 +39,41 @@ class _GracefulSession(Session):
 def _make_graceful_session():
     """Factory for _GracefulSession instances bound to the test engine."""
     return _GracefulSession(bind=db_engine, autoflush=False)
+
+
+# Every table, children first; the db fixture empties them after each test.
+_TABLES = (
+    "sighting",
+    "species",
+    "task",
+    "planting",
+    "crop",
+    "source",
+    "garden_object",
+    "reading",
+    "node",
+)
+
+# Step tests of a loop carry @pytest.mark.task("S01"). `make check` skips a step test until PLAN.md
+# (repo root) ticks its task (`- [x] S01:`), so later tasks of a running loop don't fail the check,
+# and finished ones keep counting. TASKS=all (accept commands) or no PLAN.md runs them all.
+_PLAN = Path(__file__).resolve().parents[2] / "PLAN.md"
+
+
+def _ticked() -> set[str] | None:
+    if os.environ.get("TASKS") == "all" or not _PLAN.exists():
+        return None
+    return set(re.findall(r"^- \[x\] (\w+):", _PLAN.read_text(), re.M))
+
+
+def pytest_collection_modifyitems(config, items):
+    done = _ticked()
+    if done is None:
+        return
+    for item in items:
+        mark = item.get_closest_marker("task")
+        if mark and mark.args[0] not in done:
+            item.add_marker(pytest.mark.skip(reason=f"task {mark.args[0]} not done yet (PLAN.md)"))
 
 
 @pytest.fixture(scope="session")
@@ -82,8 +119,8 @@ def db(pg_url, pg_migrate) -> Iterator[Session]:
     yield session
     # Clean up
     try:
-        session.execute(text("DELETE FROM reading"))
-        session.execute(text("DELETE FROM node"))
+        for table in _TABLES:
+            session.execute(text(f"DELETE FROM {table}"))  # noqa: S608 (fixed names)
         session.commit()
     except Exception:
         session.rollback()

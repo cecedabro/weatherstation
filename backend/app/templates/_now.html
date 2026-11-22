@@ -1,0 +1,51 @@
+{#- Live part of the overview; GET /partials/current returns just this (HTMX, every 60 s). -#}
+{% import "ui.html" as ui %}
+<div id="now" hx-get="/partials/current" hx-trigger="every 60s" hx-swap="outerHTML">
+  {% if alerts and (alerts.frost_warning or alerts.rain_total_24h > 0 or alerts.beds_needing_water > 0) %}
+  <div class="alerts">
+    {% if alerts.frost_warning %}{{ ui.alert("Frost warning", "A weather node reads 2 °C or less. Cover sensitive plants.", "bad", "❄️") }}{% endif %}
+    {% if alerts.beds_needing_water > 0 %}{{ ui.alert("Water needed", alerts.beds_needing_water ~ " bed" ~ ("s" if alerts.beds_needing_water != 1 else "") ~ " below 25 % moisture.", "warn", "💧") }}{% endif %}
+    {% if alerts.rain_total_24h > 0 %}{{ ui.alert("Rain in the last 24 h", "%.1f mm"|format(alerts.rain_total_24h), "info", "🌧️") }}{% endif %}
+  </div>
+  {% endif %}
+
+  {% if not weather_nodes and not soil_nodes %}
+  {% call ui.card() %}{{ ui.empty("No readings yet", "Once the sensors start reporting, live conditions appear here.", "🌤️") }}{% endcall %}
+  {% else %}
+  <div class="stack">
+    {% for node in weather_nodes %}
+    {% call ui.card(node.node_id, "🌦️", "sky", actions=ui.online(not node.offline)) %}
+      <div class="stats">
+        {% set m = node.metrics %}
+        {{ ui.stat("Temperature", m.get("temp_c"), "°C", "🌡️", tint="sun") }}
+        {{ ui.stat("Humidity", m.get("humidity_pct"), "%", "💧", fmt="%.0f") }}
+        {{ ui.stat("Pressure", m.get("pressure_hpa"), "hPa", "🧭", fmt="%.0f") }}
+        {{ ui.stat("Rain", m.get("rain_mm"), "mm", "🌧️", tint="water") }}
+        {{ ui.stat("Wind", m.get("wind_speed_ms"), "m/s", "🍃", meta=(compass(m["wind_dir_deg"]) ~ " " ~ ("%.0f°"|format(m["wind_dir_deg"])) if m.get("wind_dir_deg") is not none else None)) }}
+      </div>
+      <p class="small muted section">{% if node.offline %}Offline since {{ node.reading_time|local_time if node.reading_time else "—" }}{% else %}Updated {{ ui.when(node.reading_time) }}{% endif %}</p>
+    {% endcall %}
+    {% else %}
+    {% call ui.card() %}{{ ui.empty("No weather data", "Waiting for the weather node's first reading.", "🌦️") }}{% endcall %}
+    {% endfor %}
+
+    {% if soil_nodes %}
+    {% call ui.card("Soil", "🪴", "soil") %}
+      {% call ui.table(["Bed", "Moisture#", "Soil temp#", "Status", "Updated"]) %}
+        {% for node in soil_nodes %}{% set m = node.metrics %}
+        <tr{% if m.get("soil_moisture_pct") is not none and m["soil_moisture_pct"] < 25 %} class="row-alert"{% endif %}>
+          <td class="strong">{{ node.node_id }}</td>
+          <td class="num">{{ "%.0f %%"|format(m["soil_moisture_pct"]) if m.get("soil_moisture_pct") is not none else "—" }}</td>
+          <td class="num">{{ "%.1f °C"|format(m["soil_temp_c"]) if m.get("soil_temp_c") is not none else "—" }}</td>
+          <td>{% if m.get("soil_moisture_pct") is not none and m["soil_moisture_pct"] < 25 %}{{ ui.chip("needs water", "warn", dot=True) }}{% else %}{{ ui.online(not node.offline) }}{% endif %}</td>
+          <td class="small muted">{% if node.offline %}offline since {{ node.reading_time|local_time if node.reading_time else "—" }}{% else %}{{ ui.when(node.reading_time) }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+      {% endcall %}
+    {% endcall %}
+    {% else %}
+    {% call ui.card() %}{{ ui.empty("No soil data", "Waiting for the first soil sensor reading.", "🪴") }}{% endcall %}
+    {% endif %}
+  </div>
+  {% endif %}
+</div>

@@ -1,0 +1,107 @@
+/* Garden design tokens. Human-owned (docs/design.md). Every other stylesheet uses only these variables.
+   Theme: Frutiger Aero, fresh-Apple frosted glass. Light by default, dark follows the device,
+   <html data-theme="light|dark"> overrides both. */
+:root{color-scheme:light;
+  /* ink */
+  --ink:#0c2a1f;--ink-2:#2c4a3d;--muted:#5b7468;--link:#0a74d6;--on-accent:#fff;
+  /* status */
+  --ok:#159a4a;--info:#0a84ff;--warn:#d97706;--bad:#dc2626;--off:#8a9a92;
+  /* categorical: same order everywhere (charts, map markers, chips) */
+  --c1:#0a84ff;--c2:#22b35e;--c3:#f59e0b;--c4:#14b8a6;--c5:#8b5cf6;--c6:#ec4899;--c7:#a16207;--c8:#64748b;
+  /* tints for tiles and cards */
+  --t-sky:rgba(90,190,255,.26);--t-leaf:rgba(110,215,120,.26);--t-sun:rgba(255,205,90,.28);
+  --t-soil:rgba(190,140,90,.24);--t-berry:rgba(240,110,160,.22);--t-water:rgba(60,215,205,.26);--t-stone:rgba(140,160,170,.22);
+  /* scene */
+  --bg:#e4f6ff;
+  --scene:radial-gradient(45vmax 40vmax at 4% 0%,#62c6ff 0,transparent 70%),
+    radial-gradient(38vmax 34vmax at 98% 8%,#7ee8d2 0,transparent 70%),
+    radial-gradient(34vmax 28vmax at 50% 40%,#c4ecff 0,transparent 70%),
+    radial-gradient(55vmax 42vmax at 75% 105%,#a5e87a 0,transparent 70%),
+    radial-gradient(42vmax 42vmax at -5% 95%,#6fd99a 0,transparent 70%),
+    linear-gradient(165deg,#e4f6ff,#effff7 55%,#e8f9d6);
+  --scene-top:radial-gradient(70vmax 32vmax at 50% -8%,rgba(255,255,255,.75),transparent 70%);
+  --bubble:rgba(255,255,255,.75);
+  /* glass */
+  --glass:rgba(255,255,255,.5);--glass-strong:rgba(255,255,255,.72);--bar:rgba(255,255,255,.55);
+  --panel:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.32));
+  --field:rgba(255,255,255,.75);--chip:rgba(255,255,255,.66);
+  --stroke:rgba(255,255,255,.88);--stroke-soft:rgba(255,255,255,.66);
+  --hi:rgba(255,255,255,.96);--hi-soft:rgba(255,255,255,.6);
+  --line:rgba(12,42,31,.09);--track:rgba(12,42,31,.08);
+  --sheen:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,0) 40%);
+  --blur:blur(26px) saturate(185%);
+  /* buttons and gloss */
+  --btn:linear-gradient(180deg,#fff 0%,rgba(246,252,255,.9) 48%,rgba(222,240,250,.85) 52%,rgba(242,250,255,.95) 100%);
+  --primary:linear-gradient(180deg,#8fe08a 0%,#3cc35a 48%,#1fa847 52%,#45c962 100%);--primary-glow:rgba(34,179,94,.38);
+  --aqua:linear-gradient(180deg,#92ddff 0%,#33aef6 48%,#0d8be6 52%,#36b4f7 100%);--aqua-glow:rgba(10,132,255,.35);
+  --danger:linear-gradient(180deg,#ffb1a8 0%,#f05a4f 48%,#d93a30 52%,#f2665b 100%);--danger-glow:rgba(220,38,38,.3);
+  --orb:radial-gradient(circle at 34% 28%,#fff 0 12%,#a6f0b8 32%,#2fc463 62%,#138a3d 100%);
+  --fill:linear-gradient(90deg,#34d399,#22c3ee 55%,#0a84ff);
+  --num:linear-gradient(90deg,#0b6fcf,#13a7c9 50%,#1f9d4f);
+  --title-a:#0b4d36;--title-b:#0d86c6;
+  /* shape */
+  --r-xl:26px;--r-lg:20px;--r-md:14px;--r-sm:10px;--r-pill:999px;
+  --shadow:0 12px 32px rgba(20,90,80,.14),0 1px 2px rgba(20,90,80,.08);
+  --shadow-lift:0 18px 44px rgba(20,90,80,.2),0 2px 4px rgba(20,90,80,.1);
+  /* space and type */
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:28px;--s7:40px;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable","Segoe UI",Roboto,system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --page:1240px;
+  /* charts (read by js/charts.js) */
+  --chart-grid:rgba(12,42,31,.08);--chart-axis:#5b7468;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;
+  --ink:#e8f6ef;--ink-2:#c3dccf;--muted:#93ad9f;--link:#6cc4ff;
+  --ok:#3ee08f;--info:#4cc2ff;--warn:#ffb340;--bad:#ff6b6b;--off:#7d8c85;
+  --c1:#4cc2ff;--c2:#4ade80;--c3:#fbbf24;--c4:#2dd4bf;--c5:#a78bfa;--c6:#f472b6;--c7:#d6a05a;--c8:#94a3b8;
+  --t-sky:rgba(90,190,255,.15);--t-leaf:rgba(110,215,120,.14);--t-sun:rgba(255,205,90,.13);
+  --t-soil:rgba(190,140,90,.15);--t-berry:rgba(240,110,160,.13);--t-water:rgba(60,215,205,.14);--t-stone:rgba(140,160,170,.13);
+  --bg:#061611;
+  --scene:radial-gradient(45vmax 40vmax at 8% 0%,#0e4a6e 0,transparent 70%),
+    radial-gradient(40vmax 34vmax at 96% 12%,#0b5a52 0,transparent 70%),
+    radial-gradient(55vmax 42vmax at 72% 105%,#1d5228 0,transparent 70%),
+    radial-gradient(42vmax 42vmax at -5% 95%,#163f2c 0,transparent 70%),
+    linear-gradient(165deg,#07161f,#06140f 55%,#08180c);
+  --scene-top:radial-gradient(70vmax 32vmax at 50% -8%,rgba(120,220,200,.1),transparent 70%);
+  --bubble:rgba(255,255,255,.07);
+  --glass:rgba(20,40,34,.5);--glass-strong:rgba(22,44,38,.78);--bar:rgba(8,22,18,.6);
+  --panel:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+  --field:rgba(0,0,0,.25);--chip:rgba(255,255,255,.08);
+  --stroke:rgba(255,255,255,.14);--stroke-soft:rgba(255,255,255,.09);
+  --hi:rgba(255,255,255,.18);--hi-soft:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.08);--track:rgba(255,255,255,.08);
+  --sheen:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0) 35%);
+  --btn:linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.09) 48%,rgba(255,255,255,.04) 52%,rgba(255,255,255,.08) 100%);
+  --num:linear-gradient(90deg,#6cc4ff,#5ee0f0 50%,#6ee7a0);
+  --title-a:#ffffff;--title-b:#9be8c4;
+  --shadow:0 12px 34px rgba(0,0,0,.38);--shadow-lift:0 18px 44px rgba(0,0,0,.5);
+  --chart-grid:rgba(255,255,255,.07);--chart-axis:#93ad9f;
+}}
+:root[data-theme=dark]{color-scheme:dark;
+  --ink:#e8f6ef;--ink-2:#c3dccf;--muted:#93ad9f;--link:#6cc4ff;
+  --ok:#3ee08f;--info:#4cc2ff;--warn:#ffb340;--bad:#ff6b6b;--off:#7d8c85;
+  --c1:#4cc2ff;--c2:#4ade80;--c3:#fbbf24;--c4:#2dd4bf;--c5:#a78bfa;--c6:#f472b6;--c7:#d6a05a;--c8:#94a3b8;
+  --t-sky:rgba(90,190,255,.15);--t-leaf:rgba(110,215,120,.14);--t-sun:rgba(255,205,90,.13);
+  --t-soil:rgba(190,140,90,.15);--t-berry:rgba(240,110,160,.13);--t-water:rgba(60,215,205,.14);--t-stone:rgba(140,160,170,.13);
+  --bg:#061611;
+  --scene:radial-gradient(45vmax 40vmax at 8% 0%,#0e4a6e 0,transparent 70%),
+    radial-gradient(40vmax 34vmax at 96% 12%,#0b5a52 0,transparent 70%),
+    radial-gradient(55vmax 42vmax at 72% 105%,#1d5228 0,transparent 70%),
+    radial-gradient(42vmax 42vmax at -5% 95%,#163f2c 0,transparent 70%),
+    linear-gradient(165deg,#07161f,#06140f 55%,#08180c);
+  --scene-top:radial-gradient(70vmax 32vmax at 50% -8%,rgba(120,220,200,.1),transparent 70%);
+  --bubble:rgba(255,255,255,.07);
+  --glass:rgba(20,40,34,.5);--glass-strong:rgba(22,44,38,.78);--bar:rgba(8,22,18,.6);
+  --panel:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+  --field:rgba(0,0,0,.25);--chip:rgba(255,255,255,.08);
+  --stroke:rgba(255,255,255,.14);--stroke-soft:rgba(255,255,255,.09);
+  --hi:rgba(255,255,255,.18);--hi-soft:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.08);--track:rgba(255,255,255,.08);
+  --sheen:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0) 35%);
+  --btn:linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.09) 48%,rgba(255,255,255,.04) 52%,rgba(255,255,255,.08) 100%);
+  --num:linear-gradient(90deg,#6cc4ff,#5ee0f0 50%,#6ee7a0);
+  --title-a:#ffffff;--title-b:#9be8c4;
+  --shadow:0 12px 34px rgba(0,0,0,.38);--shadow-lift:0 18px 44px rgba(0,0,0,.5);
+  --chart-grid:rgba(255,255,255,.07);--chart-axis:#93ad9f;
+}
