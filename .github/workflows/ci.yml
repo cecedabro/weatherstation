@@ -32,6 +32,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
-      - name: Install uvx
-        run: uv tool install uvx
       - run: uvx --from hadolint-py hadolint Dockerfile
