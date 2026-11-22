@@ -82,8 +82,8 @@
       cursor: { drag: { x: false, y: false }, points: { size: 8 } },
       scales: { x: { time: !c.hours } },
       axes: [{ stroke: axis, grid: { stroke: grid, width: 1 }, ticks: { show: false } },
-             { stroke: axis, grid: { stroke: grid, width: 1 }, ticks: { show: false }, size: 48,
-               values: function (u, vals) { return vals.map(function (v) { return v == null ? "" : v + (c.unit && c.unit.length < 4 ? c.unit : ""); }); } }],
+             { stroke: axis, grid: { stroke: grid, width: 1 }, ticks: { show: false }, size: 60,
+               values: function (u, vals) { return vals.map(function (v) { return v == null ? "" : v + (c.unit && c.unit.length < 3 ? c.unit : ""); }); } }],
       series: series,
       hooks: { setCursor: [tooltip(c)] }
     };

@@ -15,6 +15,8 @@ from alembic import command
 from alembic import config as alembic_config
 from app.db import engine as db_engine
 
+os.environ.setdefault("SEED_CATALOGUE", "0")  # tests add catalogue rows themselves
+
 
 class _GracefulSession(Session):
     """Session that silently recovers from flush errors (e.g. unique violations)
