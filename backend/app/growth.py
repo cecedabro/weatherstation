@@ -66,10 +66,21 @@ def gdd_series(
 ) -> list[tuple[date, float]]:
     """``[(day, gdd)]`` for every day from *start* to *end* (both included) that has temperatures, oldest first.
 
-    TODO (task A03): walk ``day = start`` … ``end`` with ``timedelta(days=1)``; skip days not in *temps*; for the
-    others append ``(day, daily_gdd(tmin, tmax, base))``.
+    TODO (task A03) steps:
+    1. ``start > end`` → ``[]``.
+    2. Walk ``day = start`` … ``end`` with ``timedelta(days=1)``; skip days not in *temps*; for the others
+       append ``(day, daily_gdd(tmin, tmax, base))``.
     """
-    return []
+    if start > end:
+        return []
+    result: list[tuple[date, float]] = []
+    day = start
+    while day <= end:
+        if day in temps:
+            tmin, tmax = temps[day]
+            result.append((day, daily_gdd(tmin, tmax, base)))
+        day = day + timedelta(days=1)
+    return result
 
 
 def progress(gdd_done: float, gdd_needed: float | None) -> float | None:

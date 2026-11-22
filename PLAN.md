@@ -20,7 +20,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a01
 - [x] A02: In backend/app/growth.py fill in `local_daily_temps`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a02
-- [ ] A03: In backend/app/growth.py fill in `gdd_series`
+- [x] A03: In backend/app/growth.py fill in `gdd_series`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a03
 - [ ] A04: In backend/app/growth.py fill in `progress`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a04

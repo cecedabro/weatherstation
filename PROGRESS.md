@@ -3,3 +3,6 @@ Implemented `daily_gdd()` in `backend/app/growth.py:37`. The function computes g
 
 ## A02 - local_daily_temps
 Implemented `local_daily_temps()` in `backend/app/growth.py:47`. The function groups `[(timestamp, temp_c)]` readings by local date (Europe/Amsterdam), converting naive datetimes as UTC, then returns `{date: (min_temp, max_temp)}`. A reading at 22:30 UTC on June 1 becomes 00:30 CEST on June 2 in Amsterdam. All A02 tests pass. `make check` passes (510 passed).
+
+## A03 - gdd_series
+Implemented `gdd_series()` in `backend/app/growth.py:64`. The function walks days from `start` to `end` (inclusive, oldest first), skipping days not in `temps`, and returns `[(day, daily_gdd(tmin, tmax, base))]` for days that have temperatures. Returns `[]` when `start > end`. All A03 tests pass. `make check` passes (511 passed).
