@@ -133,7 +133,21 @@ def view_href(view: View, **changes: Any) -> str:
     2. Build a list of (key, value) pairs in that order, skipping None node and empty compare.
     3. Return ``"/sensors?" + urlencode(pairs, safe=",")``.
     """
-    return "/sensors"
+    data: dict[str, Any] = {"cat": view.cat, "range": view.range, "node": view.node, "compare": view.compare}
+    if "cat" in changes:
+        data["node"] = None
+        data["compare"] = ()
+    data.update(changes)
+    pairs: list[tuple[str, str]] = []
+    pairs.append(("cat", str(data["cat"])))
+    pairs.append(("range", str(data["range"])))
+    node = data.get("node")
+    if node is not None:
+        pairs.append(("node", str(node)))
+    compare = data.get("compare")
+    if compare:
+        pairs.append(("compare", ",".join(d.isoformat() for d in compare)))
+    return "/sensors?" + urlencode(pairs, safe=",")
 
 
 def range_window(range_key: str, now: datetime) -> tuple[datetime, datetime]:
@@ -141,7 +155,8 @@ def range_window(range_key: str, now: datetime) -> tuple[datetime, datetime]:
 
     TODO (task S04): one line per step: look up the hours (default 168), return the tuple.
     """
-    return now - timedelta(hours=168), now
+    hours = RANGES.get(range_key, ("Week", 168))[1]
+    return now - timedelta(hours=hours), now
 
 
 def daily_days(range_key: str) -> int:
@@ -149,7 +164,8 @@ def daily_days(range_key: str) -> int:
 
     TODO (task S04): ``24h`` → 1, ``7d`` → 7, ``30d`` → 30, ``90d`` and ``365d`` → 31; unknown → 7.
     """
-    return 7
+    hours = RANGES.get(range_key, ("Week", 168))[1]
+    return max(1, min(hours // 24, MAX_DAILY_ROWS))
 
 
 def latest(db: Session, node: str, metric: str) -> float | None:

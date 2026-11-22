@@ -23,7 +23,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s02
 - [x] S03: In backend/app/sensors.py fill in `parse_compare` and `parse_view`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s03
-- [ ] S04: In backend/app/sensors.py fill in `view_href`, `range_window` and `daily_days`
+- [x] S04: In backend/app/sensors.py fill in `view_href`, `range_window` and `daily_days`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s04
 - [ ] S05: In backend/app/sensors.py fill in `latest` and `tiles`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s05
