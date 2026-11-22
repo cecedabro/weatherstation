@@ -216,7 +216,25 @@ def merge_daily(per_metric: dict[str, list[dict[str, Any]]]) -> list[dict[str, A
     2. For each date, sorted newest first, make ``{"date": d}`` plus ``{metric: row or None}``.
     3. Return the first ``MAX_DAILY_ROWS``.
     """
-    return []
+    # Collect all dates and build lookup: date -> metric -> row
+    all_dates: set[str] = set()
+    lookup: dict[str, dict[str, dict[str, Any]]] = {}
+    for metric, rows in per_metric.items():
+        for row in rows:
+            d = row["date"]
+            all_dates.add(d)
+            lookup.setdefault(d, {})[metric] = row
+
+    # Build result: newest day first, at most MAX_DAILY_ROWS
+    result: list[dict[str, Any]] = []
+    for d in sorted(all_dates, reverse=True):
+        merged: dict[str, Any] = {"date": d}
+        for metric in per_metric:
+            merged[metric] = lookup.get(d, {}).get(metric)
+        result.append(merged)
+        if len(result) >= MAX_DAILY_ROWS:
+            break
+    return result
 
 
 def soil_rows(db: Session, nodes: list[str]) -> list[dict[str, Any]]:

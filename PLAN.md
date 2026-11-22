@@ -27,7 +27,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s04
 - [x] S05: In backend/app/sensors.py fill in `latest` and `tiles`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s05
-- [ ] S06: In backend/app/sensors.py fill in `merge_daily`
+- [x] S06: In backend/app/sensors.py fill in `merge_daily`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s06
 - [ ] S07: In backend/app/sensors.py fill in `soil_rows`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s07

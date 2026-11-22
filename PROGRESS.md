@@ -14,3 +14,6 @@ Implemented three functions in `backend/app/sensors.py`: `view_href()` builds a 
 
 ## Task S05 — latest, tiles
 Implemented `latest()` and `tiles()` in `backend/app/sensors.py:171-211`. `latest()` queries `Reading.value` for a given node/metric, ordered by timestamp descending, returning the newest value or None. `tiles()` builds stat tiles per metric: rain_mm shows Latest + Total, wind_dir_deg shows Latest with compass direction (using `fmt.compass`), and all other metrics show Latest, Min, Max, Average. All S05 judge tests pass; `make check` passes (323 passed, 96% coverage).
+
+## Task S06 — merge_daily
+Implemented `merge_daily()` in `backend/app/sensors.py:207-232`. The function takes a dict mapping metric names to lists of daily-stats rows, collects all unique dates, and merges them into a single list sorted newest-first. Each output row has `{"date": d, metric: row_or_none, ...}` for every input metric. Limited to `MAX_DAILY_ROWS` (31). All S06 judge tests pass; `make check` passes (325 passed).
