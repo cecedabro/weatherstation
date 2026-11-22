@@ -21,7 +21,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e01
 - [x] E02: In backend/app/species.py fill in `validate_species` (follow the 4 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e02
-- [ ] E03: In backend/app/species.py fill in `validate_sighting` (follow the 4 steps in its docstring)
+- [x] E03: In backend/app/species.py fill in `validate_sighting` (follow the 4 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e03
 - [ ] E04: In backend/app/species.py fill in `image_ext` and `media_name_ok`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e04

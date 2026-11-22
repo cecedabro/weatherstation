@@ -123,7 +123,59 @@ def validate_sighting(
     3. notes: ``form.get("notes") or ""``; over 2000 → "At most 2000 characters".
     4. object_id: "" → None; else int in *object_ids*, otherwise error "Pick an object from the list" (value None).
     """
-    return {k: form.get(k) for k in SIGHTING_FIELDS}, {}
+    errors: dict[str, str] = {}
+
+    def get(k: str) -> str:
+        return (form.get(k) or "").strip()
+
+    # Step 1: seen_on
+    seen_on: date | str
+    seen_on_raw = get("seen_on")
+    try:
+        seen_on = date.fromisoformat(seen_on_raw)
+    except (ValueError, TypeError):
+        seen_on = seen_on_raw
+        errors["seen_on"] = "Pick the date you saw it"
+
+    # Step 2: count
+    count_raw = get("count")
+    if count_raw == "":
+        count = None
+    else:
+        try:
+            count = int(count_raw)
+            if count < 1:
+                raise ValueError
+        except (ValueError, TypeError):
+            count = None
+            errors["count"] = "A whole number, 1 or more"
+
+    # Step 3: notes
+    notes = form.get("notes") or ""
+    if len(notes) > 2000:
+        errors["notes"] = "At most 2000 characters"
+
+    # Step 4: object_id
+    object_id_raw = get("object_id")
+    if object_id_raw == "":
+        object_id = None
+    else:
+        try:
+            object_id = int(object_id_raw)
+            if object_id not in object_ids:
+                raise ValueError
+        except (ValueError, TypeError):
+            object_id = None
+            errors["object_id"] = "Pick an object from the list"
+
+    values = {
+        "seen_on": seen_on,
+        "count": count,
+        "notes": notes,
+        "removed": bool(form.get("removed")),
+        "object_id": object_id,
+    }
+    return values, errors
 
 
 def image_ext(data: bytes) -> str | None:
