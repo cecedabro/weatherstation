@@ -29,7 +29,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s05
 - [x] S06: In backend/app/sensors.py fill in `merge_daily`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s06
-- [ ] S07: In backend/app/sensors.py fill in `soil_rows`
+- [x] S07: In backend/app/sensors.py fill in `soil_rows`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s07
 - [ ] S08: In backend/app/sensors.py fill in `compare_rows` and `csv_href`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s08

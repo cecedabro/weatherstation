@@ -241,10 +241,15 @@ def soil_rows(db: Session, nodes: list[str]) -> list[dict[str, Any]]:
     """Latest soil values per node, for the soil table: ``[{"node", "soil_moisture_pct", "soil_temp_c"}]``.
 
     In the order of *nodes*; a value is None when the node has no such reading.
-
-    TODO (task S07): for each node call ``latest(db, node, metric)`` for both metrics.
     """
-    return []
+    result: list[dict[str, Any]] = []
+    for node in nodes:
+        result.append({
+            "node": node,
+            "soil_moisture_pct": latest(db, node, "soil_moisture_pct"),
+            "soil_temp_c": latest(db, node, "soil_temp_c"),
+        })
+    return result
 
 
 def compare_rows(

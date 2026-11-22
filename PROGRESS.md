@@ -17,3 +17,6 @@ Implemented `latest()` and `tiles()` in `backend/app/sensors.py:171-211`. `lates
 
 ## Task S06 — merge_daily
 Implemented `merge_daily()` in `backend/app/sensors.py:207-232`. The function takes a dict mapping metric names to lists of daily-stats rows, collects all unique dates, and merges them into a single list sorted newest-first. Each output row has `{"date": d, metric: row_or_none, ...}` for every input metric. Limited to `MAX_DAILY_ROWS` (31). All S06 judge tests pass; `make check` passes (325 passed).
+
+## Task S07 — soil_rows
+Implemented `soil_rows()` in `backend/app/sensors.py:240-249`. The function takes a DB session and a list of soil node ids, and returns a list of dicts `{"node": id, "soil_moisture_pct": latest_value, "soil_temp_c": latest_value}` in the order of the input nodes. Uses the existing `latest()` helper to query the newest reading per node/metric. Returns None for a metric when the node has no such reading. All S07 judge tests pass; `make check` passes (326 passed, 96% coverage).
