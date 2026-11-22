@@ -10,6 +10,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal
@@ -37,8 +38,41 @@ def summarize(
     3. If count is 0 return the dict with count 0 and every other value None (node and metric filled).
     Imports you need: ``from sqlalchemy import func, select``.
     """
-    return {"node": node, "metric": metric, "count": 0, "min": None, "max": None, "avg": None,
-            "sum": None, "first_ts": None, "last_ts": None}  # fmt: skip
+    stmt = (
+        select(
+            func.count(),
+            func.min(Reading.value),
+            func.max(Reading.value),
+            func.avg(Reading.value),
+            func.sum(Reading.value),
+            func.min(Reading.ts),
+            func.max(Reading.ts),
+        )
+        .where(
+            Reading.node_id == node,
+            Reading.metric == metric,
+            Reading.ts >= start,
+            Reading.ts < end,
+        )
+    )
+    row = db.execute(stmt).one()
+
+    count = row[0]
+    if count == 0:
+        return {"node": node, "metric": metric, "count": 0, "min": None, "max": None,
+                "avg": None, "sum": None, "first_ts": None, "last_ts": None}
+
+    return {
+        "node": node,
+        "metric": metric,
+        "count": count,
+        "min": float(row[1]),
+        "max": float(row[2]),
+        "avg": float(row[3]),
+        "sum": float(row[4]),
+        "first_ts": row[5],
+        "last_ts": row[6],
+    }
 
 
 def daily_stats(

@@ -17,7 +17,7 @@ Rules for every task:
 - Run the accept command yourself, then `make check`. If a step test fails, read its assert and fix the function.
 - Never edit tests, templates, `Makefile`, `pyproject.toml`, `PLAN.md`, `SPEC.md`, `docs/`.
 
-- [ ] S01: In backend/app/stats.py fill in `summarize` as its docstring says
+- [x] S01: In backend/app/stats.py fill in `summarize` as its docstring says
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s01
 - [ ] S02: In backend/app/stats.py fill in `daily_stats` as its docstring says
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_sensors.py -q -k s02
