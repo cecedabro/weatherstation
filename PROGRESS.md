@@ -29,3 +29,6 @@ Implemented `soil_points` in `backend/app/objects.py:415`: selects `GardenObject
 
 ## G10 — pins (objects.py)
 Implemented `_where` helper and `pins` in `backend/app/objects.py:447`: `_where(item, db)` returns `(x, y)` from an item's own coords or falls back to its linked GardenObject; `pins` queries open tasks ordered by id (level "bad" for high/critical urgency, "info" otherwise), joins Sighting→Species where verdict is harmful/invasive and removed is false (level "warn"), filters out items with no valid location, and returns task pins followed by sighting pins. All G10 judge tests pass. `make check` exits 0 (497 passed, 4 skipped, 95.37% coverage).
+
+## G11 — whole-feature tests (all G01-G10)
+Ran `TASKS=all uv run pytest tests/judge/test_objects.py tests/judge/test_step_objects.py -q` — 47 passed. Ran `make check` — exits 0 (497 passed, 4 skipped, 95.37% coverage). All functions from G01-G10 in `backend/app/objects.py` are already implemented and passing all judge tests.
