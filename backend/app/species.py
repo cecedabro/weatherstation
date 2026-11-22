@@ -279,7 +279,15 @@ def seed_catalogue(db: Session, path: Path = CATALOGUE) -> int:
        ``db.add(Species(**entry, common=True))`` and add the name to *have*.
     3. ``db.flush()``; return the number added.
     """
-    return 0
+    have = {n.lower() for n in db.execute(select(Species.name)).scalars()}
+    added = 0
+    for entry in json.loads(path.read_text()):
+        if entry["name"].lower() not in have:
+            db.add(Species(**entry, common=True))
+            have.add(entry["name"].lower())
+            added += 1
+    db.flush()
+    return added
 
 
 def sighting_json(x: Sighting, species: Species) -> dict[str, Any]:

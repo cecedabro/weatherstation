@@ -18,3 +18,6 @@ Implemented `sighting_stats()` in `backend/app/species.py:227`: queries `species
 
 ## E07 - species.py: find_species
 Implemented `find_species()` in `backend/app/species.py:240`: builds a select with conditional where clauses — `tab="catalogue"` filters `Species.common.is_(True)`, other tabs filter `Species.id.in_(select(Sighting.species_id))`. Adds optional case-insensitive substring search on name or latin via `or_(func.lower(Species.name).like(), func.lower(Species.latin).like())` and optional `verdict` filter. Orders by `func.lower(Species.name)`. Added `or_` to imports. All E07 judge tests pass. `make check` passes (93% coverage, 340 passed).
+
+## E08 - species.py: seed_catalogue
+Implemented `seed_catalogue()` in `backend/app/species.py:269`: reads `common_species.json`, gets existing species names case-insensitively, adds entries whose lowercase name is not already present as `Species` rows with `common=True`, deduplicates within the batch, and returns the count added. Idempotent — running twice adds nothing the second time. All E08 judge tests pass. `make check` passes (93% coverage, 341 passed).
