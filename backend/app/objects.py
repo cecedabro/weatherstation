@@ -444,6 +444,17 @@ def soil_points(db: Session) -> list[tuple[float, float, float]]:
     return result
 
 
+def _where(item: Any, db: Session) -> tuple[float, float] | None:
+    """Return ``(x, y)`` from item's own coords, falling back to its linked GardenObject; else None."""
+    if item.x is not None and item.y is not None:
+        return (item.x, item.y)
+    if item.object_id is not None:
+        obj = db.get(GardenObject, item.object_id)
+        if obj is not None and obj.x is not None and obj.y is not None:
+            return (obj.x, obj.y)
+    return None
+
+
 def pins(db: Session) -> list[dict[str, Any]]:
     """Things to mark on the map: open tasks, then harmful or invasive sightings not yet removed.
 
@@ -452,15 +463,54 @@ def pins(db: Session) -> list[dict[str, Any]]:
 
     TODO (task G10) steps:
     1. A helper ``where(item)``: ``(item.x, item.y)`` when both are not None; else when ``item.object_id`` is set
-       and ``db.get(GardenObject, item.object_id)`` finds it → ``(obj.x, obj.y)``; else None.
+        and ``db.get(GardenObject, item.object_id)`` finds it → ``(obj.x, obj.y)``; else None.
     2. Open tasks (``Task.status == "open"``) ordered by id → ``{"type": "task", "id": t.id, "label": t.title,
-       "x", "y", "level": "bad" if t.urgency in ("high", "critical") else "info"}``.
+        "x", "y", "level": "bad" if t.urgency in ("high", "critical") else "info"}``.
     3. Sightings joined with their Species where ``Species.verdict`` in ``HARMFUL`` and ``Sighting.removed`` is
-       false, ordered by sighting id → ``{"type": "sighting", "id": s.id, "label": species.name, "x", "y",
-       "level": "warn"}``.
+        false, ordered by sighting id → ``{"type": "sighting", "id": s.id, "label": species.name, "x", "y",
+        "level": "warn"}``.
     4. Return the task pins followed by the sighting pins (skip items with no place).
     """
-    return []
+    # Step 2: open tasks ordered by id
+    task_stmt = select(Task).where(Task.status == "open").order_by(Task.id)
+    tasks = db.execute(task_stmt).scalars().all()
+
+    result: list[dict[str, Any]] = []
+    for t in tasks:
+        loc = _where(t, db)
+        if loc is None:
+            continue
+        result.append({
+            "type": "task",
+            "id": t.id,
+            "label": t.title,
+            "x": loc[0],
+            "y": loc[1],
+            "level": "bad" if t.urgency in ("high", "critical") else "info",
+        })
+
+    # Step 3: harmful/invasive sightings not removed, ordered by id
+    sighting_stmt = (
+        select(Sighting, Species)
+        .join(Species, Sighting.species_id == Species.id)
+        .where(Species.verdict.in_(HARMFUL), Sighting.removed == False)  # noqa: E712
+        .order_by(Sighting.id)
+    )
+    rows = db.execute(sighting_stmt).all()
+    for s, species in rows:
+        loc = _where(s, db)
+        if loc is None:
+            continue
+        result.append({
+            "type": "sighting",
+            "id": s.id,
+            "label": species.name,
+            "x": loc[0],
+            "y": loc[1],
+            "level": "warn",
+        })
+
+    return result
 
 
 # -- glue (done)

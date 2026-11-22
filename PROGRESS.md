@@ -26,3 +26,6 @@ Implemented `soil_grid` in `backend/app/objects.py:388`: returns `[]` for empty 
 
 ## G09 — soil_points (objects.py)
 Implemented `soil_points` in `backend/app/objects.py:415`: selects `GardenObject` rows where `kind == "sensor"` and `node_id` is not None, ordered by id; for each sensor, queries the newest `Reading` with that `node_id` and `metric == "soil_moisture_pct"` (ordered by `ts.desc()`, limited to 1); skips sensors without readings, returns `(obj.x, obj.y, float(value))` tuples. All G09 judge tests pass. `make check` exits 0 (496 passed, 5 skipped, 95.88% coverage).
+
+## G10 — pins (objects.py)
+Implemented `_where` helper and `pins` in `backend/app/objects.py:447`: `_where(item, db)` returns `(x, y)` from an item's own coords or falls back to its linked GardenObject; `pins` queries open tasks ordered by id (level "bad" for high/critical urgency, "info" otherwise), joins Sighting→Species where verdict is harmful/invasive and removed is false (level "warn"), filters out items with no valid location, and returns task pins followed by sighting pins. All G10 judge tests pass. `make check` exits 0 (497 passed, 4 skipped, 95.37% coverage).
