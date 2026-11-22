@@ -15,7 +15,7 @@ The acceptance tests in `backend/tests/judge/` are the human's; write your own t
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k "default_is_air or links_keep or node_picker or unknown_params or empty_station"
 - [~] S05: Air and wind content per SPEC 11.2: per metric a card with `ui.stat` tiles (latest, min, max, average over the range via `summarize`) and a `ui.chart` for the range (`range=` the chosen range). Wind direction shows the compass point (`compass` filter) next to the degrees. — skipped: $ cd backend && uv run pytest tests/judge/test_sensors.py -q -k "air_tiles or wind_compass"  (exit 4)
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k "air_tiles or wind_compass"
-- [ ] S06: Rain (bars via `kind="bar"`, a "Total" tile with the sum) and soil (one chart per soil metric with a line per soil node, and a table of each node's latest moisture and soil temperature) per SPEC 11.2.
+- [~] S06: Rain (bars via `kind="bar"`, a "Total" tile with the sum) and soil (one chart per soil metric with a line per soil node, and a table of each node's latest moisture and soil temperature) per SPEC 11.2. — skipped: $ cd backend && uv run pytest tests/judge/test_sensors.py -q -k "rain_is_bars or soil_one_line"  (exit 1)
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k "rain_is_bars or soil_one_line"
 - [ ] S07: Daily table per SPEC 11.4 with `ui.table` (newest first, at most 31 days, min/max/avg per metric, rain total) under the charts.
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k daily_table
