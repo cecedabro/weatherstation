@@ -12,3 +12,6 @@ Filled in `find_tasks()` in `backend/app/tasks.py:142` to build a SQLAlchemy que
 
 ## Task D05 — tasks.py: counts
 Filled in `counts()` in `backend/app/tasks.py:169` to load all tasks once and count: open, done, all, overdue (open tasks with deadline before today), and week (open tasks with deadline from today to today+6 days inclusive). Judge test `test_d05_counts` passes. `make check` passes.
+
+## Task D06 — tasks.py: task_json
+Filled in `task_json()` in `backend/app/tasks.py:189` to return a dict with all Task fields: id, title, notes, category, urgency, status, deadline (as `.isoformat()` or None), object_id, x, y, created_at (as `.isoformat()` or None), and done_at (as `.isoformat()` or None). Dates and datetimes are null-safe via `x.isoformat() if x else None`. Judge test `test_d06_task_json` passes. `make check` passes.

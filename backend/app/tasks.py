@@ -194,7 +194,20 @@ def task_json(task: Task) -> dict[str, Any]:
 
     TODO (task D06): build the dict.
     """
-    return {"id": task.id}
+    return {
+        "id": task.id,
+        "title": task.title,
+        "notes": task.notes,
+        "category": task.category,
+        "urgency": task.urgency,
+        "status": task.status,
+        "deadline": task.deadline.isoformat() if task.deadline else None,
+        "object_id": task.object_id,
+        "x": task.x,
+        "y": task.y,
+        "created_at": task.created_at.isoformat() if task.created_at else None,
+        "done_at": task.done_at.isoformat() if task.done_at else None,
+    }
 
 
 def apply_form(task: Task, values: dict[str, Any]) -> None:
