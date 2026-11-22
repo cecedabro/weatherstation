@@ -32,7 +32,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g07
 - [x] G08: In backend/app/objects.py fill in `soil_grid`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g08
-- [ ] G09: In backend/app/objects.py fill in `soil_points`
+- [x] G09: In backend/app/objects.py fill in `soil_points`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g09
 - [ ] G10: In backend/app/objects.py fill in `pins` (follow the 4 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g10

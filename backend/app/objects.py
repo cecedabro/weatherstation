@@ -422,7 +422,26 @@ def soil_points(db: Session) -> list[tuple[float, float, float]]:
        (``order_by(Reading.ts.desc()).limit(1)``, then ``db.execute(stmt).scalar()``).
     3. Skip objects without a reading; return ``(obj.x, obj.y, float(value))`` for the others.
     """
-    return []
+    stmt = (
+        select(GardenObject)
+        .where(GardenObject.kind == "sensor")
+        .where(GardenObject.node_id.is_not(None))
+        .order_by(GardenObject.id)
+    )
+    rows = db.execute(stmt).scalars().all()
+    result: list[tuple[float, float, float]] = []
+    for obj in rows:
+        reading_stmt = (
+            select(Reading.value)
+            .where(Reading.node_id == obj.node_id)
+            .where(Reading.metric == "soil_moisture_pct")
+            .order_by(Reading.ts.desc())
+            .limit(1)
+        )
+        value = db.execute(reading_stmt).scalar()
+        if value is not None:
+            result.append((obj.x, obj.y, float(value)))
+    return result
 
 
 def pins(db: Session) -> list[dict[str, Any]]:

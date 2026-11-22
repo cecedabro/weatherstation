@@ -23,3 +23,6 @@ Implemented `idw` in `backend/app/objects.py:360`: inverse-distance-weighted int
 
 ## G08 — soil_grid (objects.py)
 Implemented `soil_grid` in `backend/app/objects.py:388`: returns `[]` for empty points; computes `cols = ceil(width/cell)`, `rows = ceil(depth/cell)`; for each cell (r, c) computes centre `cx = (c+0.5)*cell`, `cy = (r+0.5)*cell`, calls `idw(cx, cy, points)` falling back to `0.0` when None, rounds to 1 decimal. All G08 judge tests pass. `make check` exits 0 (495 passed, 6 skipped).
+
+## G09 — soil_points (objects.py)
+Implemented `soil_points` in `backend/app/objects.py:415`: selects `GardenObject` rows where `kind == "sensor"` and `node_id` is not None, ordered by id; for each sensor, queries the newest `Reading` with that `node_id` and `metric == "soil_moisture_pct"` (ordered by `ts.desc()`, limited to 1); skips sensors without readings, returns `(obj.x, obj.y, float(value))` tuples. All G09 judge tests pass. `make check` exits 0 (496 passed, 5 skipped, 95.88% coverage).
