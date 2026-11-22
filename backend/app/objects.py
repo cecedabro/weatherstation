@@ -5,26 +5,25 @@ corner (``x`` east, ``y`` north); ``w``/``d`` are its size along x/y before rota
 ``rotation`` is degrees clockwise. The 3D map (``static/js/garden3d.js``, human-built later) only talks to the
 JSON routes at the bottom.
 
-The routes are done (human-owned glue at the bottom). The loop fills in the small functions marked
-``TODO (task Gxx)``: ``grep -n "TODO (task" app/objects.py``.
+The routes are human-owned glue at the bottom; the functions above them were filled in by loop G.
 """
 
 # ruff: noqa: E501  (step docstrings are long on purpose)
 
-import math  # noqa: F401  (math: task G08)
+import math
 import re
-from datetime import date  # noqa: F401  (date: task G01)
+from datetime import date
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response
-from sqlalchemy import select  # noqa: F401  (select: tasks G06, G09, G10)
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth import RequireUser
 from app.config import Settings
 from app.db import SessionLocal
-from app.models import GardenObject, Node, Reading, Sighting, Species, Task  # noqa: F401  (tasks G04, G09, G10)
+from app.models import GardenObject, Node, Reading, Sighting, Species, Task
 
 router = APIRouter()
 
@@ -67,7 +66,7 @@ HARMFUL = ("harmful", "invasive")
 def clean_prop(spec: tuple[Any, ...], value: Any) -> tuple[Any, str | None]:
     """Check one property value against its spec; return ``(clean value, None)`` or ``(None, error)``.
 
-    TODO (task G01) steps:
+    Steps:
     1. ``value`` is None or ``""`` → ``(None, None)`` (the property is cleared). Otherwise look at ``spec[0]``:
     2. "choice": value in ``spec[1]`` → ``(value, None)``, else ``(None, "must be one of " + ", ".join(spec[1]))``.
     3. "bool": ``True``/``False`` as they are; the strings "true", "on", "1" → True and "false", "off", "0" → False;
@@ -138,7 +137,7 @@ def clean_prop(spec: tuple[Any, ...], value: Any) -> tuple[Any, str | None]:
 def validate_props(kind: str, raw: Any) -> tuple[dict[str, Any], dict[str, str]]:
     """Check an object's ``props`` for its *kind*; return ``(props, errors)``.
 
-    TODO (task G02) steps:
+    Steps:
     1. *raw* is not a dict → ``({}, {"props": "must be an object"})``.
     2. ``specs = KIND_PROPS.get(kind, {})``. For each ``key, value`` in *raw*:
        - key not in specs → ``errors[f"props.{key}"] = "unknown property"``;
@@ -166,7 +165,7 @@ def validate_props(kind: str, raw: Any) -> tuple[dict[str, Any], dict[str, str]]
 def check_geometry(data: dict[str, Any], partial: bool) -> tuple[dict[str, Any], dict[str, str]]:
     """Check position, size, rotation and colour; return ``(fields, errors)``.
 
-    TODO (task G03) steps:
+    Steps:
     1. For each key in ``GEOMETRY_DEFAULTS`` ("x", "y", "w", "d", "h", "rotation"):
        - key missing from *data*: skip it when *partial*, else use ``GEOMETRY_DEFAULTS[key]``;
        - the value must be an int or float but not a bool, else ``errors[key] = "must be a number"``;
@@ -231,7 +230,7 @@ def validate_object(
 ) -> tuple[dict[str, Any], dict[str, str]]:
     """Check a whole object from JSON. *current* None = create (all fields); else update (only the keys sent).
 
-    TODO (task G04) steps:
+    Steps:
     1. *data* is not a dict → ``({}, {"_": "send a JSON object"})``. ``partial = current is not None``.
     2. "kind" (when sent, or always when not partial): must be in ``OBJECT_KINDS``, else
        ``errors["kind"] = "unknown kind"``; good → ``fields["kind"]``.
@@ -315,7 +314,7 @@ def validate_object(
 def object_json(obj: GardenObject) -> dict[str, Any]:
     """One object for the API.
 
-    TODO (task G05): return ``{"id", "kind", "name", "x", "y", "w", "d", "h", "rotation", "color", "props",
+    How: return ``{"id", "kind", "name", "x", "y", "w", "d", "h", "rotation", "color", "props",
     "node_id", "updated_at"}`` from the attributes of the same name; ``updated_at`` as ``.isoformat()`` (or None).
     """
     return {
@@ -338,7 +337,7 @@ def object_json(obj: GardenObject) -> dict[str, Any]:
 def apply_fields(obj: GardenObject, fields: dict[str, Any]) -> None:
     """Copy checked *fields* onto *obj*.
 
-    TODO (task G06): ``for key, value in fields.items(): setattr(obj, key, value)``.
+    How: ``for key, value in fields.items(): setattr(obj, key, value)``.
     """
     for key, value in fields.items():
         setattr(obj, key, value)
@@ -347,7 +346,7 @@ def apply_fields(obj: GardenObject, fields: dict[str, Any]) -> None:
 def find_objects(db: Session, kind: str | None) -> list[GardenObject]:
     """All objects ordered by id; only those of *kind* when it is set.
 
-    TODO (task G06): ``select(GardenObject)``, ``.where(GardenObject.kind == kind)`` when *kind*,
+    How: ``select(GardenObject)``, ``.where(GardenObject.kind == kind)`` when *kind*,
     ``.order_by(GardenObject.id)``, return ``list(db.execute(stmt).scalars())``.
     """
     stmt = select(GardenObject)
@@ -362,7 +361,7 @@ def idw(
 ) -> float | None:
     """Inverse-distance-weighted value at (*px*, *py*) from ``points = [(x, y, value)]``.
 
-    TODO (task G07) steps:
+    Steps:
     1. No points → None.
     2. For each point: ``dist = math.hypot(x - px, y - py)``. A point closer than ``1e-9`` → return its value.
     3. Otherwise ``weight = 1 / dist ** power``; return ``sum(weight * value) / sum(weight)``.
@@ -379,7 +378,7 @@ def idw(
     denominator = 0.0
     for x, y, value in points:
         dist = math.hypot(x - px, y - py)
-        w = 1.0 / dist ** power
+        w = 1.0 / dist**power
         numerator += w * value
         denominator += w
     return numerator / denominator
@@ -390,7 +389,7 @@ def soil_grid(
 ) -> list[list[float]]:
     """A grid of interpolated soil moisture over the plot, for colouring the ground.
 
-    TODO (task G08) steps:
+    Steps:
     1. No points → ``[]``.
     2. ``cols = math.ceil(width / cell)``, ``rows = math.ceil(depth / cell)``.
     3. Row ``r`` (0 = south) and column ``c`` (0 = west) hold ``round(idw(cx, cy, points) or 0.0, 1)`` with the cell centre
@@ -415,7 +414,7 @@ def soil_grid(
 def soil_points(db: Session) -> list[tuple[float, float, float]]:
     """``[(x, y, latest soil_moisture_pct)]`` for every sensor object linked to a node, ordered by object id.
 
-    TODO (task G09) steps:
+    Steps:
     1. Select ``GardenObject`` rows with ``kind == "sensor"`` and ``node_id`` not None (``.is_not(None)``),
        ordered by id.
     2. For each, the newest ``Reading.value`` with that ``node_id`` and ``metric == "soil_moisture_pct"``
@@ -461,7 +460,7 @@ def pins(db: Session) -> list[dict[str, Any]]:
     A pin is ``{"type", "id", "label", "x", "y", "level"}``. Where it goes: its own ``x``/``y`` when both are set,
     else the centre of its ``object_id`` object; with neither it gets no pin.
 
-    TODO (task G10) steps:
+    Steps:
     1. A helper ``where(item)``: ``(item.x, item.y)`` when both are not None; else when ``item.object_id`` is set
         and ``db.get(GardenObject, item.object_id)`` finds it → ``(obj.x, obj.y)``; else None.
     2. Open tasks (``Task.status == "open"``) ordered by id → ``{"type": "task", "id": t.id, "label": t.title,
@@ -480,14 +479,16 @@ def pins(db: Session) -> list[dict[str, Any]]:
         loc = _where(t, db)
         if loc is None:
             continue
-        result.append({
-            "type": "task",
-            "id": t.id,
-            "label": t.title,
-            "x": loc[0],
-            "y": loc[1],
-            "level": "bad" if t.urgency in ("high", "critical") else "info",
-        })
+        result.append(
+            {
+                "type": "task",
+                "id": t.id,
+                "label": t.title,
+                "x": loc[0],
+                "y": loc[1],
+                "level": "bad" if t.urgency in ("high", "critical") else "info",
+            }
+        )
 
     # Step 3: harmful/invasive sightings not removed, ordered by id
     sighting_stmt = (
@@ -501,14 +502,16 @@ def pins(db: Session) -> list[dict[str, Any]]:
         loc = _where(s, db)
         if loc is None:
             continue
-        result.append({
-            "type": "sighting",
-            "id": s.id,
-            "label": species.name,
-            "x": loc[0],
-            "y": loc[1],
-            "level": "warn",
-        })
+        result.append(
+            {
+                "type": "sighting",
+                "id": s.id,
+                "label": species.name,
+                "x": loc[0],
+                "y": loc[1],
+                "level": "warn",
+            }
+        )
 
     return result
 

@@ -28,6 +28,7 @@ The foundation is PR #7 (`garden-v2/foundation`), waiting for review.
 | #21 | `agent/sensors-steps` | Sensors page (SPEC §11) | S01–S09 + CI1, none skipped | 48 min |
 | #20 | `agent/tasks-steps` | Tasks (SPEC §14) | D01–D08, none skipped | 31 min |
 | #22 | `agent/species-steps` | Species and sightings (SPEC §15) | E01–E10, none skipped | 44 min |
+| #23 | `agent/objects-steps` | Garden map data: objects API, soil grid, pins (SPEC §12) | G01–G11, none skipped | 54 min |
 
 All three are merged together in `garden-v2/pages` (on top of the foundation, loop files removed). Also fixed
 there: `fmt.local_time` read times without a zone as the machine's zone; they are UTC now.
@@ -52,7 +53,7 @@ A 3D view of the plot with three.js (vendored), built by the human because it is
 
 Needs from you: a sketch of the plot with its sizes, and where the shed, beds and sensors are.
 
-### 2. Loop G: objects API and map data (agent, 11 tasks; built, branch `agent/objects-steps`)
+### 2. Loop G: objects API and map data (done: job #23, 11/11 tasks, 54 min, PR #15)
 `validate_object(form, kind)` per `KIND_PROPS`, `object_json`, the `/api/v1/objects` routes (GET, POST, PATCH,
 DELETE) as fill-ins. Also `soil_grid(points, width, depth, cell)` (inverse-distance weighting of the latest
 soil moisture between sensors, for the ground colour) and `pins(db)` (open tasks and unremoved harmful
