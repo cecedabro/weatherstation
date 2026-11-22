@@ -1,7 +1,8 @@
 """Application factory and entry point."""
 
+import contextlib
 import logging
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
 from pathlib import Path
 from urllib.parse import quote
 
@@ -18,7 +19,15 @@ _STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
-    application = FastAPI(title="Weather Station")
+
+    @contextlib.asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        from app.species import startup_seed
+
+        startup_seed()
+        yield
+
+    application = FastAPI(title="Weather Station", lifespan=lifespan)
 
     # SECURITY HEADERS per SPEC 10.15
     @application.middleware("http")
@@ -113,6 +122,10 @@ def create_app() -> FastAPI:
     from app.tasks import router as tasks_router
 
     application.include_router(tasks_router)
+
+    from app.species import router as species_router
+
+    application.include_router(species_router)
 
     from app.readapi import router as readapi_router
 

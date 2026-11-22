@@ -1,0 +1,56 @@
+{#- One species with its sightings (SPEC 15.3, 15.5, 15.6). Human-owned; context from app.species._detail. -#}
+{% extends "base.html" %}
+{% block title %}{{ sp.name }}{% endblock %}
+{% block content %}
+{% call ui.page_head(sp.name, sp.latin) %}{{ ui.button("Edit", href="/species/" ~ sp.id ~ "/edit", size="sm") }}{% endcall %}
+
+<div class="split">
+  {% call ui.card("About", icon="📖", tint="leaf") %}
+    <div class="row">{{ ui.chip(sp.verdict.title(), kind) }}{{ ui.chip(sp.kind.title()) }}{% if sp.common %}{{ ui.chip("Catalogue", "info") }}{% endif %}</div>
+    <p>{{ sp.description or "No notes yet." }}</p>
+  {% endcall %}
+
+  {% call ui.card("Log a sighting", icon="📸", tint="water") %}
+  <form class="form" method="post" action="/species/{{ sp.id }}/sightings" enctype="multipart/form-data">
+    <div class="form-row">
+      {{ ui.field("seen_on", "Seen on", type="date", value=values.seen_on, required=True, error=errors.seen_on) }}
+      {{ ui.field("count", "How many", type="number", value=values.count, error=errors.count, attrs={"min": 1}) }}
+      {{ ui.field("object_id", "Where", type="select", value=values.object_id if values.object_id is not none else "", options=objects, error=errors.object_id) }}
+    </div>
+    {{ ui.field("notes", "Notes", type="textarea", value=values.notes, error=errors.notes) }}
+    {{ ui.field("photo", "Photo", type="file", error=errors.photo, attrs={"accept": "image/jpeg,image/png,image/webp"}, hint="JPEG, PNG or WebP, at most 8 MB.") }}
+    {{ ui.field("removed", "Already removed", type="checkbox", value=values.removed) }}
+    <div class="form-actions">{{ ui.button("Add sighting", type="submit", variant="primary") }}</div>
+  </form>
+  {% endcall %}
+</div>
+
+<div class="section">
+{% call ui.card("Sightings", icon="🔎", flush=True) %}
+{% if sightings %}
+<ul class="list">
+  {% for x, place in sightings %}
+  {% set meta = [x.seen_on.strftime("%-d %b %Y")] %}
+  {% if x.count %}{% set _ = meta.append(x.count ~ "×") %}{% endif %}
+  {% if place %}{% set _ = meta.append("📍 " ~ place) %}{% endif %}
+  {% if x.removed %}{% set _ = meta.append(ui.chip("Removed", "ok")) %}{% endif %}
+  {% if x.notes %}{% set _ = meta.append(x.notes) %}{% endif %}
+  <li class="list-item">
+    {% if x.photo %}<a href="/media/sightings/{{ x.photo }}"><img class="thumb" src="/media/sightings/{{ x.photo }}" alt="Photo of {{ sp.name }}, {{ x.seen_on }}" loading="lazy"></a>{% else %}<span class="thumb" aria-hidden="true">📷</span>{% endif %}
+    <div class="list-main">
+      <div class="list-title">{{ x.seen_on.strftime("%-d %B %Y") }}</div>
+      <div class="list-meta">{% for m in meta[1:] %}<span>{{ m }}</span>{% endfor %}</div>
+    </div>
+    <div class="list-actions">
+      <form method="post" action="/sightings/{{ x.id }}/removed">{{ ui.button("Mark not removed" if x.removed else "Mark removed", type="submit", size="sm") }}</form>
+      <form method="post" action="/sightings/{{ x.id }}/delete" data-confirm="Delete this sighting?">{{ ui.button("Delete", type="submit", size="sm", variant="quiet") }}</form>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+{{ ui.empty("No sightings yet", "Log the first one with the form above.", "🔎") }}
+{% endif %}
+{% endcall %}
+</div>
+{% endblock %}

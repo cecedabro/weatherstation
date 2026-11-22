@@ -20,3 +20,8 @@ backend/pyproject.toml             # dependencies and test settings (ask in PROG
 backend/app/templates/sensors.html   # the Sensors page layout (human)
 backend/app/templates/tasks.html     # Tasks pages (human)
 backend/app/templates/task_form.html
+backend/app/templates/species.html   # Species pages (human)
+backend/app/templates/species_detail.html
+backend/app/templates/species_form.html
+backend/app/config.py                # settings (human)
+backend/app/main.py                  # app wiring (human)

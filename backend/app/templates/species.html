@@ -1,0 +1,31 @@
+{#- Species list (SPEC 15.1, 15.2). Human-owned; context from app.species.species_page. -#}
+{% extends "base.html" %}
+{% block title %}Species{% endblock %}
+{% block content %}
+{% call ui.page_head("Species", "What lives in the garden: what you found, and the common ones to know.") %}{{ ui.button("New species", href="/species/new", variant="primary", icon="＋") }}{% endcall %}
+
+{{ ui.tabs(tabs, current_tab) }}
+
+<form class="toolbar" method="get" action="/species">
+  <input type="hidden" name="tab" value="{{ tab }}">
+  <input class="input search" type="search" name="q" value="{{ q }}" placeholder="Name or latin name" aria-label="Search species">
+  <select class="select" name="verdict" aria-label="Verdict">{% for v, t in verdicts %}<option value="{{ v }}"{% if v == verdict %} selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+  {{ ui.button("Filter", type="submit", size="sm") }}
+</form>
+
+{% call ui.card(flush=True) %}
+{% if items %}
+<ul class="list">
+  {% for it in items %}{% set s = it.s %}
+  {% set meta = [ui.chip(s.verdict.title(), it.kind), s.kind.title()] %}
+  {% if s.latin %}{% set _ = meta.insert(0, s.latin) %}{% endif %}
+  {% if it.stats %}{% set _ = meta.append(it.stats.count ~ (" sighting" if it.stats.count == 1 else " sightings")) %}{% set _ = meta.append("last seen " ~ it.stats.last.strftime("%-d %b %Y")) %}{% endif %}
+  {% if it.remove %}{% set _ = meta.append(ui.chip(it.remove ~ " to remove", "warn")) %}{% endif %}
+  {{ ui.list_item(s.name, meta=meta, href="/species/" ~ s.id, icon={"plant": "🌿", "insect": "🐞", "fungus": "🍄", "bird": "🐦", "mammal": "🦔"}.get(s.kind, "🔹")) }}
+  {% endfor %}
+</ul>
+{% else %}
+{{ ui.empty("Nothing here yet" if tab == "found" else "The catalogue is empty", "Add a species you found, then log where and when you saw it.", "🐞", "/species/new", "New species") }}
+{% endif %}
+{% endcall %}
+{% endblock %}
