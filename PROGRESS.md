@@ -17,3 +17,6 @@ Implemented `object_json` in `backend/app/objects.py:315`: builds a dict with ke
 
 ## G06 — apply_fields, find_objects (objects.py)
 Implemented `apply_fields` in `backend/app/objects.py:338`: iterates `fields.items()` and calls `setattr(obj, key, value)` for each. Implemented `find_objects` in `backend/app/objects.py:346`: builds a `select(GardenObject)` query, optionally filters by `kind` via `.where(GardenObject.kind == kind)`, orders by `GardenObject.id`, returns all results. Both G06 judge tests pass. `make check` exits 0 (492 passed, 9 skipped, 95.86% coverage).
+
+## G07 — idw (objects.py)
+Implemented `idw` in `backend/app/objects.py:360`: inverse-distance-weighted interpolation. Returns None for empty points, returns the exact value when a point is within 1e-9 of the query location, otherwise computes weighted average as `sum(w*value)/sum(w)` where `w = 1/dist^power`. All 1 G07 judge tests pass. `make check` exits 0 (494 passed, 7 skipped).

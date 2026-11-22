@@ -367,7 +367,22 @@ def idw(
     2. For each point: ``dist = math.hypot(x - px, y - py)``. A point closer than ``1e-9`` → return its value.
     3. Otherwise ``weight = 1 / dist ** power``; return ``sum(weight * value) / sum(weight)``.
     """
-    return None
+    if not points:
+        return None
+
+    for x, y, value in points:
+        dist = math.hypot(x - px, y - py)
+        if dist < 1e-9:
+            return value
+
+    numerator = 0.0
+    denominator = 0.0
+    for x, y, value in points:
+        dist = math.hypot(x - px, y - py)
+        w = 1.0 / dist ** power
+        numerator += w * value
+        denominator += w
+    return numerator / denominator
 
 
 def soil_grid(
