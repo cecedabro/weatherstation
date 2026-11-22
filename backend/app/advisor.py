@@ -136,7 +136,7 @@ def snippet(body: str, terms: set[str], width: int = 600) -> str:
     if not hits or len(body) <= width:
         return body[:width]
     start = max(0, min(hits) - width // 4)
-    part = body[start:start + width]
+    part = body[start : start + width]
     result = ""
     if start > 0:
         result += "…"
@@ -158,7 +158,57 @@ def validate_source(form: dict[str, str]) -> tuple[dict[str, Any], dict[str, str
     5. body: 1–20000 characters, else "Paste the text the advisor may use (at most 20000 characters)".
     6. tags: split on ",", strip, lower case, drop empty ones, join with ", "; longer than 200 → "At most 200 characters".
     """
-    return {}, {}
+    def get(k: str) -> str:
+        return (form.get(k) or "").strip()
+
+    values: dict[str, Any] = {}
+    errors: dict[str, str] = {}
+
+    # 1. title
+    title = get("title")
+    if not title or len(title) > 200:
+        errors["title"] = "Give it a title (at most 200 characters)"
+    values["title"] = title
+
+    # 2. kind
+    kind = get("kind")
+    if kind not in SOURCE_KINDS:
+        errors["kind"] = "Pick a kind"
+    values["kind"] = kind
+
+    # 3. url
+    url = get("url")
+    if url == "":
+        values["url"] = None
+    elif not (url.startswith("http://") or url.startswith("https://")) or len(url) > 500:
+        errors["url"] = "Use a full link (https://…)"
+        values["url"] = url
+    else:
+        values["url"] = url
+
+    # 4. publisher
+    publisher = get("publisher")
+    if publisher == "":
+        values["publisher"] = None
+    elif len(publisher) > 120:
+        errors["publisher"] = "At most 120 characters"
+        values["publisher"] = publisher
+    else:
+        values["publisher"] = publisher
+
+    # 5. body
+    body = get("body")
+    if not body or len(body) > 20000:
+        errors["body"] = "Paste the text the advisor may use (at most 20000 characters)"
+    values["body"] = body
+
+    # 6. tags
+    tags = ", ".join(t.strip().lower() for t in get("tags").split(",") if t.strip())
+    if len(tags) > 200:
+        errors["tags"] = "At most 200 characters"
+    values["tags"] = tags
+
+    return values, errors
 
 
 # -- glue (done)

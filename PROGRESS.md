@@ -33,3 +33,6 @@ Implemented `rank_sources()` in `backend/app/advisor.py:101`. Tokenizes the ques
 
 ## A12 - snippet
 Implemented `snippet()` in `backend/app/advisor.py:125`. Given a body of text, a set of search terms, and a width, it finds the first occurrence of any term (case-insensitive), extracts a window of `width` characters starting at `max(0, min_hit - width//4)`, and prepends/appends "…" when the snippet doesn't cover the full body. Returns `body[:width]` when there are no hits or the body fits. All A12 tests pass. `make check` passes (533 passed).
+
+## A13 - validate_source
+Implemented `validate_source()` in `backend/app/advisor.py:149`. Validates the source form fields: title (1-200 chars), kind (must be in SOURCE_KINDS), url (empty→None, must start with http/https, ≤500 chars), publisher (empty→None, ≤120 chars), body (1-20000 chars), tags (split/comma, strip, lower, join with ", ", ≤200 chars). Returns (values, errors) tuple with all FORM_FIELDS keys present. All A13 tests pass. `make check` passes (534 passed).
