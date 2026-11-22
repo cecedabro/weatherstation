@@ -23,3 +23,10 @@ Implemented `next_status` and `timeline` in `backend/app/seeds.py`.
 - `next_status(status)`: finds status in PATH ("planned", "sown", "sprouted", "growing", "flowering", "harvesting", "done"), returns the next step or None for "done"/"failed"/unknown.
 - `timeline(status)`: returns [(step, state)] for every PATH step; steps before status are "done", current is "current", rest "todo"; for "failed" all are "todo" plus ("failed", "current") at end.
 All 2 P04 judge tests pass; `make check` exits 0 with 96% coverage.
+
+## P05 - seeds.py: rotation_warning
+Implemented `rotation_warning` in `backend/app/seeds.py` following the 3 docstring steps.
+- Returns None when `object_id` or `family` is None.
+- Queries Planting joined with Crop where the crop family matches (case-insensitive), the object matches, and sown_on is in [year-3, year), excluding a given planting id.
+- Returns the newest matching row or None; formats as `"family grew here in year (crop)"`.
+All 7 P05 judge tests pass; `make check` exits 0 with 96% coverage.

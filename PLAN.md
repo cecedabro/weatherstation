@@ -24,7 +24,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p03
 - [x] P04: In backend/app/seeds.py fill in `next_status` and `timeline`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p04
-- [ ] P05: In backend/app/seeds.py fill in `rotation_warning` (follow the 3 steps in its docstring)
+- [x] P05: In backend/app/seeds.py fill in `rotation_warning` (follow the 3 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p05
 - [ ] P06: In backend/app/seeds.py fill in `find_plantings`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p06

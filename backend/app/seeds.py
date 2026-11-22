@@ -136,6 +136,7 @@ def validate_planting(
     6. object_id: "" → None; else ``int(...)`` in *object_ids*; otherwise None and "Pick a bed from the list".
     7. notes: ``form.get("notes") or ""`` (not stripped); longer than 2000 → "At most 2000 characters".
     """
+
     def get(k: str) -> str:
         return (form.get(k) or "").strip()
 
@@ -248,7 +249,9 @@ def timeline(status: str) -> list[tuple[str, str]]:
     """
     if status in PATH:
         i = PATH.index(status)
-        return [(s, "done" if j < i else ("current" if j == i else "todo")) for j, s in enumerate(PATH)]
+        return [
+            (s, "done" if j < i else ("current" if j == i else "todo")) for j, s in enumerate(PATH)
+        ]
     if status == "failed":
         return [(s, "todo") for s in PATH] + [("failed", "current")]
     return [(s, "todo") for s in PATH]
@@ -267,7 +270,30 @@ def rotation_warning(
        ``sown_on`` first; take the first row.
     3. No row → None. Else ``f"{family} grew here in {p.sown_on.year} ({p.crop})"``.
     """
-    return None
+    if object_id is None or family is None:
+        return None
+    from datetime import date as _date
+
+    start = _date(year - 3, 1, 1)
+    end = _date(year, 1, 1)
+    stmt = (
+        select(Planting, Crop)
+        .join(Crop, Crop.id == Planting.crop_id)
+        .where(
+            Planting.object_id == object_id,
+            func.lower(Crop.family) == family.lower(),
+            Planting.sown_on >= start,
+            Planting.sown_on < end,
+        )
+    )
+    if exclude_id is not None:
+        stmt = stmt.where(Planting.id != exclude_id)
+    stmt = stmt.order_by(Planting.sown_on.desc(), Planting.id.desc())
+    row = db.execute(stmt).first()
+    if row is None:
+        return None
+    p = row[0]
+    return f"{family} grew here in {p.sown_on.year} ({p.crop})"
 
 
 def find_plantings(db: Session, show: str, year: int | None) -> list[Planting]:
