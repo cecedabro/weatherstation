@@ -1,0 +1,2 @@
+## E01 - species.py: verdict_kind and to_remove
+Implemented `verdict_kind()` in `backend/app/species.py:35` as a dict lookup mapping harmful/invasive→"bad", beneficial→"ok", neutral→"info", default→"off". Implemented `to_remove()` in `backend/app/species.py:47` to count sightings with `removed=False` only for harmful/invasive verdicts, returning 0 otherwise. Both tests pass. `make check` passes (92% coverage, 308 passed).

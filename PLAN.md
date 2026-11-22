@@ -17,7 +17,7 @@ Rules for every task:
 - Run the accept command yourself, then `make check`. If a step test fails, read its assert and fix the function.
 - Never edit tests, templates, `Makefile`, `pyproject.toml`, `PLAN.md`, `SPEC.md`, `docs/`.
 
-- [ ] E01: In backend/app/species.py fill in `verdict_kind` and `to_remove`
+- [x] E01: In backend/app/species.py fill in `verdict_kind` and `to_remove`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e01
 - [ ] E02: In backend/app/species.py fill in `validate_species` (follow the 4 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e02

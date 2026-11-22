@@ -38,7 +38,7 @@ def verdict_kind(verdict: str) -> str:
 
     TODO (task E01): a dict lookup with default "off".
     """
-    return "off"
+    return {"harmful": "bad", "invasive": "bad", "beneficial": "ok", "neutral": "info"}.get(verdict, "off")
 
 
 def to_remove(verdict: str, sightings: list[Sighting]) -> int:
@@ -47,6 +47,8 @@ def to_remove(verdict: str, sightings: list[Sighting]) -> int:
 
     TODO (task E01): one ``if`` and a ``sum(...)``.
     """
+    if verdict in ("harmful", "invasive"):
+        return sum(1 for x in sightings if not x.removed)
     return 0
 
 
