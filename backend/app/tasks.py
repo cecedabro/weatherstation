@@ -59,7 +59,7 @@ def sort_key(task: Task) -> tuple[int, date, float]:
     TODO (task D02): return ``(URGENCY_RANK.get(task.urgency, 9), task.deadline or date.max,
     -task.created_at.timestamp())``. (``created_at`` is always set once the row is flushed.)
     """
-    return (0, date.max, 0.0)
+    return (URGENCY_RANK.get(task.urgency, 9), task.deadline or date.max, -task.created_at.timestamp())
 
 
 def validate_form(
