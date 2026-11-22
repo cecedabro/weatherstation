@@ -107,7 +107,19 @@ def rank_sources(sources: list[Source], question: str, k: int = 4) -> list[Sourc
        ``score = sum(3 * title.count(t) + 2 * tags.count(t) + body.count(t) for t in terms)``.
     3. Drop sources with score 0. Sort by score (highest first), then ``s.id`` (lowest first); return the first *k*.
     """
-    return []
+    terms = set(tokenize(question))
+    if not terms:
+        return []
+    scored: list[tuple[int, int]] = []
+    for s in sources:
+        title = tokenize(s.title)
+        tags = tokenize(s.tags)
+        body = tokenize(s.body)
+        score = sum(3 * title.count(t) + 2 * tags.count(t) + body.count(t) for t in terms)
+        if score > 0:
+            scored.append((score, s.id))
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    return [s for _, sid in scored[:k] for s in sources if s.id == sid]
 
 
 def snippet(body: str, terms: set[str], width: int = 600) -> str:

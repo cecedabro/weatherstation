@@ -36,7 +36,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a09
 - [x] A10: In backend/app/advisor.py fill in `tokenize`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a10
-- [ ] A11: In backend/app/advisor.py fill in `rank_sources` (follow the 3 steps in its docstring)
+- [x] A11: In backend/app/advisor.py fill in `rank_sources` (follow the 3 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a11
 - [ ] A12: In backend/app/advisor.py fill in `snippet` (follow the 4 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_growth.py -q -k a12

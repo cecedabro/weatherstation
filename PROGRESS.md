@@ -27,3 +27,6 @@ Implemented `best_spots()` in `backend/app/growth.py:176`. Sorts candidates by s
 
 ## A10 - tokenize
 Implemented `tokenize()` in `backend/app/advisor.py:93`. Tokenizes text: lowercases, extracts words matching `[a-z0-9à-ÿ]+`, filters to length >= 3, removes stopwords. Returns list keeping duplicates. All A10 tests pass. `make check` passes (531 passed).
+
+## A11 - rank_sources
+Implemented `rank_sources()` in `backend/app/advisor.py:101`. Tokenizes the question into terms, scores each source by weighted word matches (title×3, tags×2, body×1), drops zero-score sources, sorts by score descending then id ascending, returns top *k*. All A11 tests pass. `make check` passes (532 passed).
