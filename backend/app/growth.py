@@ -164,7 +164,13 @@ def score_spot(
     2. Rotation: *rotation_hit* → ``r, r_why = 0.0, "same family here in the last 3 years"``; else ``1.0, "rotation ok"``.
     3. Return ``(round(100 * (0.4 * s + 0.4 * m + 0.2 * r)), [s_why, m_why, r_why])``.
     """
-    return 0, []
+    s, s_why = sun_fit(crop.sun, sun_hours)
+    m, m_why = moisture_fit(moisture, crop.moisture_min_pct, crop.moisture_max_pct)
+    if rotation_hit:
+        r, r_why = 0.0, "same family here in the last 3 years"
+    else:
+        r, r_why = 1.0, "rotation ok"
+    return round(100 * (0.4 * s + 0.4 * m + 0.2 * r)), [s_why, m_why, r_why]
 
 
 def best_spots(candidates: list[dict[str, Any]], n: int = 3) -> list[dict[str, Any]]:
