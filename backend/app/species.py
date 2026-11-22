@@ -38,7 +38,9 @@ def verdict_kind(verdict: str) -> str:
 
     TODO (task E01): a dict lookup with default "off".
     """
-    return {"harmful": "bad", "invasive": "bad", "beneficial": "ok", "neutral": "info"}.get(verdict, "off")
+    return {"harmful": "bad", "invasive": "bad", "beneficial": "ok", "neutral": "info"}.get(
+        verdict, "off"
+    )
 
 
 def to_remove(verdict: str, sightings: list[Sighting]) -> int:
@@ -69,6 +71,7 @@ def validate_species(
     3. kind not in SPECIES_KINDS → "Pick a kind"; verdict not in SPECIES_VERDICTS → "Pick a verdict".
     4. description over 4000 → "At most 4000 characters".
     """
+
     def get(k: str) -> str:
         return (form.get(k) or "").strip()
 
@@ -185,6 +188,12 @@ def image_ext(data: bytes) -> str | None:
 
     TODO (task E04): three ``startswith`` / slice checks.
     """
+    if data[:3] == b"\xff\xd8\xff":
+        return "jpg"
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return "png"
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return "webp"
     return None
 
 
@@ -193,7 +202,7 @@ def media_name_ok(name: str) -> bool:
 
     TODO (task E04): ``re.fullmatch(r"[0-9a-f]{16,64}\\.(jpg|png|webp)", name) is not None``.
     """
-    return False
+    return re.fullmatch(r"[0-9a-f]{16,64}\.(jpg|png|webp)", name) is not None
 
 
 def save_photo(data: bytes, media_dir: str) -> str | None:

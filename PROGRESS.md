@@ -6,3 +6,6 @@ Implemented `validate_species()` in `backend/app/species.py:55` following the 4 
 
 ## E03 - species.py: validate_sighting
 Implemented `validate_sighting()` in `backend/app/species.py:111` following the 4 docstring steps: (1) seen_on parsed via `date.fromisoformat()`, ValueError → keep text with error; (2) count: empty→None, else int or error "A whole number, 1 or more"; (3) notes: over 2000 chars → error; (4) object_id: empty→None, else must be in object_ids set. Added unit tests in `backend/tests/test_validate_sighting.py` to ensure coverage stays above 90% when judge tests are skipped. All 7 E03 judge tests and 11 unit tests pass. `make check` passes (93% coverage, 329 passed).
+
+## E04 - species.py: image_ext and media_name_ok
+Implemented `image_ext()` in `backend/app/species.py:181` with three magic-byte checks: JPEG (`\xff\xd8\xff` prefix), PNG (`\x89PNG\r\n\x1a\n` prefix), WebP (`RIFF` at 0 and `WEBP` at 8). Implemented `media_name_ok()` in `backend/app/species.py:191` using `re.fullmatch(r"[0-9a-f]{16,64}\.(jpg|png|webp)", name)`. Both E04 judge tests pass. `make check` passes (92% coverage, 336 passed).
