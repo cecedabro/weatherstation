@@ -52,7 +52,13 @@ def local_daily_temps(rows: list[tuple[datetime, float]]) -> dict[date, tuple[fl
        ``ts.astimezone(AMS).date()``.
     2. Keep the lowest and highest value per day; return ``{day: (min, max)}``.
     """
-    return {}
+    days: dict[date, list[float]] = {}
+    for ts, value in rows:
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=UTC)
+        day = ts.astimezone(AMS).date()
+        days.setdefault(day, []).append(value)
+    return {d: (min(vs), max(vs)) for d, vs in days.items()}
 
 
 def gdd_series(
