@@ -170,12 +170,12 @@ current look is the design system in `docs/design.md` (§11.0).
 - 11.8 No nodes of a category → `ui.empty` with a friendly text, never an error. The page has
        `<title>Sensors · …` and works at 360 px.
 
-## 12. Garden map (later; the human builds the 3D core first)
+## 12. Garden map (later; the human builds the 3D core first — plan in docs/roadmap.md)
 `GET /garden`: a 3D map of the plot from `garden_object` rows (beds, garden house, compost, paths,
 trees, water, fences, sensors). Objects can be added, moved, rotated and resized, and each kind has its
 own properties (`props`). Sensors link to a node; soil readings colour the ground between sensors.
 
-## 13. Seed log (later)
+## 13. Seed log (later — plan in docs/roadmap.md)
 `GET /seeds`: plantings (`planting` rows) placed on the map by bed or by point, with sown date, status
 timeline and expected harvest.
 
@@ -227,7 +227,7 @@ timeline and expected harvest.
 - 15.8 `GET /api/v1/sightings` (private) returns `[{"id","species_id","species","verdict","seen_on",
        "x","y","object_id","removed"}]`, newest first.
 
-## 16. Growth model and advisor (later)
+## 16. Growth model and advisor (later — plan in docs/roadmap.md)
 Growth from growing degree days on the station's own temperatures and the `crop` table; a suitability
 score per bed from soil readings; an optional local-LLM advisor (`LLM_BASE_URL`) that may only use the
 `source` table and the computed numbers, and always cites them.

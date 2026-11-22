@@ -4,6 +4,7 @@ Private garden weather station: ESP32 sensor nodes → Raspberry Pi → k3s back
 → public site at garden.cedricschippers.dev, with an admin view of node health.
 
 The look is a finished design system (Frutiger Aero, frosted glass): see `docs/design.md` and `/styleguide`.
+What is done, running and planned: [docs/roadmap.md](docs/roadmap.md). How agent loops are built: [docs/loops.md](docs/loops.md).
 
 Built incrementally by a local coding agent. If you are that agent, start with
 `AGENTS.md`. If you are a human, the plan is `PLAN.md` and the requirements are
@@ -15,11 +16,11 @@ Built incrementally by a local coding agent. If you are that agent, start with
 | Route | Description |
 |---|---|
 | `/` | Overview: live conditions, alerts, last days in charts |
-| `/sensors` | Every sensor by category, range, daily table, compare days (loop A) |
-| `/garden` | 3D garden map (private, later) |
-| `/seeds` | Seed log (private, later) |
-| `/tasks` | Tasks and reminders (private, loop D) |
-| `/species` | Found species and the common-species catalogue (private, loop E) |
+| `/sensors` | Every sensor by category, range, daily table, compare days (loop `agent/sensors-steps`) |
+| `/garden` | 3D garden map (private, planned: map core + loop G) |
+| `/seeds` | Seed log (private, planned: loop P) |
+| `/tasks` | Tasks and reminders (private, loop `agent/tasks-steps`) |
+| `/species` | Found species and the common-species catalogue (private, loop `agent/species-steps`) |
 | `/about` | Station info, data path and node registry |
 | `/admin` | Node health (private) |
 | `/styleguide` | Every UI component with its template code |
@@ -34,6 +35,8 @@ Built incrementally by a local coding agent. If you are that agent, start with
 | `GET` | `/api/v1/nodes` | List all known nodes with online/offline status |
 | `GET` | `/api/v1/export.csv` | Export readings as CSV with filters |
 | `GET` | `/admin/nodes.json` | Node health data as JSON (Basic auth) |
+| `GET` | `/api/v1/summary`, `/api/v1/daily_stats` | Reading statistics (Sensors loop) |
+| `GET` | `/api/v1/tasks`, `/api/v1/sightings` | Tasks and sightings (private; Tasks and Species loops) |
 | `GET` | `/healthz` | Health check returning `{"status": "ok"}` |
 
 Preview locally with `make dev` (runs on `:8000` with a throwaway Postgres).
