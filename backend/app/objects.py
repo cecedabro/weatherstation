@@ -318,7 +318,21 @@ def object_json(obj: GardenObject) -> dict[str, Any]:
     TODO (task G05): return ``{"id", "kind", "name", "x", "y", "w", "d", "h", "rotation", "color", "props",
     "node_id", "updated_at"}`` from the attributes of the same name; ``updated_at`` as ``.isoformat()`` (or None).
     """
-    return {}
+    return {
+        "id": obj.id,
+        "kind": obj.kind,
+        "name": obj.name,
+        "x": obj.x,
+        "y": obj.y,
+        "w": obj.w,
+        "d": obj.d,
+        "h": obj.h,
+        "rotation": obj.rotation,
+        "color": obj.color,
+        "props": obj.props,
+        "node_id": obj.node_id,
+        "updated_at": obj.updated_at.isoformat() if obj.updated_at else None,
+    }
 
 
 def apply_fields(obj: GardenObject, fields: dict[str, Any]) -> None:

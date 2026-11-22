@@ -11,3 +11,6 @@ Implemented `check_geometry` in `backend/app/objects.py:166`: iterates GEOMETRY_
 
 ## G04 — validate_object (objects.py)
 Implemented `validate_object` in `backend/app/objects.py:229`: checks data is a dict (else `{"_": "send a JSON object"}`), validates "kind" against OBJECT_KINDS, "name" as 1-80 char stripped string, delegates to `check_geometry` for spatial fields, validates "node_id" against Node DB, and delegates to `validate_props` for properties. Creates require kind/name always; updates only validate sent keys. All 3 G04 judge tests pass. `make check` exits 0 (488 passed, 13 skipped, 93.64% coverage).
+
+## G05 — object_json (objects.py)
+Implemented `object_json` in `backend/app/objects.py:315`: builds a dict with keys `id`, `kind`, `name`, `x`, `y`, `w`, `d`, `h`, `rotation`, `color`, `props`, `node_id`, `updated_at` from the GardenObject attributes; `updated_at` is serialized via `.isoformat()`. All G05 judge tests pass. `make check` exits 0 (491 passed, 10 skipped, 95.90% coverage).
