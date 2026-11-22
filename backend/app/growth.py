@@ -125,7 +125,12 @@ def sun_fit(crop_sun: str | None, sun_hours: float | None) -> tuple[float, str]:
     3. ``sun_hours >= need`` → ``(1.0, f"{sun_hours:g} h sun (needs {need}+)")``.
     4. Otherwise ``(round(sun_hours / need, 2), f"only {sun_hours:g} h sun (needs {need}+)")``.
     """
-    return 0.5, ""
+    need = SUN_NEED.get(crop_sun or "full", 6)
+    if sun_hours is None:
+        return 0.5, "sun hours unknown"
+    if sun_hours >= need:
+        return 1.0, f"{sun_hours:g} h sun (needs {need}+)"
+    return round(sun_hours / need, 2), f"only {sun_hours:g} h sun (needs {need}+)"
 
 
 def moisture_fit(avg: float | None, lo: float | None, hi: float | None) -> tuple[float, str]:

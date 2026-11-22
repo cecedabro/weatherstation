@@ -12,3 +12,6 @@ Implemented `progress()` in `backend/app/growth.py:86`. Returns `None` when `gdd
 
 ## A05 - harvest_eta
 Implemented `harvest_eta()` in `backend/app/growth.py:96`. Returns `None` when `gdd_needed` is None/`<= 0`; `today` when already done; `None` when no recent data or rate < 0.1 (too cold); otherwise computes average rate from `recent`, divides remaining GDD by rate, and returns `today + timedelta(days=ceil(remaining/rate))`. All A05 tests pass. `make check` passes (513 passed).
+
+## A06 - sun_fit
+Implemented `sun_fit()` in `backend/app/growth.py:119`. The function looks up sun needs from `SUN_NEED` dict (defaulting to "full"=6h), returns `(0.5, "sun hours unknown")` when sun_hours is None, `(1.0, "...")` when sun_hours meets/exceeds need, and `(round(sun_hours/need, 2), "only ...")` otherwise. All 8 A06 tests pass. `make check` passes (514 passed).
