@@ -136,7 +136,93 @@ def validate_planting(
     6. object_id: "" → None; else ``int(...)`` in *object_ids*; otherwise None and "Pick a bed from the list".
     7. notes: ``form.get("notes") or ""`` (not stripped); longer than 2000 → "At most 2000 characters".
     """
-    return {}, {}
+    def get(k: str) -> str:
+        return (form.get(k) or "").strip()
+
+    values: dict[str, Any] = {}
+    errors: dict[str, str] = {}
+
+    # 1. crop
+    crop = get("crop")
+    values["crop"] = crop
+    if not crop:
+        errors["crop"] = "Which crop?"
+    elif len(crop) > 80:
+        errors["crop"] = "At most 80 characters"
+    values["crop_id"] = crops.get(crop.lower())
+
+    # 2. variety
+    variety = get("variety")
+    if not variety:
+        values["variety"] = None
+    elif len(variety) > 80:
+        values["variety"] = variety
+        errors["variety"] = "At most 80 characters"
+    else:
+        values["variety"] = variety
+
+    # 3. method, status
+    method = get("method")
+    values["method"] = method
+    if method not in PLANTING_METHODS:
+        errors["method"] = "Pick a method"
+    status = get("status")
+    values["status"] = status
+    if status not in PLANTING_STATUSES:
+        errors["status"] = "Pick a status"
+
+    # 4. sown_on
+    sown_on_raw = get("sown_on")
+    if not sown_on_raw:
+        values["sown_on"] = sown_on_raw
+        errors["sown_on"] = "When was it sown or planted?"
+    else:
+        try:
+            values["sown_on"] = date.fromisoformat(sown_on_raw)
+        except (ValueError, TypeError):
+            values["sown_on"] = sown_on_raw
+            errors["sown_on"] = "Use a date (YYYY-MM-DD)"
+
+    # 5. count
+    count_raw = get("count")
+    if not count_raw:
+        values["count"] = None
+    else:
+        try:
+            cv = int(count_raw)
+            if cv < 1:
+                values["count"] = count_raw
+                errors["count"] = "A whole number, 1 or more"
+            else:
+                values["count"] = cv
+        except (ValueError, TypeError):
+            values["count"] = count_raw
+            errors["count"] = "A whole number, 1 or more"
+
+    # 6. object_id
+    object_id_raw = get("object_id")
+    if not object_id_raw:
+        values["object_id"] = None
+    else:
+        try:
+            oid = int(object_id_raw)
+            if oid in object_ids:
+                values["object_id"] = oid
+            else:
+                values["object_id"] = None
+                errors["object_id"] = "Pick a bed from the list"
+        except (ValueError, TypeError):
+            values["object_id"] = None
+            errors["object_id"] = "Pick a bed from the list"
+
+    # 7. notes (not stripped)
+    notes = form.get("notes") or ""
+    values["notes"] = notes
+    if len(notes) > 2000:
+        errors["notes"] = "At most 2000 characters"
+
+    values["sown_on"] = values.get("sown_on")
+    return values, errors
 
 
 def next_status(status: str) -> str | None:

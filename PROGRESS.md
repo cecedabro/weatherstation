@@ -9,3 +9,11 @@ Implemented `expected_harvest` and `harvest_text` in `backend/app/seeds.py`.
 - `expected_harvest(sown_on, days_to_harvest)`: returns `sown_on + timedelta(days=days_to_harvest)`, or `None` if unknown.
 - `harvest_text(expected, today, status)`: returns status-based text ("harvested"/"failed"/"") or relative readiness ("ready in N days"/"ready tomorrow"/"ready today"/"ready since N days"/"ready since yesterday").
 All 10 P02 judge tests pass; `make check` exits 0 with 95% coverage.
+
+## P03 - seeds.py: validate_planting
+Implemented `validate_planting` in `backend/app/seeds.py` following the 7 docstring steps.
+- Validates crop (strip, empty/length check), variety (strip, None if empty, length check),
+  method/status (must be in PLANTING_METHODS/PLANTING_STATUSES), sown_on (date parsing),
+  count (int >= 1), object_id (int in allowed set), notes (length check, no strip).
+- Returns `(values, errors)` tuple with all FORM_FIELDS + crop_id; keeps raw text for invalid fields.
+All 14 P03 judge tests pass; `make check` exits 0 with 93% overall coverage.
