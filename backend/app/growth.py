@@ -178,7 +178,8 @@ def best_spots(candidates: list[dict[str, Any]], n: int = 3) -> list[dict[str, A
 
     TODO (task A09): sort by score (highest first), then name (case-insensitive, A first); return the first *n*.
     """
-    return []
+    ranked = sorted(candidates, key=lambda x: (-x["score"], x["name"].lower()))
+    return ranked[:n]
 
 
 # -- glue (done)

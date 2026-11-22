@@ -21,3 +21,6 @@ Implemented `moisture_fit()` in `backend/app/growth.py:136`. Returns `(0.5, "no 
 
 ## A08 - score_spot
 Implemented `score_spot()` in `backend/app/growth.py:157`. Scores a bed for a crop using weighted combination: sun (40%), moisture (40%), rotation (20%). Calls `sun_fit` and `moisture_fit` for the first two components, checks `rotation_hit` for the third, and returns `round(100 * (0.4 * s + 0.4 * m + 0.2 * r))` with a list of three reason strings. All A08 tests pass. `make check` passes (529 passed).
+
+## A09 - best_spots
+Implemented `best_spots()` in `backend/app/growth.py:176`. Sorts candidates by score descending, then name case-insensitive ascending, returns the first *n* ranked entries. All A09 tests pass. `make check` passes (530 passed).
