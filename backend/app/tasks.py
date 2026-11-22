@@ -174,7 +174,16 @@ def counts(db: Session, today: date) -> dict[str, int]:
 
     TODO (task D05): load all tasks once (``db.execute(select(Task)).scalars().all()``) and count in Python.
     """
-    return {"open": 0, "done": 0, "all": 0, "overdue": 0, "week": 0}
+    all_tasks = db.execute(select(Task)).scalars().all()
+    open_tasks = [t for t in all_tasks if t.status == "open"]
+    done_tasks = [t for t in all_tasks if t.status == "done"]
+    return {
+        "open": len(open_tasks),
+        "done": len(done_tasks),
+        "all": len(all_tasks),
+        "overdue": len([t for t in open_tasks if t.deadline and t.deadline < today]),
+        "week": len([t for t in open_tasks if t.deadline and today <= t.deadline <= today + timedelta(days=6)]),
+    }
 
 
 def task_json(task: Task) -> dict[str, Any]:

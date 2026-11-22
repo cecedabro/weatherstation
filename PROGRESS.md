@@ -9,3 +9,6 @@ Filled in `validate_form()` in `backend/app/tasks.py:65` with 5 validation steps
 
 ## Task D04 — tasks.py: find_tasks
 Filled in `find_tasks()` in `backend/app/tasks.py:142` to build a SQLAlchemy query with `select(Task)`, filter by status ("open"/"done"), category, and search text `q` (case-insensitive ilike on title/notes using `or_`). Returns results sorted by `sort_key`. Added `or_` to the sqlalchemy import. Judge test `test_d04_find_tasks` passes. `make check` passes.
+
+## Task D05 — tasks.py: counts
+Filled in `counts()` in `backend/app/tasks.py:169` to load all tasks once and count: open, done, all, overdue (open tasks with deadline before today), and week (open tasks with deadline from today to today+6 days inclusive). Judge test `test_d05_counts` passes. `make check` passes.

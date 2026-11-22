@@ -25,7 +25,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d03
 - [x] D04: In backend/app/tasks.py fill in `find_tasks`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d04
-- [ ] D05: In backend/app/tasks.py fill in `counts`
+- [x] D05: In backend/app/tasks.py fill in `counts`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d05
 - [ ] D06: In backend/app/tasks.py fill in `task_json`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d06
