@@ -131,7 +131,19 @@ def snippet(body: str, terms: set[str], width: int = 600) -> str:
     3. ``start = max(0, min(hits) - width // 4)``; ``part = body[start:start + width]``.
     4. Add "…" in front when ``start > 0`` and at the end when ``start + width < len(body)``; return it.
     """
-    return body[:width]
+    low = body.lower()
+    hits = [low.find(t) for t in terms if low.find(t) >= 0]
+    if not hits or len(body) <= width:
+        return body[:width]
+    start = max(0, min(hits) - width // 4)
+    part = body[start:start + width]
+    result = ""
+    if start > 0:
+        result += "…"
+    result += part
+    if start + width < len(body):
+        result += "…"
+    return result
 
 
 def validate_source(form: dict[str, str]) -> tuple[dict[str, Any], dict[str, str]]:

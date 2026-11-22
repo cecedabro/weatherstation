@@ -30,3 +30,6 @@ Implemented `tokenize()` in `backend/app/advisor.py:93`. Tokenizes text: lowerca
 
 ## A11 - rank_sources
 Implemented `rank_sources()` in `backend/app/advisor.py:101`. Tokenizes the question into terms, scores each source by weighted word matches (title×3, tags×2, body×1), drops zero-score sources, sorts by score descending then id ascending, returns top *k*. All A11 tests pass. `make check` passes (532 passed).
+
+## A12 - snippet
+Implemented `snippet()` in `backend/app/advisor.py:125`. Given a body of text, a set of search terms, and a width, it finds the first occurrence of any term (case-insensitive), extracts a window of `width` characters starting at `max(0, min_hit - width//4)`, and prepends/appends "…" when the snippet doesn't cover the full body. Returns `body[:width]` when there are no hits or the body fits. All A12 tests pass. `make check` passes (533 passed).
