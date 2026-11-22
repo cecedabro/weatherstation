@@ -81,6 +81,57 @@ def clean_prop(spec: tuple[Any, ...], value: Any) -> tuple[Any, str | None]:
     7. "color": a str that ``COLOR_RE.fullmatch`` accepts → ``(value.lower(), None)``, else
        ``(None, "must be a colour like #a1b2c3")``.
     """
+    # 1. None or empty string → cleared
+    if value is None or value == "":
+        return None, None
+
+    kind = spec[0]
+
+    if kind == "choice":
+        if value in spec[1]:
+            return value, None
+        return None, "must be one of " + ", ".join(spec[1])
+
+    if kind == "bool":
+        if value in (True, False):
+            return value, None
+        if value in ("true", "on", "1"):
+            return True, None
+        if value in ("false", "off", "0"):
+            return False, None
+        return None, "must be yes or no"
+
+    if kind == "number":
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return None, f"must be a number from {spec[1]} to {spec[2]}"
+        if spec[1] <= value <= spec[2]:
+            return float(value), None
+        return None, f"must be a number from {spec[1]} to {spec[2]}"
+
+    if kind == "date":
+        if not isinstance(value, str):
+            return None, "must be a date (YYYY-MM-DD)"
+        try:
+            date.fromisoformat(value)
+            return value, None
+        except (ValueError, TypeError):
+            return None, "must be a date (YYYY-MM-DD)"
+
+    if kind == "text":
+        if not isinstance(value, str):
+            return None, f"at most {spec[1]} characters"
+        stripped = value.strip()
+        if len(stripped) <= spec[1]:
+            return stripped, None
+        return None, f"at most {spec[1]} characters"
+
+    if kind == "color":
+        if not isinstance(value, str):
+            return None, "must be a colour like #a1b2c3"
+        if COLOR_RE.fullmatch(value):
+            return value.lower(), None
+        return None, "must be a colour like #a1b2c3"
+
     return None, None
 
 

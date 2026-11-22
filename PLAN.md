@@ -16,7 +16,7 @@ Rules for every task:
 - Run the accept command yourself, then `make check`. If a step test fails, read its assert and fix the function.
 - Never edit tests, templates, `Makefile`, `pyproject.toml`, `PLAN.md`, `SPEC.md`, `docs/`.
 
-- [ ] G01: In backend/app/objects.py fill in `clean_prop` (follow the 7 steps in its docstring)
+- [x] G01: In backend/app/objects.py fill in `clean_prop` (follow the 7 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g01
 - [ ] G02: In backend/app/objects.py fill in `validate_props`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g02
