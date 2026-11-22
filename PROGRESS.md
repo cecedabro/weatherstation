@@ -24,3 +24,6 @@ Implemented `score_spot()` in `backend/app/growth.py:157`. Scores a bed for a cr
 
 ## A09 - best_spots
 Implemented `best_spots()` in `backend/app/growth.py:176`. Sorts candidates by score descending, then name case-insensitive ascending, returns the first *n* ranked entries. All A09 tests pass. `make check` passes (530 passed).
+
+## A10 - tokenize
+Implemented `tokenize()` in `backend/app/advisor.py:93`. Tokenizes text: lowercases, extracts words matching `[a-z0-9à-ÿ]+`, filters to length >= 3, removes stopwords. Returns list keeping duplicates. All A10 tests pass. `make check` passes (531 passed).

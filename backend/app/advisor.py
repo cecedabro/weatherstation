@@ -95,7 +95,7 @@ def tokenize(text: str) -> list[str]:
 
     TODO (task A10): ``[w for w in WORD.findall(text.lower()) if len(w) >= 3 and w not in STOPWORDS]``.
     """
-    return []
+    return [w for w in WORD.findall(text.lower()) if len(w) >= 3 and w not in STOPWORDS]
 
 
 def rank_sources(sources: list[Source], question: str, k: int = 4) -> list[Source]:
