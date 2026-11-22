@@ -31,7 +31,7 @@ Data path:
 | `SPEC.md` | Testable requirements. **Do not edit.** | — |
 | `PLAN.md` | The task list. **Do not edit.** | — |
 | `PROGRESS.md` | You append to this after each task (create it if missing) | — |
-| `backend/tests/judge/` | Acceptance tests written by the human. **Do not edit.** Step tests are tagged `pytest.mark.task("S01")`: `make check` skips them until PLAN.md ticks that task, and each task's `accept:` runs them with `TASKS=all` (see `docs/loops.md`). Your own tests go in `backend/tests/`. | — |
+| `backend/tests/judge/` | Acceptance tests written by the human. **Do not edit.** Step tests are tagged `pytest.mark.task("S01")`: `make check` skips them while PLAN.md lists that task as open (`- [ ]`), and each task's `accept:` runs them with `TASKS=all` (see `docs/loops.md`). Your own tests go in `backend/tests/`. | — |
 
 ## How you are judged (the loop)
 After you stop, the harness runs the task's `accept:` command and then

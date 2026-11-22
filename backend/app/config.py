@@ -22,7 +22,10 @@ class Settings(BaseSettings):
     LLM_BASE_URL: str = ""
     LLM_API_KEY: str = ""
     LLM_MODEL: str = "coder"
-    # Where uploaded photos go (species finds). Must be writable; a volume in production.
     # Add the common-species catalogue (app/data/common_species.json) on startup. Tests turn it off.
     SEED_CATALOGUE: bool = True
+    # Plot size in metres (x east, y north) for the garden map; set from the plot sketch.
+    GARDEN_WIDTH: float = 10.0
+    GARDEN_DEPTH: float = 20.0
+    # Where uploaded photos go (species finds). Must be writable; a volume in production.
     MEDIA_DIR: str = "/tmp/garden-media"  # nosec B108: only writable path in the read-only image
