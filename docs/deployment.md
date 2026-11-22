@@ -44,14 +44,14 @@ The check that enforces this is human-owned: `tests/ci/check-migrations.sh`, run
 | --- | --- |
 | Port | container 8000, Service `weatherstation` port 80 |
 | Probes | liveness `GET /healthz`, readiness `GET /readyz` |
-| Env (Secret `weatherstation-app`) | `DATABASE_URL`, `INGEST_TOKEN`, `ADMIN_USER`, `ADMIN_PASSWORD` |
-| Env (plain) | `APP_ENV=production` |
+| Env (Secret `weatherstation-app`) | `DATABASE_URL`, `INGEST_TOKEN`, `ADMIN_USER`, `ADMIN_PASSWORD`, `SESSION_SECRET` (required in production) |
+| Env (plain) | `APP_ENV=production`, `MEDIA_DIR=/data/media`; optional `GARDEN_WIDTH`/`GARDEN_DEPTH` (metres), `SEED_CATALOGUE`, `LLM_BASE_URL`/`LLM_API_KEY`/`LLM_MODEL` |
 | DB Secret `weatherstation-db` | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` |
 | DB host | Service `weatherstation-db:5432` |
 | Resources | app 25m / 128Mi request, 256Mi limit; Postgres 50m / 256Mi, 512Mi limit |
 | Security | runAsNonRoot, uid 10001, readOnlyRootFilesystem, drop ALL caps, seccomp RuntimeDefault, emptyDir on `/tmp` |
 | Rollout | replicas 1, strategy `Recreate` (migrations must not run twice at once) |
-| Storage | Postgres PVC 5Gi, `storageClassName: longhorn` |
+| Storage | Postgres PVC 5Gi, `storageClassName: longhorn`; media PVC 1Gi longhorn at `/data/media` (sighting photos), fsGroup 10001 |
 | Placement | avoid node `k3s-gpu-01` (node affinity `NotIn`) |
 
 `DATABASE_URL` is composed in the cluster from the DB secret; the app only reads
