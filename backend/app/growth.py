@@ -88,7 +88,9 @@ def progress(gdd_done: float, gdd_needed: float | None) -> float | None:
 
     TODO (task A04): None or ``<= 0`` → None; else ``min(1.0, gdd_done / gdd_needed)``, rounded to 3 decimals.
     """
-    return None
+    if gdd_needed is None or gdd_needed <= 0:
+        return None
+    return round(min(1.0, gdd_done / gdd_needed), 3)
 
 
 def harvest_eta(
