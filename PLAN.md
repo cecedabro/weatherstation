@@ -23,7 +23,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d02
 - [x] D03: In backend/app/tasks.py fill in `validate_form` (follow the 5 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d03
-- [ ] D04: In backend/app/tasks.py fill in `find_tasks`
+- [x] D04: In backend/app/tasks.py fill in `find_tasks`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d04
 - [ ] D05: In backend/app/tasks.py fill in `counts`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_tasks.py -q -k d05

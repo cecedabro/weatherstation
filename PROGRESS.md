@@ -6,3 +6,6 @@ Filled in `sort_key()` in `backend/app/tasks.py:56` to return `(URGENCY_RANK.get
 
 ## Task D03 — tasks.py: validate_form
 Filled in `validate_form()` in `backend/app/tasks.py:65` with 5 validation steps: title (stripped, required, max 120 chars), notes (not stripped, max 2000 chars), category/urgency (must be in allowed lists), deadline (parsed as date or kept as raw text on error), object_id (parsed as int, must be in object_ids). All 9 D03 judge tests pass. `make check` passes.
+
+## Task D04 — tasks.py: find_tasks
+Filled in `find_tasks()` in `backend/app/tasks.py:142` to build a SQLAlchemy query with `select(Task)`, filter by status ("open"/"done"), category, and search text `q` (case-insensitive ilike on title/notes using `or_`). Returns results sorted by `sort_key`. Added `or_` to the sqlalchemy import. Judge test `test_d04_find_tasks` passes. `make check` passes.

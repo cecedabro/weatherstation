@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.auth import RequireUser
@@ -153,7 +153,17 @@ def find_tasks(
        (``from sqlalchemy import or_``).
     3. ``return sorted(db.execute(stmt).scalars(), key=sort_key)``.
     """
-    return []
+    stmt = select(Task)
+    if status == "open":
+        stmt = stmt.where(Task.status == "open")
+    elif status == "done":
+        stmt = stmt.where(Task.status == "done")
+    if category:
+        stmt = stmt.where(Task.category == category)
+    if q:
+        pat = f"%{q}%"
+        stmt = stmt.where(or_(Task.title.ilike(pat), Task.notes.ilike(pat)))
+    return sorted(db.execute(stmt).scalars(), key=sort_key)
 
 
 def counts(db: Session, today: date) -> dict[str, int]:
