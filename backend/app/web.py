@@ -89,11 +89,6 @@ COMING: dict[str, tuple[str, str, str]] = {
         "🗺️",
         "A 3D map of the plot: beds, the garden house, sensors and what grows where.",
     ),
-    "seeds": (
-        "Seed log",
-        "🌱",
-        "What you sowed and planted, where and when, and when it should be ready.",
-    ),
 }
 
 

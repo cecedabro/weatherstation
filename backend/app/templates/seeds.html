@@ -1,0 +1,46 @@
+{#- Seed log (SPEC §13). Human-owned; context from app.seeds.seeds_page. -#}
+{% extends "base.html" %}
+{% block title %}Seed log{% endblock %}
+{% macro stages(steps) -%}
+<span class="stages" role="img" aria-label="Stage {{ (steps|selectattr(1, "equalto", "current")|first)[0] }}">{% for step, state in steps %}<i class="is-{{ state }}{% if step == 'failed' %} is-failed{% endif %}" title="{{ step.title() }}"></i>{% endfor %}</span>
+{%- endmacro %}
+{% block content %}
+{% call ui.page_head("Seed log", "What you sowed and planted, per bed, and when it should be ready.") %}{{ ui.button("Crops", href="/crops", variant="quiet", icon="📖") }}{{ ui.button("New planting", href="/seeds/new", variant="primary", icon="＋") }}{% endcall %}
+
+<div class="stats section">
+  {{ ui.stat("Growing", n.active, fmt="%d") }}
+  {{ ui.stat("Ready within 2 weeks", n.soon, fmt="%d", tint="leaf" if n.soon else None) }}
+  {{ ui.stat("Beds in use", n.beds, fmt="%d") }}
+</div>
+
+{{ ui.tabs(tabs, current_tab) }}
+
+<form class="toolbar" method="get" action="/seeds">
+  <input type="hidden" name="show" value="{{ show }}">
+  <select class="select" name="year" aria-label="Year">{% for v, t in years %}<option value="{{ v }}"{% if v == (year|string if year else "") %} selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+  {{ ui.button("Filter", type="submit", size="sm") }}
+</form>
+
+{% for bed, plantings in groups %}
+{% call ui.card(bed, icon="🪴" if bed != "Not placed" else "📦", cls="section") %}
+<ul class="list">
+  {% for p in plantings %}{% set it = items[p.id] %}
+  {% set meta = [stages(it.timeline), ui.chip(p.status.title(), "bad" if p.status == "failed" else "ok" if p.status == "done" else "info"), p.method.title() ~ " " ~ p.sown_on.strftime("%-d %b %Y")] %}
+  {% if it.harvest %}{% set _ = meta.append(it.harvest) %}{% endif %}
+  {% if p.count %}{% set _ = meta.append(p.count ~ "×") %}{% endif %}
+  {% if it.rotation %}{% set _ = meta.append(ui.chip("⟳ " ~ it.rotation, "warn", title="Crop rotation: same plant family in this bed within 3 years")) %}{% endif %}
+  {% call ui.list_item(p.crop ~ (" · " ~ p.variety if p.variety else ""), meta=meta, done=(p.status in ("done", "failed"))) %}
+    {% if it.next %}
+    <form method="post" action="/seeds/{{ p.id }}/advance">{{ ui.button("→ " ~ it.next.title(), type="submit", size="sm", variant="primary") }}</form>
+    {% endif %}
+    {{ ui.button("Edit", href="/seeds/" ~ p.id ~ "/edit", size="sm", variant="quiet") }}
+  {% endcall %}
+  {% endfor %}
+</ul>
+{% endcall %}
+{% else %}
+{% call ui.card(flush=True) %}
+{{ ui.empty("Nothing sown yet", "Add what you sowed or planted, and in which bed.", "🌱", "/seeds/new", "New planting") }}
+{% endcall %}
+{% endfor %}
+{% endblock %}

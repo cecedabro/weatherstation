@@ -1,0 +1,30 @@
+{#- Crop catalogue. Human-owned; context from app.seeds.crops_page. -#}
+{% extends "base.html" %}
+{% block title %}Crops{% endblock %}
+{% block content %}
+{% call ui.page_head("Crops", "Typical values for growing outdoors in the Netherlands. Your seed packet wins.") %}{{ ui.button("Seed log", href="/seeds", variant="quiet", icon="🌱") }}{% endcall %}
+
+<div class="stats section">
+  {{ ui.stat("Crops", crops|length, fmt="%d") }}
+  {{ ui.stat("Sow this month", now_sowable, fmt="%d", tint="leaf" if now_sowable else None) }}
+</div>
+
+{% call ui.card(flush=True, cls="section") %}
+{% if crops %}
+{% call ui.table(["Crop", "Family", "Sow (months)", "Days to harvest#", "Spacing cm#", ""], caption="Crop catalogue") %}
+{% for c, now in crops %}
+<tr>
+  <td><strong>{{ c.name }}</strong>{% if c.latin %}<div class="muted tiny">{{ c.latin }}</div>{% endif %}</td>
+  <td>{{ c.family or "—" }}</td>
+  <td>{{ c.sow_months or "—" }}{% if now %} {{ ui.chip("Sow now", "ok") }}{% endif %}</td>
+  <td class="num">{{ c.days_to_harvest or "—" }}</td>
+  <td class="num">{{ c.spacing_cm or "—" }}</td>
+  <td>{{ ui.button("Sow", href="/seeds/new?crop=" ~ c.name|urlencode, size="sm", variant="quiet") }}</td>
+</tr>
+{% endfor %}
+{% endcall %}
+{% else %}
+{{ ui.empty("No crops yet", "The catalogue is added when the site starts.", "📖") }}
+{% endif %}
+{% endcall %}
+{% endblock %}

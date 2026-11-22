@@ -59,7 +59,7 @@ DELETE) as fill-ins. Also `soil_grid(points, width, depth, cell)` (inverse-dista
 soil moisture between sensors, for the ground colour) and `pins(db)` (open tasks and unremoved harmful
 sightings with x/y, to draw on the map).
 
-### 3. Loop P: seed log (agent, ~10 tasks, SPEC §13)
+### 3. Loop P: seed log (agent, 11 tasks, SPEC §13; built, branch `agent/seeds-steps`)
 The crop catalogue (days to germinate and to harvest, spacing, family for rotation) and plantings placed by bed
 or by point:
 - `validate_planting`, `expected_harvest(sown, crop)`, `status_timeline(planting)`;

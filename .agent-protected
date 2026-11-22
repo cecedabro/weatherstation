@@ -25,3 +25,7 @@ backend/app/templates/species_detail.html
 backend/app/templates/species_form.html
 backend/app/config.py                # settings (human)
 backend/app/main.py                  # app wiring (human)
+backend/app/templates/seeds.html     # Seed log pages (human)
+backend/app/templates/seed_form.html
+backend/app/templates/crops.html
+backend/app/data/crops.json          # crop catalogue (human)
