@@ -44,3 +44,9 @@ Implemented `group_by_bed` in `backend/app/seeds.py`.
 - Plantings with `object_id` None or not in `objects` go under "Not placed".
 - Returns `[(name, plantings)]` sorted case-insensitively, with "Not placed" always last.
 All 1 P07 judge test passes; `make check` exits 0 with 96% coverage.
+
+## P08 - seeds.py: planting_json
+Implemented `planting_json` in `backend/app/seeds.py`.
+- Takes a Planting ORM object and returns a dict with all seed log fields: id, crop, crop_id, variety, object_id, method, status, count, x, y, notes.
+- Three date fields (sown_on, expected_harvest, harvested_on) are converted to ISO format strings via `.isoformat()`, or None when absent.
+All 1 P08 judge test passes; `make check` exits 0 with 96% coverage.

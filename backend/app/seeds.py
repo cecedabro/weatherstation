@@ -348,7 +348,22 @@ def planting_json(p: Planting) -> dict[str, Any]:
     TODO (task P08): ``{"id", "crop", "crop_id", "variety", "object_id", "method", "status", "sown_on",
     "expected_harvest", "harvested_on", "count", "x", "y", "notes"}``; the three dates as ``.isoformat()`` or None.
     """
-    return {}
+    return {
+        "id": p.id,
+        "crop": p.crop,
+        "crop_id": p.crop_id,
+        "variety": p.variety,
+        "object_id": p.object_id,
+        "method": p.method,
+        "status": p.status,
+        "sown_on": p.sown_on.isoformat() if p.sown_on else None,
+        "expected_harvest": p.expected_harvest.isoformat() if p.expected_harvest else None,
+        "harvested_on": p.harvested_on.isoformat() if p.harvested_on else None,
+        "count": p.count,
+        "x": p.x,
+        "y": p.y,
+        "notes": p.notes,
+    }
 
 
 def seed_crops(db: Session, path: Path = CROPS_FILE) -> int:
