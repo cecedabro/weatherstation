@@ -35,5 +35,5 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e08
 - [x] E09: In backend/app/species.py fill in `sighting_json`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_species.py -q -k e09
-- [ ] E10: Make the whole-feature tests pass: run them, read the first failing assert, fix only the function bodies from E01–E09
+- [x] E10: Make the whole-feature tests pass: run them, read the first failing assert, fix only the function bodies from E01–E09
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_species.py tests/judge/test_step_species.py -q

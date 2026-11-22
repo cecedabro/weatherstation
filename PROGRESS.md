@@ -24,3 +24,6 @@ Implemented `seed_catalogue()` in `backend/app/species.py:269`: reads `common_sp
 
 ## E09 - species.py: sighting_json
 Implemented `sighting_json()` in `backend/app/species.py:293`: builds a dict with id, species_id, species (name), verdict, seen_on (isoformat), x, y, object_id, removed from the Sighting and Species objects. All E09 judge tests pass. `make check` passes (93% coverage, 342 passed).
+
+## E10 - All judge tests pass
+Ran `TASKS=all uv run pytest tests/judge/test_species.py tests/judge/test_step_species.py -q` — 51 passed. Ran `make check` — lint, type-check, all tests, coverage (93%), bandit scan, and migration checks all pass. No fixes needed; all E01–E09 implementations satisfy the judge tests.
