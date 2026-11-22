@@ -118,16 +118,3 @@ def _placeholder(key: str) -> Any:
 
 for _key in COMING:
     router.add_api_route(f"/{_key}", _placeholder(_key), methods=["GET"])
-
-
-@router.get("/sensors")
-async def sensors_placeholder(request: Request) -> HTMLResponse:
-    """Replaced by loop A (SPEC §11)."""
-    return render(
-        request,
-        "coming_soon.html",
-        active="sensors",
-        title="Sensors",
-        icon="📈",
-        text="Every sensor in graphs and tables, per category and across days.",
-    )

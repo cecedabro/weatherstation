@@ -17,3 +17,4 @@ backend/tests/judge/               # acceptance tests written by the human
 backend/tests/conftest.py
 Makefile                           # make check is the judge; never weaken it
 backend/pyproject.toml             # dependencies and test settings (ask in PROGRESS.md)
+backend/app/templates/sensors.html   # the Sensors page layout (human)
