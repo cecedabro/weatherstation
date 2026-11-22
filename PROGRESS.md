@@ -50,3 +50,10 @@ Implemented `planting_json` in `backend/app/seeds.py`.
 - Takes a Planting ORM object and returns a dict with all seed log fields: id, crop, crop_id, variety, object_id, method, status, count, x, y, notes.
 - Three date fields (sown_on, expected_harvest, harvested_on) are converted to ISO format strings via `.isoformat()`, or None when absent.
 All 1 P08 judge test passes; `make check` exits 0 with 96% coverage.
+
+## P09 - seeds.py: seed_crops
+Implemented `seed_crops` in `backend/app/seeds.py`.
+- Reads JSON from *path* (default `data/crops.json`), queries existing crop names case-insensitively,
+  adds only new crops via `db.add(Crop(**row))`, flushes, and returns the count added.
+- Idempotent: re-calling with the same data returns 0.
+All 2 P09 judge tests pass; `make check` exits 0 with 96% coverage.

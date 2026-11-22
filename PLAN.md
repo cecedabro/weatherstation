@@ -32,7 +32,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p07
 - [x] P08: In backend/app/seeds.py fill in `planting_json`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p08
-- [ ] P09: In backend/app/seeds.py fill in `seed_crops`
+- [x] P09: In backend/app/seeds.py fill in `seed_crops`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p09
 - [ ] P10: In backend/app/seeds.py fill in `apply_form` and `set_status`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_seeds.py -q -k p10

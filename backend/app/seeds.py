@@ -375,7 +375,16 @@ def seed_crops(db: Session, path: Path = CROPS_FILE) -> int:
     3. For each row whose ``name.lower()`` is not in *have*: ``db.add(Crop(**row))`` and add it to *have*.
     4. ``db.flush()`` (not commit: the caller commits) and return the number added.
     """
-    return 0
+    rows = json.loads(path.read_text(encoding="utf-8"))
+    have = {n.lower() for n in db.execute(select(Crop.name)).scalars()}
+    count = 0
+    for row in rows:
+        if row["name"].lower() not in have:
+            db.add(Crop(**row))
+            have.add(row["name"].lower())
+            count += 1
+    db.flush()
+    return count
 
 
 def apply_form(p: Planting, values: dict[str, Any], days_to_harvest: int | None) -> None:
