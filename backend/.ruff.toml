@@ -1,0 +1,9 @@
+line-length = 100
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["B017", "E402"]
+
+[lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.param_functions.Depends"]

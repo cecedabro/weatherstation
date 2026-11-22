@@ -9,7 +9,7 @@ The acceptance tests in `backend/tests/judge/` are the human's; write your own t
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k summary
 - [~] S02: `GET /api/v1/daily_stats` per SPEC 11.4 in `app/stats.py`, with a function `daily_stats(db, node, metric, days)` the page reuses (UTC days, oldest first, empty days left out). — skipped: $ make check  (exit 2)
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k daily_stats
-- [ ] S03: New `app/sensors.py` router with the SPEC 11.7 redirects (301) for `/weather`, `/history`, `/soil`, `/soil/{node_id}`. Include it in `app/main.py`.
+- [x] S03: New `app/sensors.py` router with the SPEC 11.7 redirects (301) for `/weather`, `/history`, `/soil`, `/soil/{node_id}`. Include it in `app/main.py`.
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k old_pages
 - [ ] S04: `GET /sensors` in `app/sensors.py` (delete the placeholder route in `app/web.py`) and `templates/sensors.html`: a pure function `parse_view(cat, range, node, compare, weather_nodes)` applies SPEC 11.1 defaults and fallbacks; the page has `ui.page_head("Sensors", …)`, `ui.tabs` for Air/Soil/Rain/Wind, `ui.seg` for the range (24h, 7d, 30d, 90d, 365d labelled Day, Week, Month, Season, Year) and `ui.seg` for the weather node; every link keeps the other parameters. No nodes → `ui.empty`. Render with `render(request, "sensors.html", active="sensors", …)`.
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k "default_is_air or links_keep or node_picker or unknown_params or empty_station"
