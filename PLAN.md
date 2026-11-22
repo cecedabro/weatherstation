@@ -22,7 +22,7 @@ Rules for every task:
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g02
 - [x] G03: In backend/app/objects.py fill in `check_geometry` (follow the 3 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g03
-- [ ] G04: In backend/app/objects.py fill in `validate_object` (follow the 7 steps in its docstring)
+- [x] G04: In backend/app/objects.py fill in `validate_object` (follow the 7 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g04
 - [ ] G05: In backend/app/objects.py fill in `object_json`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g05

@@ -8,3 +8,6 @@ Implemented `validate_props` in `backend/app/objects.py:138`: if raw is not a di
 
 ## G03 — check_geometry (objects.py)
 Implemented `check_geometry` in `backend/app/objects.py:166`: iterates GEOMETRY_DEFAULTS keys with range validation per key type (x/y: -500..500, w/d: 0..100 exclusive start, h: 0..20, rotation: mod 360), skips missing keys when partial, applies defaults otherwise; handles color with None/empty→None, hex validation via COLOR_RE, and lowercase normalization. All 11 G03 judge tests pass. `make check` exits 0 (477 passed, 24 skipped).
+
+## G04 — validate_object (objects.py)
+Implemented `validate_object` in `backend/app/objects.py:229`: checks data is a dict (else `{"_": "send a JSON object"}`), validates "kind" against OBJECT_KINDS, "name" as 1-80 char stripped string, delegates to `check_geometry` for spatial fields, validates "node_id" against Node DB, and delegates to `validate_props` for properties. Creates require kind/name always; updates only validate sent keys. All 3 G04 judge tests pass. `make check` exits 0 (488 passed, 13 skipped, 93.64% coverage).

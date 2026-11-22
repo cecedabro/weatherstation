@@ -245,7 +245,71 @@ def validate_object(
        not sent and not partial → ``fields["props"] = {}``.
     7. Return ``(fields, errors)``.
     """
-    return {}, {}
+    if not isinstance(data, dict):
+        return {}, {"_": "send a JSON object"}
+    partial = current is not None
+
+    fields: dict[str, Any] = {}
+    errors: dict[str, str] = {}
+
+    # 3. name: when sent, or always when not partial
+    if "name" in data:
+        name = data["name"]
+        if isinstance(name, str):
+            stripped = name.strip()
+            if 1 <= len(stripped) <= 80:
+                fields["name"] = stripped
+            else:
+                errors["name"] = "1 to 80 characters"
+        else:
+            errors["name"] = "1 to 80 characters"
+    elif not partial:
+        errors["name"] = "1 to 80 characters"
+
+    # 2. kind: when sent, or always when not partial
+    if "kind" in data:
+        if data["kind"] in OBJECT_KINDS:
+            fields["kind"] = data["kind"]
+        else:
+            errors["kind"] = "unknown kind"
+    elif not partial:
+        errors["kind"] = "unknown kind"
+
+    # 4. geometry
+    geo, geo_errors = check_geometry(data, partial)
+    fields.update(geo)
+    errors.update(geo_errors)
+
+    # 5. node_id: only when sent
+    if "node_id" in data:
+        nid = data["node_id"]
+        if nid is None or nid == "":
+            fields["node_id"] = None
+        else:
+            if db.get(Node, nid) is not None:
+                fields["node_id"] = nid
+            else:
+                errors["node_id"] = "unknown node"
+
+    # 6. props
+    kind_for_props: str | None
+    if partial and "kind" in data:
+        kind_for_props = fields.get("kind")
+    elif partial:
+        assert current is not None
+        kind_for_props = current.kind
+    else:
+        kind_for_props = fields.get("kind")
+    if "props" in data:
+        props, props_errors = validate_props(kind_for_props or "", data["props"])
+        if props:
+            fields["props"] = props
+        errors.update(props_errors)
+    elif not partial:
+        fields["props"] = {}
+
+    # 7.
+    return fields, errors
 
 
 def object_json(obj: GardenObject) -> dict[str, Any]:
