@@ -179,7 +179,51 @@ def check_geometry(data: dict[str, Any], partial: bool) -> tuple[dict[str, Any],
        ``COLOR_RE.fullmatch`` accepts → ``value.lower()``. Anything else → ``errors["color"] = "must be a colour like #a1b2c3"``.
     3. Return ``(fields, errors)``.
     """
-    return {}, {}
+    fields: dict[str, Any] = {}
+    errors: dict[str, str] = {}
+
+    for key in GEOMETRY_DEFAULTS:
+        if key not in data:
+            if not partial:
+                fields[key] = float(GEOMETRY_DEFAULTS[key])
+            continue
+
+        v = data[key]
+        if isinstance(v, bool) or not isinstance(v, (int, float)):
+            errors[key] = "must be a number"
+            continue
+
+        if key in ("x", "y"):
+            if -LIMIT <= v <= LIMIT:
+                fields[key] = float(v)
+            else:
+                errors[key] = "must be from -500 to 500"
+        elif key in ("w", "d"):
+            if 0 < v <= 100:
+                fields[key] = float(v)
+            else:
+                errors[key] = "must be more than 0 and at most 100"
+        elif key == "h":
+            if 0 <= v <= 20:
+                fields[key] = float(v)
+            else:
+                errors[key] = "must be from 0 to 20"
+        elif key == "rotation":
+            fields[key] = float(v) % 360
+
+    if "color" not in data:
+        if not partial:
+            fields["color"] = None
+    else:
+        v = data["color"]
+        if v is None or v == "":
+            fields["color"] = None
+        elif isinstance(v, str) and COLOR_RE.fullmatch(v):
+            fields["color"] = v.lower()
+        else:
+            errors["color"] = "must be a colour like #a1b2c3"
+
+    return fields, errors
 
 
 def validate_object(
