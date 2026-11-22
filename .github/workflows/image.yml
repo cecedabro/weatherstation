@@ -61,7 +61,6 @@ jobs:
             -e ADMIN_USER=admin \
             -e SESSION_SECRET=ci-session-secret-not-used-anywhere-else \
             -e DATABASE_URL=postgresql+psycopg://weather:weather@localhost:5432/weather \
-            -e SESSION_SECRET=smoke-test-session-secret-do-not-use \
             weatherstation:test
 
       - name: Wait for startup
