@@ -12,3 +12,6 @@ Implemented `image_ext()` in `backend/app/species.py:181` with three magic-byte 
 
 ## E05 - species.py: save_photo
 Implemented `save_photo()` in `backend/app/species.py:208`: checks image type via `image_ext()` and size against `MAX_PHOTO`, creates the `sightings` subdirectory, generates a 32-char hex filename with `secrets.token_hex(16)`, writes the data, and returns the filename. Returns `None` for invalid/unrecognized data or oversized files. Both E05 judge tests pass. `make check` passes (92% coverage, 338 passed).
+
+## E06 - species.py: sighting_stats
+Implemented `sighting_stats()` in `backend/app/species.py:227`: queries `species_id`, `func.count()`, and `func.max(seen_on)` grouped by species_id, returning a dict mapping species_id → `{"count": int, "last": date}`. Only species with sightings appear in the result. All E06 judge tests pass. `make check` passes (93% coverage, 339 passed).

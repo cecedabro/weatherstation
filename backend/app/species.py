@@ -230,7 +230,11 @@ def sighting_stats(db: Session) -> dict[int, dict[str, Any]]:
     TODO (task E06): ``select(Sighting.species_id, func.count(), func.max(Sighting.seen_on)).group_by(Sighting.species_id)``,
     then a dict comprehension over the rows.
     """
-    return {}
+    rows = db.execute(
+        select(Sighting.species_id, func.count(), func.max(Sighting.seen_on))
+        .group_by(Sighting.species_id)
+    ).all()
+    return {sid: {"count": cnt, "last": last} for sid, cnt, last in rows}
 
 
 def find_species(db: Session, tab: str, q: str | None, verdict: str | None) -> list[Species]:
