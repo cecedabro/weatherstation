@@ -7,7 +7,7 @@ The acceptance tests in `backend/tests/judge/` are the human's; write your own t
 ## Tasks (SPEC §14) — all routes need `user: str = RequireUser`
 - [x] D01: Pure helpers in a new `app/tasks.py`: `deadline_text(deadline, today) -> (text, overdue)` per SPEC 14.2, `task_sort_key(task)` per 14.1, `local_today()` (Europe/Amsterdam date) and `validate_task_form(form, object_ids) -> (values, errors)` per 14.3. Unit tests in `backend/tests/test_tasks_logic.py` (every rule, both sides of each limit).
   accept: cd backend && uv run pytest tests/test_tasks_logic.py -q
-- [ ] D02: `GET /api/v1/tasks` per SPEC 14.5 (router in `app/tasks.py`, included in `app/main.py`).
+- [~] D02: `GET /api/v1/tasks` per SPEC 14.5 (router in `app/tasks.py`, included in `app/main.py`). — skipped: $ cd backend && uv run pytest tests/judge/test_tasks.py -q -k "api or private"  (exit 1)
   accept: cd backend && uv run pytest tests/judge/test_tasks.py -q -k "api or private"
 - [ ] D03: `GET /tasks` (delete the placeholder in `app/web.py`) with `templates/tasks.html`: `ui.page_head` with a "New task" button, `ui.tabs` Open/Done/All with counts (`/tasks?status=done`, `/tasks?status=all`), tasks in SPEC 14.1 order as a `ul.list` of `ui.list_item`, empty state with a link to `/tasks/new`.
   accept: cd backend && uv run pytest tests/judge/test_tasks.py -q -k "empty_state or order_urgency or tabs_and_counts"
