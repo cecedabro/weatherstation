@@ -73,7 +73,26 @@ def parse_compare(raw: str | None) -> tuple[date, ...]:
        (catch ``ValueError``); skip a date that is already in the list.
     3. Return at most the first 3 as a tuple, in the given order.
     """
-    return ()
+    if not raw:
+        return ()
+    result: list[date] = []
+    seen: set[str] = set()
+    for part in raw.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        try:
+            d = date.fromisoformat(part)
+        except ValueError:
+            continue
+        key = d.isoformat()
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(d)
+        if len(result) >= 3:
+            break
+    return tuple(result)
 
 
 def parse_view(params: dict[str, str], nodes: list[str]) -> View:
@@ -87,7 +106,16 @@ def parse_view(params: dict[str, str], nodes: list[str]) -> View:
     4. ``compare = parse_compare(params.get("compare"))``.
     (The route works out *nodes* from the category, so it calls this twice: once to learn the category.)
     """
-    return View()
+    cat = params.get("cat", "") if params.get("cat") in CATEGORIES else "air"
+    rng = params.get("range", "") if params.get("range") in RANGES else "7d"
+    if not nodes:
+        node: str | None = None
+    else:
+        node = params.get("node")
+        if node not in nodes:
+            node = sorted(nodes)[0]
+    compare = parse_compare(params.get("compare"))
+    return View(cat=cat, range=rng, node=node, compare=compare)
 
 
 def view_href(view: View, **changes: Any) -> str:
