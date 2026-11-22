@@ -18,7 +18,7 @@ Rules for every task:
 
 - [x] G01: In backend/app/objects.py fill in `clean_prop` (follow the 7 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g01
-- [ ] G02: In backend/app/objects.py fill in `validate_props`
+- [x] G02: In backend/app/objects.py fill in `validate_props`
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g02
 - [ ] G03: In backend/app/objects.py fill in `check_geometry` (follow the 3 steps in its docstring)
   accept: cd backend && TASKS=all uv run pytest tests/judge/test_step_objects.py -q -k g03

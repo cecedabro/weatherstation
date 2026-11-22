@@ -146,7 +146,21 @@ def validate_props(kind: str, raw: Any) -> tuple[dict[str, Any], dict[str, str]]
          value that is not None goes to ``props[key]`` (None means "cleared": leave the key out).
     3. Return ``(props, errors)``.
     """
-    return {}, {}
+    if not isinstance(raw, dict):
+        return {}, {"props": "must be an object"}
+    specs = KIND_PROPS.get(kind, {})
+    props: dict[str, Any] = {}
+    errors: dict[str, str] = {}
+    for key, value in raw.items():
+        if key not in specs:
+            errors[f"props.{key}"] = "unknown property"
+        else:
+            clean, err = clean_prop(specs[key], value)
+            if err is not None:
+                errors[f"props.{key}"] = err
+            elif clean is not None:
+                props[key] = clean
+    return props, errors
 
 
 def check_geometry(data: dict[str, Any], partial: bool) -> tuple[dict[str, Any], dict[str, str]]:
