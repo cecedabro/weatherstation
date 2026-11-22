@@ -170,7 +170,7 @@
 {% macro chart(title, series, unit="", kind="line", range="7d", height=240, small=False, x="time") -%}
 <figure class="chart{% if small %} chart-sm{% endif %}">
   <figcaption class="chart-head"><span class="chart-title">{{ title }}</span>
-    <span class="legend">{% for node, metric, label in series %}<span class="legend-item">{{ swatch(loop.index) }}{{ label }}</span>{% endfor %}</span>
+    <span class="legend">{% for s in series %}<span class="legend-item">{{ swatch(loop.index) }}{{ s[2] }}{% if x == "hour" %} · {{ s[3] }}{% endif %}</span>{% endfor %}</span>
   </figcaption>
   <div class="chart-plot" data-chart data-kind="{{ kind }}" data-unit="{{ unit }}" data-range="{{ range }}" data-height="{{ height }}"{% if x == "hour" %} data-x="hour"{% endif %}
        data-series='{{ series|map("list")|list|tojson }}' role="img" aria-label="{{ title }} chart, {{ series|length }} series"></div>
