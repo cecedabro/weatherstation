@@ -7,7 +7,7 @@ The acceptance tests in `backend/tests/judge/` are the human's; write your own t
 ## Sensors (SPEC §11)
 - [~] S01: `GET /api/v1/summary` per SPEC 11.3 in a new module `app/stats.py` (router included in `app/main.py`). Put the query in a pure-ish function `summarize(db, node, metric, start, end) -> dict` that the page reuses. Reuse `_parse_dt` from `app/readapi.py` for dates. — skipped: changed protected paths: backend/app/auth.py, backend/app/styleguide.py, backend/tests/conftest.py, backend/tests/judge/test_design_system.py, backend/tests/jud
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k summary
-- [ ] S02: `GET /api/v1/daily_stats` per SPEC 11.4 in `app/stats.py`, with a function `daily_stats(db, node, metric, days)` the page reuses (UTC days, oldest first, empty days left out).
+- [~] S02: `GET /api/v1/daily_stats` per SPEC 11.4 in `app/stats.py`, with a function `daily_stats(db, node, metric, days)` the page reuses (UTC days, oldest first, empty days left out). — skipped: $ make check  (exit 2)
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k daily_stats
 - [ ] S03: New `app/sensors.py` router with the SPEC 11.7 redirects (301) for `/weather`, `/history`, `/soil`, `/soil/{node_id}`. Include it in `app/main.py`.
   accept: cd backend && uv run pytest tests/judge/test_sensors.py -q -k old_pages
