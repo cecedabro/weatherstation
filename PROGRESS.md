@@ -63,3 +63,8 @@ Implemented `apply_form` and `set_status` in `backend/app/seeds.py`.
 - `apply_form(p, values, days_to_harvest)`: sets crop, crop_id, variety, object_id, method, status, sown_on, count, notes from values dict, then computes expected_harvest via `expected_harvest(p.sown_on, days_to_harvest)`. Leaves harvested_on alone.
 - `set_status(p, status, today)`: sets p.status; when status is "done" and harvested_on is None, sets harvested_on to today; for any other status, resets harvested_on to None.
 All 2 P10 judge tests pass; `make check` exits 0 with 96% coverage.
+
+## P11 - seeds.py: full judge suite
+Ran `TASKS=all uv run pytest tests/judge/test_seeds.py tests/judge/test_step_seeds.py -q` and `make check`.
+All 44 judge tests pass (44 passed, 5 skipped), `make check` passes with 547 tests, 97% coverage, and all migration checks green.
+No code changes needed — all prior task implementations were already correct and passing.
